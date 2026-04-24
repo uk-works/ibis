@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<title>ログイン | IBIS</title>
+</head>
+
+<body>
+	<h1>IBIS</h1>
+	<form th:action="@{/auth/login}" method="post" th:object="${form}">
+		<p th:errors="*{loginId}"></p>
+		<input type="text" th:field="*{loginId}" />
+
+		<p th:errors="*{password}"></p>
+		<input type="password" th:field="*{password}" />
+		
+		<input type="submit" />
+	</form>
+
+<!--	<a href="" >-->
+	<script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
