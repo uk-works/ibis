@@ -13,6 +13,28 @@
 
 <body>
 
+	<table border="1" >
+		<tr><th>書店名</th><th>営業状態</th></tr>
+		<tr th:each="summary : ${dashboardInfo.storeStatuses}" th:object="${summary}">
+			<td>[[*{storeName}]]</td>
+			<td>[[*{storeStatus.getStoreStatus}]]</td>
+			<td><a href="#">詳細</a></td>
+		</tr>
+		
+	</table>	
+
+	<table border="1" >
+		<tr><th>承認ステータス</th><th>書籍名</th><th>書店名</th><th>提案日時</th></tr>
+		<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
+			<td>[[*{proposalStatus.getProposalStatus}]]</td>
+			<td>[[*{bookTitle}]]</td>
+			<td>[[*{storeName}]]</td>	
+			<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+			<td><a href="#">詳細</a></td>
+		</tr>
+		
+	</table>
+	
 	<script src="js/bootstrap.bundle.min.js"></script>
 </body>
 
