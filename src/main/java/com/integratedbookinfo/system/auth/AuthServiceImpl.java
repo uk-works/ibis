@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 
 import lombok.RequiredArgsConstructor;
+
+/**
+ * AuthServiceの実装クラス
+ * DBから取得したユーザー情報を使い、ユーザーの認証を行う
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
