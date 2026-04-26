@@ -2,6 +2,7 @@ package com.integratedbookinfo.system.shared.enums;
 
 public enum ProposalStatus {
 
+	PENDING("pending", "未承認"),
 	APPROVE("approve", "承認"),
 	REJECT("reject", "却下");
 
