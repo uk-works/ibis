@@ -11,7 +11,19 @@
 
 	<header th:replace="~{common/store_header :: page_header}"></header>
 
-
+	営業状態：<span>[[${dashboardInfo.storeStatus.getStoreStatus}]]</span>
+	
+	<table border="1" >
+		<tr><th>承認ステータス</th><th>書籍名</th><th>最終更新日時</th><th>提案日時</th></tr>
+		<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
+			<td>[[*{proposalStatus.getProposalStatus}]]</td>
+			<td>[[*{bookTitle}]]</td>
+			<td>[[*{#temporals.format(updatedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+			<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+			<td><a href="#">詳細</a></td>
+		</tr>
+		
+	</table>
 
 
 
