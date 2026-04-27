@@ -5,6 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
 	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/common_header.css" rel="stylesheet">
 	<link href="css/dashboard.css" rel="stylesheet">
 	<title>管理者ダッシュボード | IBIS</title>
 </head>
@@ -13,27 +14,46 @@
 
 <body>
 
-	<table border="1" >
-		<tr><th>書店名</th><th>営業状態</th></tr>
-		<tr th:each="summary : ${dashboardInfo.storeStatuses}" th:object="${summary}">
-			<td>[[*{storeName}]]</td>
-			<td>[[*{storeStatus.getStoreStatus}]]</td>
-			<td><a href="#">詳細</a></td>
-		</tr>
-		
-	</table>	
+	<main>
+		<div class="dashboard">
+			<nav class="nav-submenu">
+			    <a href="/book" class="nav-sub-item">書籍管理</a>
+			    <a href="/inventory" class="nav-sub-item">在庫管理</a>
+			    <a href="/store" class="nav-sub-item">書店管理</a>
+			    <a href="/bookeditproposal" class="nav-sub-item">書籍編集提案<br>申請管理</a>
+			</nav>
 
-	<table border="1" >
-		<tr><th>承認ステータス</th><th>書籍名</th><th>書店名</th><th>提案日時</th></tr>
-		<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
-			<td>[[*{proposalStatus.getProposalStatus}]]</td>
-			<td>[[*{bookTitle}]]</td>
-			<td>[[*{storeName}]]</td>	
-			<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
-			<td><a href="#">詳細</a></td>
-		</tr>
-		
-	</table>
+			<div class="flex-cards">
+				
+				<div class="table-item">
+					<table border="1" >
+						<tr><th>書店名</th><th>営業状態</th></tr>
+						<tr th:each="summary : ${dashboardInfo.storeStatuses}" th:object="${summary}">
+							<td>[[*{storeName}]]</td>
+							<td>[[*{storeStatus.getStoreStatus}]]</td>
+							<td><a href="#">詳細</a></td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="table-item">
+					<table border="1" >
+						<tr><th>承認ステータス</th><th>書籍名</th><th>書店名</th><th>提案日時</th></tr>
+						<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
+							<td>[[*{proposalStatus.getProposalStatus}]]</td>
+							<td>[[*{bookTitle}]]</td>
+							<td>[[*{storeName}]]</td>	
+							<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+							<td><a href="#">詳細</a></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+		</div>
+
+	</main>
+
 	
 	<script src="js/bootstrap.bundle.min.js"></script>
 </body>
