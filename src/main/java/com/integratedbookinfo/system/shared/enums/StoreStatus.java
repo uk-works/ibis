@@ -18,7 +18,7 @@ public enum StoreStatus {
 		return code;
 	}
 	
-	public String getStoreStatus() {
+	public String getLabel() {
 		return label;
 	}
 	

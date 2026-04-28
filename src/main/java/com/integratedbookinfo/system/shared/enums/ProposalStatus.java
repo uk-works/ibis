@@ -19,7 +19,7 @@ public enum ProposalStatus {
 		return code;
 	}
 	
-	public String getProposalStatus() {
+	public String getLabel() {
 		return label;
 	}
 	
