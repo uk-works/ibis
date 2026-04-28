@@ -2,10 +2,14 @@ package com.integratedbookinfo.system.shared.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.concurrent.Flow.Publisher;
 
 import com.integratedbookinfo.system.shared.enums.BookSize;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class BookDTO {
 
 	private String bookId;
@@ -17,7 +21,7 @@ public class BookDTO {
 	private Publisher publisher;
 	private String author;
 	private String bookTitle;
-	private BookSize size;
+	private BookSize bookSize;
 	private int listPrice;
 	private String edition;
 	private  LocalDate releaseDate;
