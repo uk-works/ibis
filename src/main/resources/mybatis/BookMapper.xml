@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.book.BookMapper">
+
+	<resultMap id="bookResult" type="com.integratedbookinfo.system.book.dto.BookSummaryDTO">
+		<id property="bookId" column="book_id" />
+		<result property="bookTitle" column="book_title" />
+		<result property="author" column="author" />
+		<result property="publisherName" column="publisher_name" />
+		<result property="releaseDate" column="release_date" />
+		<result property="isbn" column="isbn" />
+	</resultMap>
+
+
+	<select id="selectBookList" resultMap="bookResult">
+
+		SELECT 
+			m_books.book_id,
+		    book_title,
+		    author,
+		    publisher_name,
+			release_date,
+		    isbn
+		FROM
+			m_books
+		INNER JOIN
+			m_publishers
+		ON
+			m_books.publisher_id = m_publishers.publisher_id
+			
+		<if test="accountRole.name() == 'STORE'">
+			INNER JOIN
+				store_books
+			ON
+				m_books.book_id = store_books.book_id		
+		</if>	
+		
+		<where>
+			<if test="accountRole.name() == 'STORE'">
+				store_books.store_id = #{storeId}
+			</if>
+			<if test="keyword != null and keyword.trim() != ''">
+				AND book_title LIKE CONCAT('%',#{keyword},'%') 
+			</if>
+		</where>
+
+		LIMIT 
+			#{offset}, #{limit};
+
+	</select>
+
+	<select id="countBookRecord" resultType="Long">
+	
+		SELECT 
+			count(*)
+		FROM
+			m_books
+			
+		<if test="accountRole.name() == 'STORE'">
+			INNER JOIN
+				store_books
+			ON
+				m_books.book_id = store_books.book_id		
+		</if>	
+		
+		<where>
+			<if test="accountRole.name() == 'STORE'">
+				store_books.store_id = #{storeId}
+			</if>
+			<if test="keyword != null and keyword.trim() != ''">
+				AND book_title LIKE CONCAT('%',#{keyword},'%') 
+			</if>
+		</where>
+		
+	</select>
+
+	<select id="selectLastBookIdForUpdate" resultType="String">
+		SELECT
+			book_id
+		FROM
+			m_books
+		ORDER BY book_id DESC
+		LIMIT
+			1
+		FOR UPDATE;
+	</select>
+
+	<insert id="insertBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
+		INSERT INTO 
+			m_books(
+				book_id,
+				isbn, 
+			    c_code, 
+			    jan_code, 
+			    genre_id, 
+			    publisher_id, 
+			    author, 
+			    book_title, 
+			    book_size, 
+			    list_price, 
+			    edition, 
+			    release_date, 
+			    created_at, 
+			    cover_image_path)
+		VALUES
+			(#{bookId}, 
+			#{isbn}, 
+			#{cCode}, 
+			#{janCode}, 
+			#{genre.genreId}, 
+			#{publisher.publisherId}, 
+			#{author}, 
+			#{bookTitle}, 
+			#{bookSize}, 
+			#{listPrice}, 
+			#{edtion}, 
+			#{releaseDate}, 
+			NOW(), 
+			#{coverImagePath});
+	</insert>
+
+	<insert id="insertStoreBook" parameterType="com.integratedbookinfo.system.book.dto.StoreBookDTO">
+		INSERT INTO 
+			store_books(
+				book_id, 
+		        store_id, 
+		        store_comment, 
+		        store_genre, 
+		        store_price, 
+		        note, 
+		        created_at)
+		VALUES
+			(#{bookId}, 
+			#{storeId}, 
+			#{storeComment}, 
+			#{storeGenre}, 
+			#{storePrice}, 
+			#{note}, 
+			NOW())
+	</insert>
+
+	<resultMap id="storeProposalResult" type="com.integratedbookinfo.system.dashboard.dto.BookEditProposalSummaryDTO">
+		<id property="proposalId" column="proposal_id" />
+		<result property="bookTitle" column="book_title" />
+		<result property="storeName" column="store_name" />
+		<result property="proposedAt" column="proposed_at" />
+	</resultMap>
+
+	<select id="selectStoreBookEditProposalList" parameterType="String"  resultMap="storeProposalResult">
+
+		SELECT 
+			proposal_id, 
+			proposal_status, 
+			book_title, 
+			updated_at, 
+			proposed_at
+		FROM 
+			t_book_edit_proposals
+		WHERE 
+			store_id = #{storeId};
+
+	</select>
+
+
+	<select id="selectStoreStoreStatus" parameterType="String" resultType="com.integratedbookinfo.system.shared.enums.StoreStatus">
+	
+		SELECT 
+			store_status
+		FROM 
+			m_stores
+		WHERE 
+			store_id = #{storeId};
+	
+	</select>
+
+</mapper>
