@@ -68,13 +68,7 @@ public class AuthController {
 		if(errors.hasErrors()) {
 			return "common/login";
 		}
-		
-		form.setLoginId("admin0001_user");
-		form.setPassword("dev_0011");
-		
-//		form.setLoginId("store0001_user");
-//		form.setPassword("dev_0001");
-		
+	
 		LoginUserRequestDTO loginUser = authService.authenticate(form);
 		
 		if (loginUser == null) {

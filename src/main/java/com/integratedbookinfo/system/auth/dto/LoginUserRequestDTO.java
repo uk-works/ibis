@@ -20,6 +20,7 @@ public class LoginUserRequestDTO {
 	
 	@NotBlank
 	private String password;
+	private String storeId;
 	private String displayName;
 	private AccountRole accountRole;
 }

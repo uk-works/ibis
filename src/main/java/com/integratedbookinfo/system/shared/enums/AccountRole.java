@@ -18,7 +18,7 @@ public enum AccountRole {
 		return code;
 	}
 	
-	public String getAccountRole() {
+	public String getLabel() {
 		return label;
 	}
 	
