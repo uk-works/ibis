@@ -65,12 +65,13 @@
 	<table border="1" >
 		<tr><th>書籍名</th><th>著者</th><th>出版社</th><th>発行日</th><th>ISBN</th></tr>
 		<tr th:each="summary : ${books}" th:object="${summary}">
+			<td>[[*{bookId}]]</td>
 			<td>[[*{bookTitle}]]</td>
 			<td>[[*{author}]]</td>
 			<td>[[*{publisherName}]]</td>
 			<td>[[*{#temporals.format(releaseDate, 'yyyy/MM/dd')}]]</td>
 			<td>[[*{isbn}]]</td>
-			<td><a href="#">詳細</a></td>
+			<td><a th:href="@{/book/edit/{bookId}(bookId=*{bookId})}">編集</a></td>
 		</tr>
 	</table>
 	

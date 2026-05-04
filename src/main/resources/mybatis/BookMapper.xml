@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.integratedbookinfo.system.book.BookMapper">
 
-	<resultMap id="bookResult" type="com.integratedbookinfo.system.book.dto.BookSummaryDTO">
+	<resultMap id="booksResult" type="com.integratedbookinfo.system.book.dto.BookSummaryDTO">
 		<id property="bookId" column="book_id" />
 		<result property="bookTitle" column="book_title" />
 		<result property="author" column="author" />
@@ -12,7 +12,7 @@
 	</resultMap>
 
 
-	<select id="selectBookList" resultMap="bookResult">
+	<select id="selectBookList" resultMap="booksResult">
 
 		SELECT 
 			m_books.book_id,
@@ -36,6 +36,8 @@
 		</if>	
 		
 		<where>
+			m_books.deleted_flag = 0
+		
 			<if test="accountRole.name() == 'STORE'">
 				store_books.store_id = #{storeId}
 			</if>
@@ -64,6 +66,8 @@
 		</if>	
 		
 		<where>
+			m_books.deleted_flag = 0
+		
 			<if test="accountRole.name() == 'STORE'">
 				store_books.store_id = #{storeId}
 			</if>
@@ -85,6 +89,91 @@
 		FOR UPDATE;
 	</select>
 
+	<select id="selectPublishers" resultType="com.integratedbookinfo.system.shared.domain.Publisher">
+		SELECT 
+			publisher_id, 
+			publisher_name
+		FROM
+			m_publishers;
+	</select>
+
+	<select id="selectGenres" resultType="com.integratedbookinfo.system.shared.domain.Genre">
+		SELECT 
+			genre_id, 
+			genre_name
+		FROM
+			m_genres;	
+	</select>
+
+	<select id="selectStoreOptions" resultType="com.integratedbookinfo.system.shared.domain.StoreOptionDTO">
+		SELECT 
+			store_id, 
+			store_name
+		FROM
+			m_stores
+	</select>
+
+	<resultMap id="bookResult" type="com.integratedbookinfo.system.shared.domain.BookDTO" autoMapping="true">
+		<id property="bookId" column="book_id" />
+		<association property="genre" javaType="com.integratedbookinfo.system.shared.domain.Genre">
+			<id property="genreId" column="genre_id"></id>
+		</association>
+		<association property="publisher" javaType="com.integratedbookinfo.system.shared.domain.Publisher">
+			<id property="publisherId" column="publisher_id"></id>
+		</association>
+	</resultMap>
+
+	<select id="selectBookByBookId" resultMap="bookResult" >
+		SELECT
+			book_id,
+			isbn, 
+		    c_code, 
+		    jan_code, 
+		    genre_id, 
+		    publisher_id, 
+		    author, 
+		    book_title, 
+		    book_size, 
+		    list_price, 
+		    edition, 
+		    release_date, 
+		    cover_image_path
+		FROM
+			m_books
+		WHERE
+			book_id = #{bookId};
+	</select>
+	
+	<select id="selectStoreBookByStoreIdAndBookId">
+		SELECT
+			book_id,
+			store_id,
+			store_comment,
+			store_genre,
+			store_price,
+			note
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId};
+	</select>
+
+	<select id="selectStoreBooksByBookId">
+		SELECT
+			book_id,
+			store_id,
+			store_comment,
+			store_genre,
+			store_price,
+			note
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId};	
+	</select>
+
 	<insert id="insertBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
 		INSERT INTO 
 			m_books(
@@ -98,9 +187,10 @@
 			    book_title, 
 			    book_size, 
 			    list_price, 
-			    edition, 
+			    `edition`, 
 			    release_date, 
 			    created_at, 
+			    updated_at,
 			    cover_image_path)
 		VALUES
 			(#{bookId}, 
@@ -113,9 +203,10 @@
 			#{bookTitle}, 
 			#{bookSize}, 
 			#{listPrice}, 
-			#{edtion}, 
+			#{edition}, 
 			#{releaseDate}, 
 			NOW(), 
+			NOW(),
 			#{coverImagePath});
 	</insert>
 
@@ -128,7 +219,8 @@
 		        store_genre, 
 		        store_price, 
 		        note, 
-		        created_at)
+		        created_at,
+		        updated_at)
 		VALUES
 			(#{bookId}, 
 			#{storeId}, 
@@ -136,6 +228,7 @@
 			#{storeGenre}, 
 			#{storePrice}, 
 			#{note}, 
+			NOW(),
 			NOW())
 	</insert>
 
@@ -157,6 +250,8 @@
 		FROM 
 			t_book_edit_proposals
 		WHERE 
+			t_book_edit_proposals.deleted_flag = 0
+		AND
 			store_id = #{storeId};
 
 	</select>
@@ -173,4 +268,64 @@
 	
 	</select>
 
+	<update id="updateBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
+		UPDATE
+			m_books
+		SET	
+			isbn = #{isbn},
+		    c_code = #{cCode},
+		    jan_code = #{janCode},
+		    genre_id = #{genre.genreId},
+		    publisher_id = #{publisher.publisherId},
+		    author = #{author},
+		    book_title = #{bookTitle},
+		    book_size = #{bookSize},
+		    list_price = #{listPrice},
+		    `edition` = #{edition},
+		    release_date = #{releaseDate},
+		    updated_at = NOW(),
+		    cover_image_path = #{coverImagePath}
+		WHERE
+			book_id = #{bookId};
+	</update>
+
+	<update id="updateStoreBook">
+		
+		UPDATE
+			store_books
+		SET
+	        store_comment = #{storeBook.storeComment},
+	        store_genre = #{storeBook.storeGenre},
+	        store_price = #{storeBook.storePrice},
+	        note = #{storeBook.note},
+	        updated_at = NOW()
+		WHERE
+			book_id = #{bookId}
+		AND
+	        store_id = #{storeBook.storeId};
+	</update>
+	
+	
+	<!-- 書籍・書店書籍 論理削除 -->
+	<update id="deleteStoreBookByBookId" parameterType="String">
+	
+		UPDATE
+			store_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}
+	
+	</update>
+	
+	<update id="deleteBookByBookId">
+	
+		UPDATE
+			m_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}	
+	
+	</update>
 </mapper>

@@ -1,62 +1,208 @@
 package com.integratedbookinfo.system.book;
 
-import org.springframework.stereotype.Service;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
+import com.integratedbookinfo.system.book.dto.AdminBookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookListResponseDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
+import com.integratedbookinfo.system.book.dto.StoreBookEditRequestDTO;
+import com.integratedbookinfo.system.bookeditproposal.BookEditProposalMapper;
+import com.integratedbookinfo.system.inventory.InventoryMapper;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
+import com.integratedbookinfo.system.shared.domain.Genre;
+import com.integratedbookinfo.system.shared.domain.Publisher;
+import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookServiceImpl implements BookService {
 
 	private final BookMapper bookMapper;
+	private final InventoryMapper inventoryMapper;
+	private final BookEditProposalMapper bookEditProposalMapper;
 	
 	@Override
 	public BookListResponseDTO getBookList(int page, int numPerPage, AccountRole accountRole, String storeId,
 			String keyword) {
 		int offset = numPerPage * (page - 1);
-		
+
 		BookListResponseDTO bookListResponse = new BookListResponseDTO();
-		
+
 		bookListResponse.setBooks(bookMapper.selectBookList(offset, numPerPage, accountRole, storeId, keyword));
-		
+
 		return bookListResponse;
 	}
-	
+
 	@Override
 	public int getTotalPages(int numPerPage, AccountRole accountRole, String storeId, String keyword) {
 		double totalNum = (double) bookMapper.countBookRecord(accountRole, storeId, keyword);
-		
+
 		return (int) Math.ceil(totalNum / numPerPage);
 	}
-	
+
 	@Override
-	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO) {
-		// TODO 自動生成されたメソッド・スタブ
+	public List<Publisher> getPublishers() {
+		return bookMapper.selectPublishers();
+	}
+
+	@Override
+	public List<Genre> getGenres() {
+		return bookMapper.selectGenres();
+	}
+
+	@Override
+	public List<StoreOptionDTO> getStoreOptions() {
+		return bookMapper.selectStoreOptions();
+	}
+
+	@Override
+	public List<StoreOptionDTO> getStoreOptionsByBookId(String bookId) {
 		
+	    List<StoreBookDTO> storeBooks = bookMapper.selectStoreBooksByBookId(bookId);
+
+	    List<String> storeIds = storeBooks.stream()
+	        .map(StoreBookDTO::getStoreId)
+	        .toList();
+
+	    List<StoreOptionDTO> storeOptions = bookMapper.selectStoreOptions().stream()
+	        .filter(opt -> storeIds.contains(opt.getStoreId()))
+	        .toList();
+	    
+	    return storeOptions;
 	}
 	
 	@Override
-	public void modifyBook(BookDTO bookDto) {
-		// TODO 自動生成されたメソッド・スタブ
+	public List<StoreBookDTO> getStoreBooksByBookId(String bookId) {
 		
+		return bookMapper.selectStoreBooksByBookId(bookId);
 	}
 	
 	@Override
-	public void modifyStoreBook(StoreBookDTO storeBookDto) {
-		// TODO 自動生成されたメソッド・スタブ
+	public AdminBookEditRequestDTO getBookAndStoreBookForAdmin(AccountRole accountRole, String bookId) {
+
+		BookDTO book = bookMapper.selectBookByBookId(bookId);
+		
+		AdminBookEditRequestDTO adminBookEditRequest = new AdminBookEditRequestDTO();
+
+		adminBookEditRequest.setBook(book);
+		adminBookEditRequest.setStoreBook(new StoreBookDTO());
+		
+		return adminBookEditRequest;
+	}
+
+	@Override
+	public StoreBookEditRequestDTO getBookAndStoreBookForStore(AccountRole accountRole, String bookId, String storeId) {
+
+		BookDTO book = bookMapper.selectBookByBookId(bookId);
+
+		StoreBookDTO storeBook = bookMapper.selectStoreBookByStoreIdAndBookId(bookId, storeId);
+
+		StoreBookEditRequestDTO storeBookEditRequest = new StoreBookEditRequestDTO();
+
+		storeBookEditRequest.setBook(book);
+		storeBookEditRequest.setStoreBook(storeBook);
+
+		return storeBookEditRequest;
+
+	}
+
+	@Override
+	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser) {
+
+		String recentBookId = bookMapper.selectLastBookIdForUpdate();
+
+		String nextBookId = generateBookId(recentBookId);
+
+		BookDTO book = bookCreateRequestDTO.getBook();
+		book.setBookId(nextBookId);
+
+		StoreBookDTO storeBook = bookCreateRequestDTO.getStoreBook();
+		storeBook.setBookId(nextBookId);
+
+		if (loginUser.getAccountRole() == AccountRole.STORE) {
+			storeBook.setStoreId(loginUser.getStoreId());
+		}
+
+		// 画像登録処理
+		saveImageFile(bookCreateRequestDTO.getBook());
+
+		bookMapper.insertBook(book);
+
+		bookMapper.insertStoreBook(storeBook);
+
+	}
+
+	@Override
+	public void modifyBookAll(String bookId, BookDTO book, StoreBookDTO storeBook) {
+		
+		book.setBookId(bookId);
+		
+		// 画像登録処理
+		saveImageFile(book);
+		
+		int updateBookCount = bookMapper.updateBook(book);
+		int updateStoreBookCount = bookMapper.updateStoreBook(bookId, storeBook);
+		
+		System.out.println("updateBook : " + updateBookCount);
+		System.out.println("updateStoreBook : " + updateStoreBookCount);
 		
 	}
-	
+
 	@Override
 	public void removeBook(String bookId) {
-		// TODO 自動生成されたメソッド・スタブ
 		
+		bookMapper.deleteStoreBookByBookId(bookId);
+
+		inventoryMapper.deleteInventoryByBookId(bookId);
+		
+		bookEditProposalMapper.deleteBookEditProposalByBookId(bookId);
+		
+		bookMapper.deleteBookByBookId(bookId);
+
+	}
+
+	public String generateBookId(String recentBookId) {
+		String numberPart = recentBookId.substring(4);
+		int next = Integer.parseInt(numberPart) + 1;
+
+		if (next > 9999) {
+			throw new RuntimeException("bookID上限に到達");
+		}
+
+		return String.format("book%04d", next);
 	}
 	
+	public void saveImageFile(BookDTO book) {
+		MultipartFile upFile = book.getCoverImageFile();
+		
+		final String UPLOAD_DIRECTORY = "C:/pleiades/workspace/images";
+		
+		if (upFile != null) {
+			String fileName = upFile.getOriginalFilename();
+
+			book.setCoverImagePath(fileName);
+
+			File dest = new File(UPLOAD_DIRECTORY + "/" + fileName);
+
+			try {
+				upFile.transferTo(dest);
+			} catch (IOException e) {
+				System.out.println(e);
+				System.out.println("画像ファイルを保存できませんでした。");
+
+			}
+		}
+	}
 }
