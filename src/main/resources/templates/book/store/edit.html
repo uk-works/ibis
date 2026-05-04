@@ -4,13 +4,123 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<title>[画面名] | IBIS</title>
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
+	<title>取扱書籍編集 | IBIS</title>
 </head>
 
+<header th:replace="~{common/admin_header :: page_header}"></header>
 <body>
 
-	<script src="js/bootstrap.bundle.min.js"></script>
+	<p>取扱書籍編集</p>
+	
+	<form th:action="@{/book/edit/{bookId}(bookId = *{book.bookId})}" method="post" th:object="${bookEditRequest}" enctype="multipart/form-data">
+		<button>登録</button>
+		<button type="button" onclick="location.href='/book/list'">戻る</button>
+
+		<input type="hidden" th:field="*{book.bookId}" />
+		
+		<p th:errors="*{book.isbn}"></p>
+		<label>ISBN<input type="text" th:field="*{book.isbn}" /></label>
+		
+		<p th:errors="*{book.janCode}"></p>
+		<label>JANコード<input type="text" th:field="*{book.janCode}" /></label>
+		
+		<p th:errors="*{book.bookTitle}"></p>
+		<label>書籍名<input type="text" th:field="*{book.bookTitle}" /></label>
+
+		<p th:errors="*{book.cCode}"></p>
+		<label>Cコード<input type="text" th:field="*{book.cCode}" /></label>
+
+		<label>ジャンル名
+			<select th:field="*{book.genre.genreId}">
+				<option th:each="genre : ${genres}" th:value="${genre.genreId}">
+					[[${genre.genreName}]]
+				</option>
+			</select>
+		</label>
+		
+		<p th:errors="*{book.author}"></p>
+		<label>著者<input type="text" th:field="*{book.author}" /></label>
+
+		<label>出版社
+			<select th:field="*{book.publisher.publisherId}">
+				<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
+					[[${publisher.publisherName}]]
+				</option>
+			</select>
+		</label>
+		
+		<p th:errors="*{book.publisher.publisherName}"></p>
+		<p>出版社リストに無い出版社で書籍登録したい場合は、<br>リストを未選択状態にして上、入力してください</p>
+		<label>出版社（その他）<input type="text" th:field="*{book.publisher.publisherName}" readonly/></label>
+
+		<label>サイズ
+			<select th:field="*{book.bookSize}">
+				<option th:each="bookSize : ${bookSizes}" th:value="${bookSize}">
+					[[${bookSize.getLabel}]]
+				</option>
+			</select>
+		</label>
+
+		
+		<p th:errors="*{book.listPrice}"></p>
+		<label>定価(税込み)<input type="text" th:field="*{book.listPrice}" /></label>
+		
+		<p th:errors="*{book.edition}"></p>
+		<label>版<input type="text" th:field="*{book.edition}" /></label>
+		
+		<p th:errors="*{book.releaseDate}"></p>
+		<label>発売日<input type="date" th:field="*{book.releaseDate}" /></label>
+
+		<p th:errors="*{book.coverImageFile}"></p>
+		<p>※エラーがある場合は再度画像を選択してください</p>
+		<label>表紙画像<input type="file" th:field="*{book.coverImageFile}" /></label>
+		
+		<input type="hidden" th:field="*{book.coverImagePath}" />
+		<p th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''">現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
+		<img th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''" th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">
+		
+		
+		<!-- 書店個別項目 -->
+		<input type="hidden" th:field="*{storeBook.storeId}" />
+		<label>店頭価格<input type="text" id="storePrice" th:field="*{storeBook.storePrice}"></label>
+		<label>紹介文<input type="text" id="storeComment" th:field="*{storeBook.storeComment}"></label>
+		<label>備考<input type="text" id="note" th:field="*{storeBook.note}"></label>
+		
+	</form>
+	
+	<!-- Button trigger modal -->
+	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deleteModal">
+	  削除
+	</button>
+
+	<!-- Modal -->
+	<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	  <div class="modal-dialog modal-dialog-centered">
+	    <div class="modal-content">
+			<form id="deleteForm" method="post">
+	      <div class="modal-header">
+
+	        <h1 class="modal-title fs-5" id="staticBackdropLabel">書籍削除確認</h1>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <p>以下の書籍を削除してもよろしいですか？</p>
+			<p>ISBN：<span id="isbn"></span></p>
+			<p>書籍名：<span id="bookTitle"></span></p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+	        <button type="button" id="deleteButton" class="btn btn-primary">削除</button>
+	      </div>
+		  </form>
+	    </div>
+	  </div>
+	</div>
+	
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
+
 </body>
 
 </html>

@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
-import com.integratedbookinfo.system.book.dto.AdminBookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
+import com.integratedbookinfo.system.book.dto.BookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
@@ -35,7 +35,6 @@ import tools.jackson.databind.ObjectMapper;
 public class BookController {
 
 	private final int NUM_PER_PAGE = 10;
-	private static final String UPLOAD_DIRECTORY = "C:/pleiades/workspace/images";
 	private final BookService bookService;
 	
 	@GetMapping("/list")
@@ -166,8 +165,8 @@ public class BookController {
 
 			pageName = "book/admin/edit";
 		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
-			model.addAttribute("", bookService.getBookAndStoreBookForStore(loginUser.getAccountRole(), bookId, loginUser.getStoreId()));
-			
+			model.addAttribute("bookEditRequest", bookService.getBookAndStoreBookForStore(loginUser.getAccountRole(), bookId, loginUser.getStoreId()));
+
 			pageName = "book/store/edit";
 		}
 		
@@ -177,13 +176,11 @@ public class BookController {
 	@PostMapping("/edit/{bookId}")
 	public String editBook(
 			@PathVariable String bookId,
-			@Valid @ModelAttribute("bookEditRequest") AdminBookEditRequestDTO form,
+			@Valid @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
 			Errors errors,
 			HttpSession session,
 			Model model) {
-		
-		System.out.println(bookId);
-		
+
 		LoginUserRequestDTO loginUser = getLoginUser(session);
 		
 		MultipartFile imageFile = form.getBook().getCoverImageFile();
@@ -213,13 +210,13 @@ public class BookController {
 
 				return "book/admin/edit";
 			} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
-				model.addAttribute("", bookService.getBookAndStoreBookForStore(loginUser.getAccountRole(), bookId, loginUser.getStoreId()));
-				
+				model.addAttribute("bookEditRequest", form);
+
 				return "book/store/edit";
 			}
 		}
 		
-		bookService.modifyBookAll(bookId, form.getBook(), form.getStoreBook());
+		bookService.modifyBook(loginUser.getAccountRole(), form.getBook(), form.getStoreBook());
 		
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
