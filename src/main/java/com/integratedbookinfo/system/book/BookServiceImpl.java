@@ -9,11 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
-import com.integratedbookinfo.system.book.dto.AdminBookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
+import com.integratedbookinfo.system.book.dto.BookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookListResponseDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
-import com.integratedbookinfo.system.book.dto.StoreBookEditRequestDTO;
 import com.integratedbookinfo.system.bookeditproposal.BookEditProposalMapper;
 import com.integratedbookinfo.system.inventory.InventoryMapper;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
@@ -90,31 +89,31 @@ public class BookServiceImpl implements BookService {
 	}
 	
 	@Override
-	public AdminBookEditRequestDTO getBookAndStoreBookForAdmin(AccountRole accountRole, String bookId) {
+	public BookEditRequestDTO getBookAndStoreBookForAdmin(AccountRole accountRole, String bookId) {
 
 		BookDTO book = bookMapper.selectBookByBookId(bookId);
 		
-		AdminBookEditRequestDTO adminBookEditRequest = new AdminBookEditRequestDTO();
+		BookEditRequestDTO bookEditRequest = new BookEditRequestDTO();
 
-		adminBookEditRequest.setBook(book);
-		adminBookEditRequest.setStoreBook(new StoreBookDTO());
+		bookEditRequest.setBook(book);
+		bookEditRequest.setStoreBook(new StoreBookDTO());
 		
-		return adminBookEditRequest;
+		return bookEditRequest;
 	}
 
 	@Override
-	public StoreBookEditRequestDTO getBookAndStoreBookForStore(AccountRole accountRole, String bookId, String storeId) {
+	public BookEditRequestDTO getBookAndStoreBookForStore(AccountRole accountRole, String bookId, String storeId) {
 
 		BookDTO book = bookMapper.selectBookByBookId(bookId);
 
 		StoreBookDTO storeBook = bookMapper.selectStoreBookByStoreIdAndBookId(bookId, storeId);
 
-		StoreBookEditRequestDTO storeBookEditRequest = new StoreBookEditRequestDTO();
+		BookEditRequestDTO bookEditRequest = new BookEditRequestDTO();
 
-		storeBookEditRequest.setBook(book);
-		storeBookEditRequest.setStoreBook(storeBook);
+		bookEditRequest.setBook(book);
+		bookEditRequest.setStoreBook(storeBook);
 
-		return storeBookEditRequest;
+		return bookEditRequest;
 
 	}
 
@@ -145,15 +144,17 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public void modifyBookAll(String bookId, BookDTO book, StoreBookDTO storeBook) {
+	public void modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
 		
-		book.setBookId(bookId);
-		
+		int updateBookCount = 0;
 		// 画像登録処理
 		saveImageFile(book);
 		
-		int updateBookCount = bookMapper.updateBook(book);
-		int updateStoreBookCount = bookMapper.updateStoreBook(bookId, storeBook);
+		if (accountRole.equals(AccountRole.ADMIN)) {
+			updateBookCount = bookMapper.updateBook(book);
+		}
+
+		int updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
 		
 		System.out.println("updateBook : " + updateBookCount);
 		System.out.println("updateStoreBook : " + updateStoreBookCount);
@@ -195,7 +196,7 @@ public class BookServiceImpl implements BookService {
 			book.setCoverImagePath(fileName);
 
 			File dest = new File(UPLOAD_DIRECTORY + "/" + fileName);
-
+			System.out.println(dest);
 			try {
 				upFile.transferTo(dest);
 			} catch (IOException e) {
