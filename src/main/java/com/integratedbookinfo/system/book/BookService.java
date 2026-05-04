@@ -5,11 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
-import com.integratedbookinfo.system.book.dto.AdminBookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
+import com.integratedbookinfo.system.book.dto.BookEditRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookListResponseDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
-import com.integratedbookinfo.system.book.dto.StoreBookEditRequestDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
 import com.integratedbookinfo.system.shared.domain.Genre;
 import com.integratedbookinfo.system.shared.domain.Publisher;
@@ -42,13 +41,13 @@ public interface BookService {
 	
 	public List<StoreBookDTO> getStoreBooksByBookId(String bookId);
 	
-	public AdminBookEditRequestDTO getBookAndStoreBookForAdmin(AccountRole accountRole, String bookId);
+	public BookEditRequestDTO getBookAndStoreBookForAdmin(AccountRole accountRole, String bookId);
 	
-	public StoreBookEditRequestDTO getBookAndStoreBookForStore(AccountRole accountRole, String bookId, String storeId);
+	public BookEditRequestDTO getBookAndStoreBookForStore(AccountRole accountRole, String bookId, String storeId);
 	
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser);
 
-	public void modifyBookAll(String bookId, BookDTO book, StoreBookDTO storeBook);
+	public void modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook);
 
 	public void removeBook(String bookId);
 
