@@ -70,7 +70,7 @@
 			<td>[[*{publisherName}]]</td>
 			<td>[[*{#temporals.format(releaseDate, 'yyyy/MM/dd')}]]</td>
 			<td>[[*{isbn}]]</td>
-			<td><a href="#">編集</a></td>
+			<td><a th:href="@{/book/edit/{bookId}(bookId=*{bookId})}">編集</a></td>
 		</tr>
 	</table>
 	
