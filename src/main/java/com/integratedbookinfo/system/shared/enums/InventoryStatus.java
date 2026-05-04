@@ -21,7 +21,7 @@ public enum InventoryStatus {
 		return code;
 	}
 	
-	public String getInventoryStatus() {
+	public String getLabel() {
 		return label;
 	}
 	

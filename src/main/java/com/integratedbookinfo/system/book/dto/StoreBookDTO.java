@@ -11,10 +11,15 @@ public class StoreBookDTO {
 
 	private String bookId;
 	private String storeId;
+	
 	private String storeComment;
+
 	private String storeGenre;
+	
 	private String storePrice;
+	
 	private String note;
+	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private boolean deletedFlag;

@@ -6,6 +6,7 @@
 		<id property="loginId" column="login_id" />
 		<result property="password" column="password" />
 		<result property="displayName" column="display_name" />
+		<result property="storeId" column="store_id" />
 		<result property="accountRole" column="account_role" />
 	</resultMap>
 
@@ -15,6 +16,7 @@
 		SELECT  
 			user_accounts.login_id, 
 			user_accounts.password, 
+			store_accounts.store_id,
 			user_accounts.account_role, 
 			CASE 
 				WHEN user_accounts.account_role = 'admin' THEN administrators.full_name 

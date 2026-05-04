@@ -1,6 +1,6 @@
 package com.integratedbookinfo.system.book.dto;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 import com.integratedbookinfo.system.shared.domain.BookDTO;
 
@@ -9,8 +9,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AdminBookEditRequestDTO {
+public class BookEditRequestDTO {
 
+	@Valid
 	private BookDTO book;
-	private List<StoreBookDTO> storeBooks;
+	
+	@Valid
+	private StoreBookDTO storeBook;
 }

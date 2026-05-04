@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.integratedbookinfo.system.filter.AuthFilter;
@@ -33,6 +34,14 @@ public class ApplicationConfig implements WebMvcConfigurer{
 	FilterRegistrationBean<AuthFilter> authFilter() {
 		var bean = new FilterRegistrationBean<AuthFilter>(new AuthFilter());
 		bean.addUrlPatterns("/dashboard");
+		bean.addUrlPatterns("/book/*");
 		return bean;
 	}
+	
+	// 静的画像ファイルの保存場所マッピング
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/images/**")
+                .addResourceLocations("file:///C:/pleiades/workspace/images/");
+    }
 }
