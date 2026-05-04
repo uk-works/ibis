@@ -18,6 +18,7 @@
 		<button>登録</button>
 		<button type="button" onclick="location.href='/book/list'">戻る</button>
 
+		<input type="hidden" th:field="*{book.bookId}" />
 		<p th:errors="*{book.isbn}"></p>
 		<label>ISBN<input type="text" th:field="*{book.isbn}" /></label>
 		
@@ -74,8 +75,9 @@
 		<p>※エラーがある場合は再度画像を選択してください</p>
 		<label>表紙画像<input type="file" th:field="*{book.coverImageFile}" /></label>
 		
-		<p th:if="*{book.coverImagePath} != null">現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
-		<img th:if="*{book.coverImagePath} != null" th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">
+		<input type="hidden" th:field="*{book.coverImagePath}" />
+		<p th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''">現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
+		<img th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''" th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">
 		
 		
 		
@@ -124,11 +126,13 @@
 	
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 	<script th:inline="javascript">
-		const book = /*[[*{bookEditRequest.book}]]*/ [];
-		console.log(book.bookId);
+		const bookId = /*[[*{bookEditRequest.book.bookId}]]*/ [];
+		const isbn = /*[[*{bookEditRequest.book.isbn}]]*/ [];
+		const bookTitle = /*[[*{bookEditRequest.book.bookTitle}]]*/ [];
+
 		// モーダル内の表示要素を更新
-		document.getElementById("isbn").textContent = book.isbn;
-		document.getElementById("bookTitle").textContent = book.bookTitle;
+		document.getElementById("isbn").textContent = isbn;
+		document.getElementById("bookTitle").textContent = bookTitle;
 
 		// 削除ボタンのクリックイベント
 		// 削除ボタン（青い「削除」ボタン）のクリックイベント
@@ -138,7 +142,7 @@
 		deleteButton.addEventListener('click', () => {
 		    // 1. 実行時にURLを組み立てる (例: /books/delete/123)
 		    const baseUrl = /*[[@{/book/delete/}]]*/ '/books/delete/';
-		    deleteForm.action = baseUrl + book.bookId;
+		    deleteForm.action = baseUrl + bookId;
 		    console.log("Formです" + deleteForm.action)
 		    // 2. フォームを送信する
 		    deleteForm.submit();
