@@ -89,36 +89,7 @@
 		<label>備考<input type="text" id="note" th:field="*{storeBook.note}"></label>
 		
 	</form>
-	
-	<!-- Button trigger modal -->
-	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deleteModal">
-	  削除
-	</button>
 
-	<!-- Modal -->
-	<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered">
-	    <div class="modal-content">
-			<form id="deleteForm" method="post">
-	      <div class="modal-header">
-
-	        <h1 class="modal-title fs-5" id="staticBackdropLabel">書籍削除確認</h1>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body">
-	        <p>以下の書籍を削除してもよろしいですか？</p>
-			<p>ISBN：<span id="isbn"></span></p>
-			<p>書籍名：<span id="bookTitle"></span></p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-	        <button type="button" id="deleteButton" class="btn btn-primary">削除</button>
-	      </div>
-		  </form>
-	    </div>
-	  </div>
-	</div>
-	
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 
 </body>
