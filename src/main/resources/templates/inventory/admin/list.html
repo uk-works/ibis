@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link href="../../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/common_header.css" rel="stylesheet">
+	<title>在庫管理 | IBIS</title>
+</head>
+
+<header th:replace="~{common/admin_header :: page_header}"></header>
+
+<body>
+	在庫検索
+	<form th:action="@{/inventory/list}" method="get">
+		<input type="text" name="keyword"/>
+		<input type="submit" value="検索"/>
+	</form>
+	
+	在庫一覧
+	<!-- ページネーション-->
+	<div th:if="${totalPages >= 2}" class="container">
+		<ul class="pagination">
+			<!-- 前ページへ -->
+			<th:block th:switch="${page}">
+				<li th:case="1" class="page-item disabled">
+					<a class="page-link" href="">&laquo;</a>
+				</li>
+				<li th:case="*" class="page-item">
+					<a class="page-link" th:href="@{/inventory/list(page=${page - 1})}">&laquo;</a>
+				</li>
+			</th:block>
+			
+			<!-- ページ番号 -->
+			<th:block th:each="index : ${#numbers.sequence(1, totalPages)}">
+				<th:block th:switch="${index}">
+					<li th:case="${page}" class="page-item active">
+						<a class="page-link" href="">[[${index}]]</a>
+					</li>
+					<li th:case="*" class="page-item">
+						<a class="page-link" th:href="@{/inventory/list(page=${index})}">[[${index}]]</a>
+					</li>
+				</th:block>
+			</th:block>
+			
+			<!-- 次ページへ -->
+			<th:block th:switch="${page}">
+				<li th:case="${totalPages}" class="page-item disabled">
+					<a class="page-link" href="">&raquo;</a>
+				</li>
+				<li th:case="*" class="page-item">
+					<a class="page-link" th:href="@{/inventory/list(page=${page + 1})}">&raquo;</a>
+				</li>
+			</th:block>
+		</ul>
+	</div>
+	
+	<a class="button" th:href="@{/inventory/create}">登録</a>
+	<table border="1">
+	    <!-- 1店舗ごとのまとまりをループ -->
+	    <th:block th:each="storeInventory : ${storeInventoryResponse.storeInventories}" th:object="${storeInventory}">
+	        
+	        <!-- 店舗名セクション（1行使って目立たせる） -->
+	        <thead style="background-color: #eee;">
+	            <tr>
+	                <th colspan="5" th:text="'店舗名：' + *{storeName}"></th>
+	            </tr>
+	            <tr>
+	                <th>書籍名</th>
+	                <th>在庫数</th>
+	                <th>在庫状態</th>
+	                <th>更新日時</th>
+	                <th>アクション</th>
+	            </tr>
+	        </thead>
+
+	        <!-- その店舗に紐づく在庫リストをループ -->
+	        <tbody>
+	            <tr th:each="summary : *{inventorySummaries}">
+	                <td th:text="${summary.bookTitle}"></td>
+	                <td th:text="${summary.amount}"></td>
+	                <!-- Enumのメソッド呼び出しはプロパティ形式かカッコありで -->
+	                <td th:text="${summary.inventoryStatus.getLabel}"></td>
+	                <td th:text="${#temporals.format(summary.updatedAt, 'yyyy/MM/dd')}"></td>
+	                <td>
+	                    <a th:href="@{/inventory/edit/{id}(id=${summary.bookId})}">編集</a>
+						<a th:href="@{#}">削除</a>
+	                </td>
+	            </tr>
+	            <!-- 店舗間の区切りとして少しスペースを空ける行（任意） -->
+	            <tr style="height: 10px; border: none;"><td colspan="5" style="border: none;"></td></tr>
+	        </tbody>
+
+	    </th:block>
+	</table>
+
+	<!-- ページネーション-->
+	<div th:if="${totalPages >= 2}" class="container">
+		<ul class="pagination">
+			<!-- 前ページへ -->
+			<th:block th:switch="${page}">
+				<li th:case="1" class="page-item disabled">
+					<a class="page-link" href="">&laquo;</a>
+				</li>
+				<li th:case="*" class="page-item">
+					<a class="page-link" th:href="@{/inventory/list(page=${page - 1})}">&laquo;</a>
+				</li>
+			</th:block>
+			
+			<!-- ページ番号 -->
+			<th:block th:each="index : ${#numbers.sequence(1, totalPages)}">
+				<th:block th:switch="${index}">
+					<li th:case="${page}" class="page-item active">
+						<a class="page-link" href="">[[${index}]]</a>
+					</li>
+					<li th:case="*" class="page-item">
+						<a class="page-link" th:href="@{/inventory/list(page=${index})}">[[${index}]]</a>
+					</li>
+				</th:block>
+			</th:block>
+			
+			<!-- 次ページへ -->
+			<th:block th:switch="${page}">
+				<li th:case="${totalPages}" class="page-item disabled">
+					<a class="page-link" href="">&raquo;</a>
+				</li>
+				<li th:case="*" class="page-item">
+					<a class="page-link" th:href="@{/inventory/list(page=${page + 1})}">&raquo;</a>
+				</li>
+			</th:block>
+		</ul>
+	</div>
+	
+	<script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
