@@ -2,7 +2,26 @@ package com.integratedbookinfo.system.inventory;
 
 import org.springframework.stereotype.Service;
 
+import com.integratedbookinfo.system.inventory.dto.AdminInventoryResponseDTO;
+import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
+import com.integratedbookinfo.system.inventory.dto.StoreInventoryResponseDTO;
+
 @Service
 public interface InventoryService {
+
+	public AdminInventoryResponseDTO getStoreInventoriesByKeyword(int page, int numPerPage, String keyword);
+
+	public StoreInventoryResponseDTO getInventorySummariesByKeyword(int page, int numPerPage, String storeId, String keyword);
+
+	public int getStoreTotalPagesByKeyword(int numPerPage, String keyword);
+
+	public int getInventoryTotalPagesByKeyword(int numPerPage, String storeId, String keyword);
+
+	public void saveInventory(InventoryRequestDTO inventoryRequestDto);
+
+	public void modifyInventory(InventoryRequestDTO InventoryRequestDto);
+
+	public void removeInventory(String storeId, String bookId);
+
 
 }
