@@ -113,6 +113,22 @@
 	
 	</select>
 
+	<insert id="insertInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
+	
+		INSERT INTO
+			t_inventories
+		VALUE(
+			#{bookId},
+			#{storeId},
+			#{amount},
+			#{inventoryStatus},
+			NOW(),
+			NOW(),
+			0	
+		);
+
+	</insert>
+
 	<update id="updateInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
 	
 		UPDATE
