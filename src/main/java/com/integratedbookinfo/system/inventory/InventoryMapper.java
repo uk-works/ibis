@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.InventorySummaryDTO;
 import com.integratedbookinfo.system.inventory.dto.StoreInventoryDTO;
+import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
 
 @Mapper
 public interface InventoryMapper {
@@ -26,7 +27,8 @@ public interface InventoryMapper {
 
 	public int deleteInventory(String storeId, String bookId);
 
-
-	
 	public int deleteInventoryByBookId(String bookId);
+	
+	
+	List<StoreOptionDTO> selectStoresHasUnregisteredInventories();
 }
