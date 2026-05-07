@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.integratedbookinfo.system.book.dto.BookSummaryDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
+import com.integratedbookinfo.system.shared.domain.BookOptionDTO;
 import com.integratedbookinfo.system.shared.domain.Genre;
 import com.integratedbookinfo.system.shared.domain.Publisher;
 import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
@@ -44,6 +45,8 @@ public interface BookMapper {
 	public StoreBookDTO selectStoreBookByStoreIdAndBookId(String bookId, String storeId);
 	
 	public List<StoreBookDTO> selectStoreBooksByBookId(String bookId);
+	
+	public List<BookOptionDTO> selectBookOptions();
 	
 	public int insertBook(BookDTO bookDto);
 
