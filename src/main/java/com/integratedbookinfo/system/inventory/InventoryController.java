@@ -109,6 +109,8 @@ public class InventoryController {
 
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
+		inventoryService.saveInventory(form);
+		
 		pageName = "redirect:/inventory/list";
 		return pageName;
 	}
