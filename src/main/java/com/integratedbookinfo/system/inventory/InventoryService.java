@@ -1,10 +1,14 @@
 package com.integratedbookinfo.system.inventory;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.integratedbookinfo.system.inventory.dto.AdminInventoryResponseDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.StoreInventoryResponseDTO;
+import com.integratedbookinfo.system.shared.domain.BookOptionDTO;
+import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
 
 @Service
 public interface InventoryService {
@@ -17,6 +21,10 @@ public interface InventoryService {
 
 	public int getInventoryTotalPagesByKeyword(int numPerPage, String storeId, String keyword);
 
+	public List<StoreOptionDTO> getStoreOptions();
+	
+	public List<BookOptionDTO> getBookOptions();
+	
 	public void saveInventory(InventoryRequestDTO inventoryRequestDto);
 
 	public void modifyInventory(InventoryRequestDTO InventoryRequestDto);

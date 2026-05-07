@@ -1,10 +1,16 @@
 package com.integratedbookinfo.system.inventory;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import com.integratedbookinfo.system.book.BookMapper;
 import com.integratedbookinfo.system.inventory.dto.AdminInventoryResponseDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.StoreInventoryResponseDTO;
+import com.integratedbookinfo.system.shared.domain.BookOptionDTO;
+import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
+import com.integratedbookinfo.system.store.StoreMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 public class InventoryServiceImpl implements InventoryService {
 
 	private final InventoryMapper inventoryMapper;
+	private final BookMapper bookMapper;
+	private final StoreMapper storeMapper;
 	
 	@Override
 	public AdminInventoryResponseDTO getStoreInventoriesByKeyword(int page, int numPerPage, String keyword) {
@@ -47,6 +55,21 @@ public class InventoryServiceImpl implements InventoryService {
 		double totalNum = (double) inventoryMapper.countInventorySummariesByKeyword(keyword);
 
 		return (int) Math.ceil(totalNum / numPerPage);
+	}
+	
+	/**
+	 * TODO（優先順位：低）DB取得メソッドはbookMapperからstoreMapperに変更する
+	 */
+	@Override
+	public List<StoreOptionDTO> getStoreOptions() {
+	
+		return storeMapper.selectStoresHasUnregisteredInventories();
+	}
+	
+	@Override
+	public List<BookOptionDTO> getBookOptions() {
+
+		return bookMapper.selectBookOptions();
 	}
 	
 	@Override

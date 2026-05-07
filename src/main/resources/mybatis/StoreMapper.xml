@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.store.StoreMapper">
+
+	<select id="selectStoresHasUnregisteredInventories" resultType="com.integratedbookinfo.system.shared.domain.StoreOptionDTO">
+	
+		SELECT
+			DISTINCT m_stores.store_id, 
+		    m_stores.store_name
+		FROM
+			m_books
+		INNER JOIN
+			store_books
+		ON
+			m_books.book_id = store_books.book_id
+		INNER JOIN
+			m_stores
+		ON
+			store_books.store_id = m_stores.store_id
+		LEFT JOIN
+			t_inventories
+		ON 
+			m_books.book_id = t_inventories.book_id
+		WHERE
+			t_inventories.book_id IS NULL;
+	
+	</select>
+
+</mapper>
