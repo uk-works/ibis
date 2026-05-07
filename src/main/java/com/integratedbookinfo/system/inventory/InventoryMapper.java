@@ -21,9 +21,9 @@ public interface InventoryMapper {
 	
 	public Long countInventorySummariesByKeyword(String keyword);
 
-	public int insertInventory(InventoryRequestDTO inventoryRequestDto);
+	public int insertInventory(InventoryRequestDTO inventoryRequest);
 
-	public int updateInventory(InventoryRequestDTO inventoryRequestDto);
+	public int updateInventory(InventoryRequestDTO inventoryRequest);
 
 	public int deleteInventory(String storeId, String bookId);
 
