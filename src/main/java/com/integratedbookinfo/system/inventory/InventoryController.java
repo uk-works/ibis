@@ -3,6 +3,7 @@ package com.integratedbookinfo.system.inventory;
 import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,7 @@ import com.integratedbookinfo.system.shared.enums.InventoryStatus;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -111,6 +113,21 @@ public class InventoryController {
 		return pageName;
 	}
 
+	@PostMapping("/edit")
+	public String editInventory(
+			@Valid @ModelAttribute InventoryRequestDTO form,
+			Errors errors,
+			Model model
+			) {
+		
+		inventoryService.modifyInventory(form);
+		
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
+		
+		return "redirect:/inventory/list";
+	}
+	
+	
 	private LoginUserRequestDTO getLoginUser(HttpSession session) {
 		LoginUserRequestDTO loginUser = new LoginUserRequestDTO();
 		loginUser = (LoginUserRequestDTO) session.getAttribute("loginUser");

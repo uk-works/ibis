@@ -84,7 +84,6 @@
 			</if>
 	</select>
 
-
 	<select id="selectInventorySummariesByKeyword" resultType="com.integratedbookinfo.system.inventory.dto.InventorySummaryDTO">
 	
 		SELECT
@@ -113,6 +112,21 @@
 			#{offset}, #{limit};
 	
 	</select>
+
+	<update id="updateInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
+	
+		UPDATE
+			t_inventories
+		SET
+			amount = #{amount},
+			inventory_status = #{inventoryStatus},
+			updated_at = NOW()
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId};
+	
+	</update>
 
 	<!-- 在庫 論理削除 -->
 	<update id="deleteInventoryByBookId" parameterType="String">
