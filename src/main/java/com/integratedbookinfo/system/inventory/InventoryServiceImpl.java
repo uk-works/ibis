@@ -73,15 +73,15 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 	
 	@Override
-	public void saveInventory(InventoryRequestDTO inventoryRequestDto) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void saveInventory(InventoryRequestDTO inventoryRequest) {
 		
+		inventoryMapper.insertInventory(inventoryRequest);
 	}
 	
 	@Override
-	public void modifyInventory(InventoryRequestDTO InventoryRequestDto) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void modifyInventory(InventoryRequestDTO InventoryRequest) {
 		
+		inventoryMapper.updateInventory(InventoryRequest);
 	}
 	
 	@Override

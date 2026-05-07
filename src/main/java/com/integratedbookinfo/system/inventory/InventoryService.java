@@ -25,9 +25,9 @@ public interface InventoryService {
 	
 	public List<BookOptionDTO> getBookOptions();
 	
-	public void saveInventory(InventoryRequestDTO inventoryRequestDto);
+	public void saveInventory(InventoryRequestDTO inventoryRequest);
 
-	public void modifyInventory(InventoryRequestDTO InventoryRequestDto);
+	public void modifyInventory(InventoryRequestDTO InventoryRequest);
 
 	public void removeInventory(String storeId, String bookId);
 
