@@ -2,6 +2,64 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.integratedbookinfo.system.store.StoreMapper">
 
+	<select id="selectLastStoreIdForUpdate" resultType="String">
+		SELECT
+			store_id
+		FROM
+			m_stores
+		ORDER BY store_id DESC
+		LIMIT
+			1
+		FOR UPDATE;
+	</select>
+
+	<insert id="insertStore" parameterType="com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO">
+	
+		INSERT INTO
+			m_stores(
+				store_id,
+				store_name,
+				email,
+				tel,
+				postal_code,
+				address,
+				opening_hours,
+				closed_days,
+				store_status,
+				note,
+				created_at,
+				updated_at,
+				deleted_flag
+			)
+		VALUE(
+			#{storeId},
+			#{storeName},
+			#{email},
+			#{tel},
+			#{postalCode},
+			#{address},
+			#{openingHours},
+			#{closedDays},
+			#{storeStatus},
+			#{note},
+			NOW(),
+			NOW(),
+			0
+		);
+	
+	</insert>
+
+	<insert id="insertStoreAccounts">
+	
+		INSERT INTO
+			store_accounts
+		VALUE(
+			#{storeId},
+			#{accountId}
+		);
+	
+	</insert>
+
 	<select id="selectStoresHasUnregisteredInventories" resultType="com.integratedbookinfo.system.shared.domain.StoreOptionDTO">
 	
 		SELECT
