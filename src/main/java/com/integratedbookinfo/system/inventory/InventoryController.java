@@ -129,6 +129,15 @@ public class InventoryController {
 		return "redirect:/inventory/list";
 	}
 	
+	@PostMapping("/delete")
+	public String deleteInventory(
+			@RequestParam String storeId, 
+			@RequestParam String bookId) {
+		
+		inventoryService.removeInventory(storeId, bookId);
+		
+		return "redirect:/inventory/list";
+	}
 	
 	private LoginUserRequestDTO getLoginUser(HttpSession session) {
 		LoginUserRequestDTO loginUser = new LoginUserRequestDTO();
