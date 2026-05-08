@@ -131,6 +131,8 @@
 			m_books.book_id = t_inventories.book_id
 		WHERE
 			t_inventories.book_id IS NULL
+		OR
+			t_inventories.deleted_flag = 1
 		ORDER BY
 			store_books.store_id;
 	
@@ -338,6 +340,19 @@
 			deleted_flag = 1
 		WHERE
 			book_id = #{bookId}
+	
+	</update>
+	
+	<update id="deleteStoreBookByBookIdAndStoreId">
+	
+		UPDATE
+			store_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId}
 	
 	</update>
 	

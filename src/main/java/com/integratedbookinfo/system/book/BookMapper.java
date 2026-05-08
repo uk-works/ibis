@@ -60,6 +60,8 @@ public interface BookMapper {
 	 * 書籍マスタ・書店書籍・在庫・書籍編集提案 削除 */
 	public int deleteBookByBookId(String bookId);
 	
+	public int deleteStoreBookByBookIdAndStoreId(@Param("bookId") String bookId, @Param("storeId") String storeId);
+	
 	public int deleteStoreBookByBookId(String bookId);
 
 }
