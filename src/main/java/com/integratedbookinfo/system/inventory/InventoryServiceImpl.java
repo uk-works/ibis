@@ -86,7 +86,9 @@ public class InventoryServiceImpl implements InventoryService {
 	
 	@Override
 	public void removeInventory(String storeId, String bookId) {
-		// TODO 自動生成されたメソッド・スタブ
 		
+		inventoryMapper.deleteInventoryByStoreIdAndBookId(storeId, bookId);
+		
+		bookMapper.deleteStoreBookByBookIdAndStoreId(bookId, storeId);
 	}
 }
