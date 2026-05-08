@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
-import com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO;
+import com.integratedbookinfo.system.store.dto.StoreDTO;
 import com.integratedbookinfo.system.store.dto.StoreEditRequestDTO;
 import com.integratedbookinfo.system.store.dto.StoreSummaryDTO;
 
@@ -19,7 +19,9 @@ public interface StoreMapper {
 
 	public String selectLastStoreIdForUpdate();
 
-	public int insertStore(StoreCreateRequestDTO StoreCreateRequest);
+	public int insertStore(StoreDTO store);
+
+	public int insertStoreAccounts(@Param("storeId") String storeId, @Param("accountId") int accountId);
 
 	public int updateStore(StoreEditRequestDTO storeEditRequest);
 

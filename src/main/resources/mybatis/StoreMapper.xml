@@ -17,6 +17,7 @@
 	
 		INSERT INTO
 			m_stores(
+				store_id,
 				store_name,
 				email,
 				tel,
@@ -31,6 +32,7 @@
 				deleted_flag
 			)
 		VALUE(
+			#{storeId},
 			#{storeName},
 			#{email},
 			#{tel},
@@ -47,6 +49,16 @@
 	
 	</insert>
 
+	<insert id="insertStoreAccounts">
+	
+		INSERT INTO
+			store_accounts
+		VALUE(
+			#{storeId},
+			#{accountId}
+		);
+	
+	</insert>
 
 	<select id="selectStoresHasUnregisteredInventories" resultType="com.integratedbookinfo.system.shared.domain.StoreOptionDTO">
 	

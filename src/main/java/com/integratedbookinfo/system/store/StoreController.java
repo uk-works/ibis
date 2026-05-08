@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.integratedbookinfo.system.shared.enums.StoreStatus;
+import com.integratedbookinfo.system.store.dto.AccountDTO;
 import com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO;
+import com.integratedbookinfo.system.store.dto.StoreDTO;
 import com.integratedbookinfo.system.store.dto.StoreEditRequestDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,11 @@ public class StoreController {
 			Model model
 			) {
 		
-		model.addAttribute("storeCreateRequest", new StoreCreateRequestDTO());
+		StoreCreateRequestDTO storeCreateRequest = new StoreCreateRequestDTO();
+		storeCreateRequest.setAccount(new AccountDTO());
+		storeCreateRequest.setStore(new StoreDTO());
+		
+		model.addAttribute("storeCreateRequest", storeCreateRequest);
 		model.addAttribute("storeStatuses", StoreStatus.values());
 		return "bookstore/store/register";
 	}

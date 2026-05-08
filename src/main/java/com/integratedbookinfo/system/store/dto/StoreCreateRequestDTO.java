@@ -1,8 +1,6 @@
 package com.integratedbookinfo.system.store.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
-import com.integratedbookinfo.system.shared.enums.StoreStatus;
+import jakarta.validation.Valid;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,36 +9,9 @@ import lombok.Setter;
 @Setter
 public class StoreCreateRequestDTO {
 
-	private String storeId;
+	@Valid
+	private StoreDTO store;
 	
-	@NotBlank
-	private String storeName;
-
-	@NotBlank
-	private String email;
-	
-	@NotBlank
-	private String tel;
-	
-	@NotBlank
-	private String postalCode;
-	
-	@NotBlank
-	private String address;
-	
-	@NotBlank
-	private String openingHours;
-	
-	@NotBlank
-	private String closedDays;
-	
-	private StoreStatus storeStatus;
-	
-	private String note;
-	
-	@NotBlank
-	private String loginId;
-	
-	@NotBlank
-	private String password;
+	@Valid
+	private AccountDTO account;
 }
