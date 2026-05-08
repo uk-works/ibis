@@ -28,8 +28,11 @@ public class StoreServiceImpl implements StoreService {
 	
 	@Override
 	public void saveStore(StoreCreateRequestDTO storeCreateRequest) {
-		// TODO 自動生成されたメソッド・スタブ
+		String recentStoreId = storeMapper.selectLastStoreIdForUpdate();
 		
+		storeCreateRequest.setStoreId(recentStoreId);
+		
+		storeMapper.insertStore(storeCreateRequest);
 	}
 	
 	@Override
