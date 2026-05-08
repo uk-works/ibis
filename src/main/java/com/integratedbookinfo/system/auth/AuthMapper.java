@@ -3,6 +3,7 @@ package com.integratedbookinfo.system.auth;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
+import com.integratedbookinfo.system.store.dto.AccountDTO;
 
 /**
  * ユーザーアカウント情報の取得を行うMapper
@@ -12,4 +13,6 @@ import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 public interface AuthMapper {
 
 	public LoginUserRequestDTO selectLoginUserByLoginId(String loginId);
+	
+	public int insertAccount(AccountDTO account);
 }
