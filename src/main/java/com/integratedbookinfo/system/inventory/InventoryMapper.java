@@ -25,7 +25,7 @@ public interface InventoryMapper {
 
 	public int updateInventory(InventoryRequestDTO inventoryRequest);
 
-	public int deleteInventory(String storeId, String bookId);
+	public int deleteInventoryByStoreIdAndBookId(String storeId, String bookId);
 
 	public int deleteInventoryByBookId(String bookId);
 	

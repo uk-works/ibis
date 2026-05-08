@@ -150,10 +150,26 @@
 		UPDATE
 			t_inventories
 		SET
+			updated_at = NOW(),
 			deleted_flag = 1
 		WHERE
-			book_id = #{bookId}
+			book_id = #{bookId};
 	
 	</update>
+	
+	<update id="deleteInventoryByStoreIdAndBookId">
+	
+		UPDATE
+			t_inventories
+		SET
+			updated_at = NOW(),
+			deleted_flag = 1
+		WHERE
+			store_id = #{storeId}
+		AND
+			book_id = #{bookId};
+	
+	</update>
+	
 	
 </mapper>

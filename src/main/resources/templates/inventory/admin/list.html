@@ -84,13 +84,16 @@
 					<td th:text="${summary.inventoryStatus.getLabel}"></td>
 					<td th:text="${#temporals.format(summary.updatedAt, 'yyyy/MM/dd')}"></td>
 					<td>
-						<!--	                    <a th:href="@{/inventory/edit/{id}(id=${summary.bookId})}">編集</a>-->
 						<button type="button" class="btn btn-primary inventoryEditButton" data-bs-toggle="modal"
 							th:data-store-id="${summary.storeId}" th:data-book-id="${summary.bookId}"
 							data-bs-target="#editModal">
 							編集
 						</button>
-						<a th:href="@{#}">削除</a>
+						<button type="button" class="btn btn-primary inventoryDeleteButton" data-bs-toggle="modal"
+							th:data-store-id="${summary.storeId}" th:data-book-id="${summary.bookId}"
+							data-bs-target="#inventoryDeleteModal">
+							削除
+						</button>
 					</td>
 				</tr>
 				<!-- 店舗間の区切りとして少しスペースを空ける行（任意） -->
@@ -140,10 +143,9 @@
 	</div>
 
 	<script src="js/bootstrap.bundle.min.js"></script>
-	<!-- Button trigger modal -->
 
 
-	<!-- Modal -->
+	<!-- 在庫編集モーダル -->
 	<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
 		aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
@@ -200,6 +202,38 @@
 		</div>
 	</div>
 
+	
+	<div class="modal fade" id="inventoryDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+
+					<div class="modal-header">
+
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+
+					<form id="deleteForm" th:action="@{/inventory/delete}" method="post">
+						<input type="hidden" name="storeId" id="delStoreIdInput">
+						<input type="hidden" name="bookId" id="delBookIdInput">
+
+						<div class="modal-body">
+							<p>以下の在庫を削除しますか？</p>
+							<p>書店名：<span id="delStoreName"></span></p>
+							<p>書籍名：<span id="delBookTitle"></span></p>
+							<p>在庫数：<span id="delAmount" ></span></p>
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+							<button type="button" id="deleteButton" class="btn btn-primary">削除</button>
+						</div>
+					</form>
+			</div>
+		</div>
+	</div>
+		
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 	<script th:inline="javascript">
 		const storeInventories = /*[[${storeInventoryResponse.storeInventories}]]*/[];
@@ -278,6 +312,48 @@
 		);
 
 
+	</script>
+	<script th:inline="javascript">
+		/* 在庫削除モーダル 処理 */
+
+		document.querySelectorAll(".inventoryDeleteButton").forEach(button => {
+
+			button.addEventListener("click", () => {
+
+				const storeId = button.dataset.storeId;
+				const bookId = button.dataset.bookId;
+
+				const storeInventory = storeInventories.find((sis) => sis.storeId === storeId);
+
+				const inventorySummary = storeInventory.inventorySummaries.find((si) => si.bookId === bookId);
+
+				document.getElementById("delStoreName").textContent = storeInventory.storeName;
+
+				document.getElementById("delBookTitle").textContent = inventorySummary.bookTitle;
+				
+				document.getElementById("delAmount").textContent = inventorySummary.amount;
+
+				document.getElementById("delStoreIdInput").value
+				    = storeId;
+
+				document.getElementById("delBookIdInput").value
+				    = bookId;
+			
+			});
+		});	
+			
+		const deleteButton =
+		    document.getElementById("deleteButton");
+
+		const deleteForm =
+		    document.getElementById("deleteForm");
+
+		deleteButton.addEventListener("click", () => {
+
+		    deleteForm.submit();
+
+		});
+		
 	</script>
 </body>
 
