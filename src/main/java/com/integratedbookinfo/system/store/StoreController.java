@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.integratedbookinfo.system.shared.enums.StoreStatus;
 import com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO;
 import com.integratedbookinfo.system.store.dto.StoreEditRequestDTO;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,17 +39,29 @@ public class StoreController {
 			Model model
 			) {
 		
-		
-		return null;
+		model.addAttribute("storeCreateRequest", new StoreCreateRequestDTO());
+		model.addAttribute("storeStatuses", StoreStatus.values());
+		return "bookstore/store/register";
 	}
 
 	@PostMapping("/create")
 	public String createStore(
-			@Valid @ModelAttribute StoreCreateRequestDTO form,
+			@Valid @ModelAttribute("storeCreateRequest") StoreCreateRequestDTO form,
 			Errors errors,
 			Model model
 			) {
-		return null;
+		
+		if(errors.hasErrors()) {
+			model.addAttribute("storeCreateRequest", form);
+			model.addAttribute("storeStatuses", StoreStatus.values());
+			return "bookstore/store/register";
+		}
+		
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
+		
+		storeService.saveStore(form);
+		
+		return "redirect:/auth/login";
 	}
 	
 	@GetMapping("/edit")

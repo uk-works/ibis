@@ -17,13 +17,15 @@ public interface StoreMapper {
 
 	public Long countStoreRecord(String keyword);
 
+	public String selectLastStoreIdForUpdate();
+
 	public int insertStore(StoreCreateRequestDTO StoreCreateRequest);
 
 	public int updateStore(StoreEditRequestDTO storeEditRequest);
 
 	public int deleteStore(String StoreId);
 
-
+	
 	
 	
 	public List<StoreOptionDTO> selectStoresHasUnregisteredInventories();
