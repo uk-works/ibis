@@ -16,42 +16,42 @@
 		<button>登録</button>
 		<button type="button" onclick="location.href='/auth/login'">戻る</button>
 
-		<p th:errors="*{loginId}"></p>
-		<label>ID<input type="text" th:field="*{loginId}" /></label>
+		<p th:errors="*{account.loginId}"></p>
+		<label>ID<input type="text" th:field="*{account.loginId}" /></label>
 		
-		<p th:errors="*{password}"></p>
-		<label>パスワード<input type="password" th:field="*{password}" /></label>
+		<p th:errors="*{account.password}"></p>
+		<label>パスワード<input type="password" th:field="*{account.password}" /></label>
 
-		<p th:errors="*{storeName}"></p>
-		<label>書店名<input type="text" th:field="*{storeName}" /></label>
+		<p th:errors="*{store.storeName}"></p>
+		<label>書店名<input type="text" th:field="*{store.storeName}" /></label>
 
-		<p th:errors="*{email}"></p>
-		<label>メールアドレス<input type="email" th:field="*{email}" /></label>
+		<p th:errors="*{store.email}"></p>
+		<label>メールアドレス<input type="email" th:field="*{store.email}" /></label>
 
-		<p th:errors="*{tel}"></p>
-		<label>電話番号<input type="text" th:field="*{tel}" /></label>
+		<p th:errors="*{store.tel}"></p>
+		<label>電話番号<input type="text" th:field="*{store.tel}" /></label>
 
-		<p th:errors="*{postalCode}"></p>
-		<label>郵便番号<input type="text" th:field="*{postalCode}" /></label>
+		<p th:errors="*{store.postalCode}"></p>
+		<label>郵便番号<input type="text" th:field="*{store.postalCode}" /></label>
 		
-		<p th:errors="*{address}"></p>
-		<label>住所<input type="text" th:field="*{address}" /></label>
+		<p th:errors="*{store.address}"></p>
+		<label>住所<input type="text" th:field="*{store.address}" /></label>
 		
-		<p th:errors="*{openingHours}"></p>
-		<label>営業時間<input type="text" th:field="*{openingHours}" /></label>
+		<p th:errors="*{store.openingHours}"></p>
+		<label>営業時間<input type="text" th:field="*{store.openingHours}" /></label>
 		
-		<p th:errors="*{closedDays}"></p>
-		<label>定休日<input type="text" th:field="*{closedDays}" /></label>
+		<p th:errors="*{store.closedDays}"></p>
+		<label>定休日<input type="text" th:field="*{store.closedDays}" /></label>
 
 		<label>書店営業状態
-			<select th:field="*{storeStatus}">
+			<select th:field="*{store.storeStatus}">
 				<option th:each="status : ${storeStatuses}" th:value="${status}">
 					[[${status.label}]]
 				</option>
 			</select>
 		</label>
 		
-		<label>備考<input type="text" th:field="*{note}" /></label>
+		<label>備考<input type="text" th:field="*{store.note}" /></label>
 	</form>
 	
 	
