@@ -3,6 +3,8 @@ package com.integratedbookinfo.system.store.dto;
 import jakarta.validation.constraints.NotBlank;
 
 import com.integratedbookinfo.system.shared.enums.StoreStatus;
+import com.integratedbookinfo.system.validationgroup.StoreCreateGroup;
+import com.integratedbookinfo.system.validationgroup.StoreEditGroup;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,25 +15,25 @@ public class StoreDTO {
 	
 	private String storeId;
 	
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String storeName;
 
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String email;
 	
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String tel;
 	
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String postalCode;
 	
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String address;
 	
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String openingHours;
 	
-	@NotBlank
+	@NotBlank(groups = {StoreCreateGroup.class, StoreEditGroup.class})
 	private String closedDays;
 	
 	private StoreStatus storeStatus;
