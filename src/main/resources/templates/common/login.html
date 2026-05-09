@@ -12,10 +12,10 @@
 	<h1>IBIS</h1>
 	<form th:action="@{/auth/login}" method="post" th:object="${form}">
 		<p th:errors="*{loginId}"></p>
-		<input type="text" th:field="*{loginId}" />
+		<input type="text" th:field="*{loginId}" autocomplete="loginId"/>
 
 		<p th:errors="*{password}"></p>
-		<input type="password" th:field="*{password}" />
+		<input type="password" th:field="*{password}" autocomplete="current-password"/>
 		
 		<input type="submit" />
 	</form>
