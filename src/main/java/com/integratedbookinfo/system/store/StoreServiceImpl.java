@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.integratedbookinfo.system.auth.AuthMapper;
+import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.store.dto.AccountDTO;
 import com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO;
 import com.integratedbookinfo.system.store.dto.StoreDTO;
@@ -12,6 +13,7 @@ import com.integratedbookinfo.system.store.dto.StoreEditRequestDTO;
 import com.integratedbookinfo.system.store.dto.StoreListResponseDTO;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +33,16 @@ public class StoreServiceImpl implements StoreService {
 	public int getTotalPages(int numPerPage, String keyword) {
 		// TODO 自動生成されたメソッド・スタブ
 		return 0;
+	}
+	
+	@Override
+	public StoreEditRequestDTO getStoreEdit(String storeId) {
+		
+		StoreEditRequestDTO storeEdit = storeMapper.selectStoreEditByStoreId(storeId);
+		
+		storeEdit.getAccount().setPassword("");
+		
+		return storeEdit;
 	}
 	
 	@Override
@@ -56,9 +68,24 @@ public class StoreServiceImpl implements StoreService {
 	}
 	
 	@Override
-	public void modifyStore(StoreEditRequestDTO storeEditRequest) {
-		// TODO 自動生成されたメソッド・スタブ
+	public void modifyStore(StoreEditRequestDTO storeEditRequest, LoginUserRequestDTO loginUser) {
 		
+		StoreDTO store = storeEditRequest.getStore();
+		AccountDTO account = storeEditRequest.getAccount();
+		
+		if(account.getPassword() == null || account.getPassword().isEmpty()) {
+			StoreEditRequestDTO originStoreEdit = storeMapper.selectStoreEditByStoreId(loginUser.getStoreId());
+			
+			System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(originStoreEdit));
+			account.setPassword(originStoreEdit.getAccount().getPassword());
+
+		} else {
+			String hashedPassword = BCrypt.hashpw(account.getPassword(), BCrypt.gensalt());
+			account.setPassword(hashedPassword);
+		}
+
+		storeMapper.updateAccount(account, loginUser.getStoreId());
+		storeMapper.updateStore(store, loginUser.getStoreId());
 	}
 	
 	@Override

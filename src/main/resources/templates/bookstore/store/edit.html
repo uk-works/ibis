@@ -4,29 +4,56 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../../css/common_header.css" rel="stylesheet">
 	<title>書店管理 | IBIS</title>
 </head>
 
+<header th:replace="~{common/store_header :: page_header}"></header>
 <body>
 
 	<p>書店編集</p>
 	
-	<form action="#" method="post">
-		<label>ID<input type="text" /></label>
-		<label>パスワード<input type="text" /></label>
-		<label>書店名<input type="text" /></label>
-		<label>メールアドレス<input type="text" /></label>
-		<label>電話番号<input type="text" /></label>
-		<label>郵便番号<input type="text" /></label>
-		<label>住所<input type="text" /></label>
-		<label>営業時間<input type="text" /></label>
-		<label>定休日<input type="text" /></label>
+	<form th:action="@{/store/edit}" method="post" th:object="${storeEditRequest}">
+		<button>完了</button>
+		<button type="button" onclick="location.href='/dashboard'">戻る</button>
+
+		<p th:errors="*{account.loginId}"></p>
+		<label>ID<input type="text" th:field="*{account.loginId}" /></label>
+		
+		<p th:errors="*{account.password}"></p>
+		<label>パスワード<input type="text" th:field="*{account.password}" /></label>
+
+		<p th:errors="*{store.storeName}"></p>
+		<label>書店名<input type="text" th:field="*{store.storeName}" /></label>
+
+		<p th:errors="*{store.email}"></p>
+		<label>メールアドレス<input type="email" th:field="*{store.email}" /></label>
+
+		<p th:errors="*{store.tel}"></p>
+		<label>電話番号<input type="text" th:field="*{store.tel}" /></label>
+
+		<p th:errors="*{store.postalCode}"></p>
+		<label>郵便番号<input type="text" th:field="*{store.postalCode}" /></label>
+		
+		<p th:errors="*{store.address}"></p>
+		<label>住所<input type="text" th:field="*{store.address}" /></label>
+		
+		<p th:errors="*{store.openingHours}"></p>
+		<label>営業時間<input type="text" th:field="*{store.openingHours}" /></label>
+		
+		<p th:errors="*{store.closedDays}"></p>
+		<label>定休日<input type="text" th:field="*{store.closedDays}" /></label>
+
 		<label>書店営業状態
-			<select>
-				<option></option></select>
+			<select th:field="*{store.storeStatus}">
+				<option th:each="status : ${storeStatuses}" th:value="${status}">
+					[[${status.label}]]
+				</option>
+			</select>
 		</label>
-		<label>備考<input type="text" /></label>
+		
+		<label>備考<input type="text" th:field="*{store.note}" /></label>
 	</form>
 	
 	
