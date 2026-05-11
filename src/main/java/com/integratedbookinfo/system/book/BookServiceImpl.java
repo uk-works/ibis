@@ -168,6 +168,13 @@ public class BookServiceImpl implements BookService {
 
 		int updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
 		
+		// 書籍編集（書店書籍 新規追加の場合）
+		// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
+		if (updateStoreBookCount == 0) {
+			storeBook.setBookId(book.getBookId());
+			bookMapper.insertStoreBook(storeBook);
+		}
+		
 		System.out.println("updateBook : " + updateBookCount);
 		System.out.println("updateStoreBook : " + updateStoreBookCount);
 		
