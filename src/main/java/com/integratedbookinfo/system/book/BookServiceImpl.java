@@ -3,6 +3,8 @@ package com.integratedbookinfo.system.book;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -65,19 +68,28 @@ public class BookServiceImpl implements BookService {
 	public List<StoreOptionDTO> getStoreOptions() {
 		return bookMapper.selectStoreOptions();
 	}
-
+	
 	@Override
 	public List<StoreOptionDTO> getStoreOptionsByBookId(String bookId) {
 		
 	    List<StoreBookDTO> storeBooks = bookMapper.selectStoreBooksByBookId(bookId);
-
-	    List<String> storeIds = storeBooks.stream()
+	    
+	    List<StoreOptionDTO> storeOptions = bookMapper.selectStoreOptions();
+	    
+	    Set<String> hasBookStoreIds = storeBooks.stream()
 	        .map(StoreBookDTO::getStoreId)
-	        .toList();
+	        .collect(Collectors.toSet());
 
-	    List<StoreOptionDTO> storeOptions = bookMapper.selectStoreOptions().stream()
-	        .filter(opt -> storeIds.contains(opt.getStoreId()))
-	        .toList();
+	    storeOptions.forEach(store -> {
+	    	
+	    	if(!hasBookStoreIds.contains(store.getStoreId())) {
+	    		store.setStoreName(store.getStoreName() + "（未登録）");
+	    	}
+	    	
+	    });
+	    	    
+	    System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(storeOptions));
+		System.out.println("=====");	    
 	    
 	    return storeOptions;
 	}
