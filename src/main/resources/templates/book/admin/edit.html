@@ -89,9 +89,17 @@
 		  </option>
 		</select>
 		
-		<input type="text" id="storePrice" th:field="*{storeBook.storePrice}">
-		<input type="text" id="storeComment" th:field="*{storeBook.storeComment}">
-		<input type="text" id="note" th:field="*{storeBook.note}">
+		<p th:errors="*{storeBook.storeGenre}"></p>
+		<label>書店ジャンル<input type="text" id="storeGenre" th:field="*{storeBook.storeGenre}" /></label>
+
+		<p th:errors="*{storeBook.storePrice}"></p>
+		<label>店頭価格<input type="text" id="storePrice" th:field="*{storeBook.storePrice}" /></label>
+
+		<p th:errors="*{storeBook.storeComment}"></p>
+		<label>紹介文<input type="text" id="storeComment" th:field="*{storeBook.storeComment}" /></label>
+
+		<p th:errors="*{storeBook.note}"></p>
+		<label>備考<input type="text" id="note" th:field="*{storeBook.note}" /></label>
 		
 	</form>
 	
@@ -152,6 +160,7 @@
 	    const storeBooks = /*[[${storeBooks}]]*/ [];
 
 	    const select = document.getElementById("storeSelect");
+		const genre = document.getElementById("storeGenre");
 	    const price = document.getElementById("storePrice");
 	    const comment = document.getElementById("storeComment");
 	    const note = document.getElementById("note");
@@ -164,12 +173,14 @@
 	            price.value = "";
 	            comment.value = "";
 	            note.value = "";
+				genre.value = "";
 	            return;
 	        }
 
 	        price.value = data.storePrice || "";
 	        comment.value = data.storeComment || "";
 	        note.value = data.note || "";
+			genre.value = data.storeGenre || "";
 	    }
 
 	    // 変更時
