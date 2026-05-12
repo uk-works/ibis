@@ -1,6 +1,9 @@
 package com.integratedbookinfo.system.inventory.dto;
 
+import jakarta.validation.constraints.Min;
+
 import com.integratedbookinfo.system.shared.enums.InventoryStatus;
+import com.integratedbookinfo.system.validationgroup.InventoryRegisterGroup;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +14,8 @@ public class InventoryRequestDTO {
 
 	private String storeId;
 	private String bookId;
+	
+	@Min(value = 1, message = "在庫数は1以上を入力してください", groups= {InventoryRegisterGroup.class})
 	private int amount;
 	private InventoryStatus inventoryStatus;
 }

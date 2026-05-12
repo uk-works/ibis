@@ -2,16 +2,224 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.integratedbookinfo.system.inventory.InventoryMapper">
 
+	<resultMap id="resultAllInventories" type="com.integratedbookinfo.system.inventory.dto.StoreInventoryDTO" >
+		<id property="storeId" column="store_id" />
+		<result property="storeName" column="store_name" />
+		<collection property="inventorySummaries" ofType="com.integratedbookinfo.system.inventory.dto.InventorySummaryDTO" autoMapping="true">
+			<id property="bookId" column="book_id" />
+			<id property="storeId" column="store_id" />
+		</collection>
+	</resultMap>
+
+	<select id="selectStoreInventoriesByKeyword"  resultMap="resultAllInventories">
+	
+		SELECT
+			t_inventories.book_id,
+		    t_inventories.store_id,
+		    m_stores.store_name,
+			m_books.book_title,
+		    t_inventories.amount,
+		    t_inventories.inventory_status,
+		    t_inventories.updated_at
+		FROM (
+				SELECT
+					DISTINCT t_inventories.store_id
+				FROM
+					m_stores
+				INNER JOIN
+					t_inventories
+				ON
+					m_stores.store_id = t_inventories.store_id
+				LIMIT
+					#{offset}, #{limit}
+				) store_id_list
+		INNER JOIN
+			t_inventories
+		ON
+			store_id_list.store_id = t_inventories.store_id
+		INNER JOIN
+			m_stores
+		ON
+			m_stores.store_id = t_inventories.store_id
+		INNER JOIN
+			m_books
+		ON
+			t_inventories.book_id = m_books.book_id
+		WHERE
+			t_inventories.deleted_flag = 0
+			<if test="keyword != null and keyword != ''">
+			    AND (
+						m_books.book_title LIKE CONCAT('%', #{keyword}, '%')
+					OR 
+						m_stores.store_name LIKE CONCAT('%', #{keyword}, '%') 
+				)
+			</if>
+		ORDER BY
+			t_inventories.store_id;
+	
+	</select>
+
+	<select id="countStoresByKeyword" parameterType="String" resultType="Long">
+	
+		SELECT
+			COUNT(DISTINCT t_inventories.store_id) AS store_count
+		FROM 
+			m_stores
+		INNER JOIN
+			t_inventories
+		ON
+			m_stores.store_id = t_inventories.store_id
+		INNER JOIN
+			m_books
+		ON
+			t_inventories.book_id = m_books.book_id
+		WHERE
+			t_inventories.deleted_flag = 0
+			<if test="keyword != null and keyword != ''">
+				AND (
+					m_books.book_title LIKE CONCAT('%', #{keyword}, '%')
+				OR 
+					m_stores.store_name LIKE CONCAT('%', #{keyword}, '%') 
+				)
+			</if>
+	</select>
+
+	<select id="selectInventorySummariesByKeyword" resultType="com.integratedbookinfo.system.inventory.dto.InventorySummaryDTO">
+	
+		SELECT
+			t_inventories.book_id,
+		    t_inventories.store_id,
+		    m_books.book_title,
+		    t_inventories.amount,
+		    t_inventories.inventory_status,
+		    t_inventories.updated_at
+		FROM
+			t_inventories
+		INNER JOIN
+			m_books
+		ON
+			t_inventories.book_id = m_books.book_id
+		WHERE
+			t_inventories.deleted_flag = 0
+			<if test="keyword != null and keyword != ''">
+	  		    AND m_books.book_title LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		AND
+			t_inventories.store_id = #{storeId}
+		ORDER BY 
+			t_inventories.store_id
+		LIMIT 
+			#{offset}, #{limit};
+	
+	</select>
+
+	<select id="countInventoryByStoreIdAndBookId" resultType="long">
+	
+		SELECT
+			count(*)
+		FROM
+			t_inventories
+		WHERE
+			store_id = #{storeId}
+		AND
+			book_id = #{bookId};
+	</select>
+
+	<select id="countInventorySummariesByStoreIdAndKeyword" resultType="Long">
+	
+		SELECT
+			count(*)
+		FROM
+			t_inventories
+		INNER JOIN
+			m_books
+		ON
+			t_inventories.book_id = m_books.book_id
+		WHERE
+			t_inventories.deleted_flag = 0
+			<if test="keyword != null and keyword != ''">
+	  		    AND m_books.book_title LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		AND
+			t_inventories.store_id = #{storeId};
+	
+	</select>
+
+	<insert id="insertInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
+	
+		INSERT INTO
+			t_inventories
+		VALUE(
+			#{bookId},
+			#{storeId},
+			#{amount},
+			#{inventoryStatus},
+			NOW(),
+			NOW(),
+			0	
+		);
+
+	</insert>
+
+	<update id="updateInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
+	
+		UPDATE
+			t_inventories
+		SET
+			amount = #{amount},
+			inventory_status = #{inventoryStatus},
+			updated_at = NOW()
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId};
+	
+	</update>
+
+	<update id="updateResumeInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
+	
+		UPDATE
+			t_inventories
+		SET
+			amount = #{amount},
+			inventory_status = 'active',
+			updated_at = NOW(),
+			deleted_flag = 0
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId};
+			
+	</update>
+
 	<!-- 在庫 論理削除 -->
 	<update id="deleteInventoryByBookId" parameterType="String">
 	
 		UPDATE
 			t_inventories
 		SET
+			updated_at = NOW(),
 			deleted_flag = 1
 		WHERE
-			book_id = #{bookId}
+			book_id = #{bookId};
 	
 	</update>
+	
+	<update id="deleteInventoryByStoreIdAndBookId">
+	
+		UPDATE
+			t_inventories
+		SET
+			amount = 0,
+			inventory_status = 'discontinued',
+			updated_at = NOW(),
+			deleted_flag = 1
+		WHERE
+			store_id = #{storeId}
+		AND
+			book_id = #{bookId};
+	
+	</update>
+	
 	
 </mapper>

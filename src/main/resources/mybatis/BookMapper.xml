@@ -113,6 +113,69 @@
 			m_stores
 	</select>
 
+	<select id="selectBookOptions" resultType="com.integratedbookinfo.system.shared.domain.BookOptionDTO">
+
+		SELECT
+			store_books.store_id,
+			m_books.book_id,
+		    m_books.book_title
+		FROM
+			m_books
+		INNER JOIN
+			store_books
+		ON
+			m_books.book_id = store_books.book_id
+		LEFT JOIN
+			t_inventories
+		ON 
+			m_books.book_id = t_inventories.book_id
+		WHERE
+			t_inventories.book_id IS NULL
+		OR(
+				t_inventories.deleted_flag = 1
+		    AND
+				t_inventories.inventory_status = 'discontinued'
+			AND
+				t_inventories.amount = 0
+		)
+		ORDER BY
+			store_books.store_id;
+	
+	</select>
+
+	<select id="selectBookOptionsByStoreId" parameterType="String" resultType="com.integratedbookinfo.system.shared.domain.BookOptionDTO">
+
+		SELECT
+			store_books.store_id,
+			m_books.book_id,
+			m_books.book_title
+		FROM
+			m_books
+		INNER JOIN
+			store_books
+		ON
+			m_books.book_id = store_books.book_id
+		LEFT JOIN
+			t_inventories
+		ON 
+			m_books.book_id = t_inventories.book_id
+		WHERE
+			t_inventories.book_id IS NULL
+		AND
+			store_books.store_id = #{storeId}
+		OR(
+				t_inventories.deleted_flag = 1
+			AND
+				t_inventories.inventory_status = 'discontinued'
+			AND
+				t_inventories.amount = 0
+		)
+		ORDER BY
+			store_books.store_id;
+	
+	</select>
+
+
 	<resultMap id="bookResult" type="com.integratedbookinfo.system.shared.domain.BookDTO" autoMapping="true">
 		<id property="bookId" column="book_id" />
 		<association property="genre" javaType="com.integratedbookinfo.system.shared.domain.Genre">
@@ -315,6 +378,19 @@
 			deleted_flag = 1
 		WHERE
 			book_id = #{bookId}
+	
+	</update>
+	
+	<update id="deleteStoreBookByBookIdAndStoreId">
+	
+		UPDATE
+			store_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId}
 	
 	</update>
 	

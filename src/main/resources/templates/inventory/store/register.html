@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">	
+	<title>在庫登録 | IBIS</title>
+</head>
+<header th:replace="~{common/store_header :: page_header}"></header>
+<body>
+	<p>在庫登録</p>
+	
+	<form th:action="@{/inventory/create}" method="post" th:object="${inventoryRequest}">
+
+		<label>書籍
+			<select th:field="*{bookId}">
+				<option th:each="book : ${bookOptions}" th:value="${book.bookId}">
+					[[${book.bookTitle}]]
+				</option>
+			</select>
+		</label>
+		<p th:errors="*{amount}"></p>
+		<label>在庫数
+			<input type="number" th:field="*{amount}" />
+		</label>
+		<button>登録</button>
+		<button type="button" onclick="location.href='/inventory/list'">戻る</button>
+	</form>
+	
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
+
+</body>
+
+</html>
