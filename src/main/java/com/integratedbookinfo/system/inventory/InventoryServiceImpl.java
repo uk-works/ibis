@@ -52,7 +52,7 @@ public class InventoryServiceImpl implements InventoryService {
 	
 	@Override
 	public int getInventoryTotalPagesByKeyword(int numPerPage, String storeId, String keyword) {
-		double totalNum = (double) inventoryMapper.countInventorySummariesByKeyword(keyword);
+		double totalNum = (double) inventoryMapper.countInventorySummariesByStoreIdAndKeyword(storeId, keyword);
 
 		return (int) Math.ceil(totalNum / numPerPage);
 	}
