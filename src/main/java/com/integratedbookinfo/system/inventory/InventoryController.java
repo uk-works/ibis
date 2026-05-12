@@ -1,14 +1,11 @@
 package com.integratedbookinfo.system.inventory;
 
-import java.util.List;
-
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -76,14 +73,23 @@ public class InventoryController {
 		String pageName = "";
 		LoginUserRequestDTO loginUser = getLoginUser(session);
 		InventoryRequestDTO inventoryRequest = new InventoryRequestDTO();
+		
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
 
-		model.addAttribute("storeOptions", inventoryService.getStoreOptions());
-		model.addAttribute("bookOptions", inventoryService.getBookOptions());
 		model.addAttribute("inventoryRequest", inventoryRequest);
+
+		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)){
+			model.addAttribute("storeOptions", inventoryService.getStoreOptions());
+			model.addAttribute("bookOptions", inventoryService.getBookOptions());
+			
+
+			pageName = "inventory/admin/register";
+		} else {
+			model.addAttribute("bookOptions", inventoryService.getBookOptionsByStoreId(loginUser.getStoreId()));
 		
-		pageName = "inventory/admin/register";
+			pageName = "inventory/store/register";	
+		}
 		
 		return pageName;
 	}
@@ -95,35 +101,36 @@ public class InventoryController {
 			HttpSession session,
 			Model model) {
 
-		String pageName = "";
 		LoginUserRequestDTO loginUser = getLoginUser(session);
 
 		form.setInventoryStatus(InventoryStatus.ACTIVE);
-		List<ObjectError> objList = errors.getAllErrors();
-		for(ObjectError obj : objList) {
-			System.out.println(obj.toString());
-		}
-		System.out.println(errors.hasErrors());
-		System.out.println(errors.getErrorCount());
+		
 		if(errors.hasErrors()) {
+			
 			model.addAttribute("displayName", loginUser.getDisplayName());
 			model.addAttribute("accountRole", loginUser.getAccountRole());
-
-			model.addAttribute("storeOptions", inventoryService.getStoreOptions());
-			model.addAttribute("bookOptions", inventoryService.getBookOptions());
 			model.addAttribute("inventoryRequest", form);
 			
-			pageName = "inventory/admin/register";
-			return pageName;
+			if (loginUser.getAccountRole().equals(AccountRole.ADMIN)){
+				model.addAttribute("storeOptions", inventoryService.getStoreOptions());
+				model.addAttribute("bookOptions", inventoryService.getBookOptions());
+				model.addAttribute("inventoryRequest", form);
+				
+				return "inventory/admin/register";
+			} else {
+				model.addAttribute("bookOptions", inventoryService.getBookOptionsByStoreId(loginUser.getStoreId()));
+
+				return "inventory/store/register";
+			}
+
 		}
 
-
+		
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
-		inventoryService.saveInventory(form);
+		inventoryService.saveInventory(form, loginUser);
 		
-		pageName = "redirect:/inventory/list";
-		return pageName;
+		return "redirect:/inventory/list";
 	}
 
 	@PostMapping("/edit")
