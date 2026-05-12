@@ -21,9 +21,14 @@ public interface InventoryMapper {
 	
 	public Long countInventorySummariesByKeyword(String keyword);
 
+	public int countInventoryByStoreIdAndBookId(@Param("storeId") String storeId, @Param("bookId") String bookId);
+	
 	public int insertInventory(InventoryRequestDTO inventoryRequest);
 
 	public int updateInventory(InventoryRequestDTO inventoryRequest);
+
+	// 在庫復活処理
+	public int updateResumeInventory(InventoryRequestDTO inventoryRequest);
 
 	public int deleteInventoryByStoreIdAndBookId(String storeId, String bookId);
 

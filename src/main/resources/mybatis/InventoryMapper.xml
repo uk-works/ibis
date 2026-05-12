@@ -113,6 +113,18 @@
 	
 	</select>
 
+	<select id="countInventoryByStoreIdAndBookId" resultType="int">
+	
+		SELECT
+			count(*)
+		FROM
+			t_inventories
+		WHERE
+			store_id = #{storeId}
+		AND
+			book_id = #{bookId};
+	</select>
+
 	<insert id="insertInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
 	
 		INSERT INTO
@@ -144,6 +156,22 @@
 	
 	</update>
 
+	<update id="updateResumeInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
+	
+		UPDATE
+			t_inventories
+		SET
+			amount = #{amount},
+			inventory_status = 'active',
+			updated_at = NOW(),
+			deleted_flag = 0
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId};
+			
+	</update>
+
 	<!-- 在庫 論理削除 -->
 	<update id="deleteInventoryByBookId" parameterType="String">
 	
@@ -162,6 +190,8 @@
 		UPDATE
 			t_inventories
 		SET
+			amount = 0,
+			inventory_status = 'discontinued',
 			updated_at = NOW(),
 			deleted_flag = 1
 		WHERE
