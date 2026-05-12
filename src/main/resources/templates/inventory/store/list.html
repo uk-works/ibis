@@ -125,7 +125,7 @@
 
 					<div class="modal-header">
 
-						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">取扱在庫編集</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 
@@ -174,36 +174,35 @@
 	</div>
 
 	
-<!--	<div class="modal fade" id="inventoryDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"-->
-<!--		aria-labelledby="staticBackdropLabel" aria-hidden="true">-->
-<!--		<div class="modal-dialog modal-dialog-centered">-->
-<!--			<div class="modal-content">-->
+	<div class="modal fade" id="inventoryDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
 
-<!--					<div class="modal-header">-->
+					<div class="modal-header">
 
-<!--						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>-->
-<!--						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-<!--					</div>-->
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">取扱在庫削除</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
 
-<!--					<form id="deleteForm" th:action="@{/inventory/delete}" method="post">-->
-<!--						<input type="hidden" name="storeId" id="delStoreIdInput">-->
-<!--						<input type="hidden" name="bookId" id="delBookIdInput">-->
+					<form id="deleteForm" th:action="@{/inventory/delete}" method="post">
+						<input type="hidden" name="storeId" id="delStoreIdInput">
+						<input type="hidden" name="bookId" id="delBookIdInput">
 
-<!--						<div class="modal-body">-->
-<!--							<p>以下の在庫を削除しますか？</p>-->
-<!--							<p>書店名：<span id="delStoreName"></span></p>-->
-<!--							<p>書籍名：<span id="delBookTitle"></span></p>-->
-<!--							<p>在庫数：<span id="delAmount" ></span></p>-->
+						<div class="modal-body">
+							<p>以下の在庫を削除しますか？</p>
+							<p>書籍名：<span id="delBookTitle"></span></p>
+							<p>在庫数：<span id="delAmount" ></span></p>
 
-<!--						</div>-->
-<!--						<div class="modal-footer">-->
-<!--							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>-->
-<!--							<button type="button" id="deleteButton" class="btn btn-primary">削除</button>-->
-<!--						</div>-->
-<!--					</form>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--	</div>-->
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+							<button type="button" id="deleteButton" class="btn btn-primary">削除</button>
+						</div>
+					</form>
+			</div>
+		</div>
+	</div>
 		
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 	<script th:inline="javascript">
@@ -212,14 +211,11 @@
 		document.querySelectorAll(".inventoryEditButton").forEach(button => {
 
 			button.addEventListener("click", () => {
-
 				
 				const storeId = button.dataset.storeId;
 				const bookId = button.dataset.bookId;
 
 				const storeInventory = storeInventories.find((sis) => sis.storeId === storeId && sis.bookId === bookId);
-				console.log("storeInventory:", storeInventory)
-
 			
 				document.getElementById("bookTitle").textContent = storeInventory.bookTitle;
 				
@@ -279,8 +275,43 @@
 			"input",
 			updateInventoryStatusVisibility
 		);
+	</script>
+	<script th:inline="javascript">
+		/* 在庫削除モーダル 処理 */
 
+		document.querySelectorAll(".inventoryDeleteButton").forEach(button => {
 
+			button.addEventListener("click", () => {
+
+				const storeId = button.dataset.storeId;
+				const bookId = button.dataset.bookId;
+
+				const storeInventory = storeInventories.find((sis) => sis.storeId === storeId && sis.bookId === bookId);
+
+				document.getElementById("delBookTitle").textContent = storeInventory.bookTitle;
+				
+				document.getElementById("delAmount").textContent = storeInventory.amount;
+
+				document.getElementById("delStoreIdInput").value
+				    = storeId;
+
+				document.getElementById("delBookIdInput").value
+				    = bookId;
+			});
+		});	
+			
+		const deleteButton =
+		    document.getElementById("deleteButton");
+
+		const deleteForm =
+		    document.getElementById("deleteForm");
+
+		deleteButton.addEventListener("click", () => {
+
+		    deleteForm.submit();
+
+		});
+		
 	</script>
 </body>
 
