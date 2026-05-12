@@ -19,7 +19,7 @@ public interface InventoryMapper {
 
 	public Long countStoresByKeyword(String keyword);
 	
-	public Long countInventorySummariesByKeyword(String keyword);
+	public Long countInventorySummariesByStoreIdAndKeyword(@Param("storeId") String storeId, @Param("keyword") String keyword);
 
 	public int countInventoryByStoreIdAndBookId(@Param("storeId") String storeId, @Param("bookId") String bookId);
 	
