@@ -162,6 +162,8 @@
 		UPDATE
 			t_inventories
 		SET
+			amount = 0,
+			inventory_status = 'discontinued',
 			updated_at = NOW(),
 			deleted_flag = 1
 		WHERE
