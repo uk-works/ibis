@@ -74,8 +74,19 @@ public class InventoryServiceImpl implements InventoryService {
 	
 	@Override
 	public void saveInventory(InventoryRequestDTO inventoryRequest) {
+		// 新規在庫追加の場合 or 廃止された在庫復活の場合で処理が分かれる
+		int countInventory = inventoryMapper.countInventoryByStoreIdAndBookId(inventoryRequest.getStoreId(), inventoryRequest.getBookId());
+		int countUpdateResumeInventory = 0;
+		int countInsertInventory = 0;
 		
-		inventoryMapper.insertInventory(inventoryRequest);
+		if (countInventory == 1) {
+			countUpdateResumeInventory = inventoryMapper.updateResumeInventory(inventoryRequest);
+		} else {
+			countInsertInventory = inventoryMapper.insertInventory(inventoryRequest);
+		}
+		
+		System.out.println("updateResumeInventory()：" + countUpdateResumeInventory + "件");
+		System.out.println("insertInventory()：" + countInsertInventory + "件");
 	}
 	
 	@Override
