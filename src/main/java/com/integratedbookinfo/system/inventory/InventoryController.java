@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.integratedbookinfo.system.auth.AuthController;
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
+import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.shared.enums.InventoryStatus;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +31,11 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("/inventory")
 public class InventoryController {
 
-	private final int NUM_PER_PAGE = 5;
+    private final AuthController authController;
+
+	private final int NUM_PER_PAGE = 2;
 	private final InventoryService inventoryService;
+
 
 	@GetMapping("/list")
 	public String showinventories(
@@ -46,11 +51,17 @@ public class InventoryController {
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
 
-		pageName = "inventory/admin/list";
-		model.addAttribute("page", page);
-		model.addAttribute("storeInventoryResponse",
-				inventoryService.getStoreInventoriesByKeyword(page, NUM_PER_PAGE, keyword));
-		model.addAttribute("totalPages", inventoryService.getStoreTotalPagesByKeyword(NUM_PER_PAGE, keyword));
+		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			model.addAttribute("page", page);
+			model.addAttribute("storeInventoryResponse", inventoryService.getStoreInventoriesByKeyword(page, NUM_PER_PAGE, keyword));
+			model.addAttribute("totalPages", inventoryService.getStoreTotalPagesByKeyword(NUM_PER_PAGE, keyword));
+			pageName = "inventory/admin/list";
+		} else {
+			model.addAttribute("page", page);
+			model.addAttribute("storeInventoryResponse", inventoryService.getInventorySummariesByKeyword(page, NUM_PER_PAGE, loginUser.getStoreId(), keyword));
+			model.addAttribute("totalPages", inventoryService.getInventoryTotalPagesByKeyword(NUM_PER_PAGE, loginUser.getStoreId(), keyword));
+			pageName = "inventory/store/list";
+		}
 
 		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(inventoryService.getStoreInventoriesByKeyword(NUM_PER_PAGE, NUM_PER_PAGE, keyword)));
 
