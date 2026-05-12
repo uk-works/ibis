@@ -114,7 +114,7 @@
 	</select>
 
 	<select id="selectBookOptions" resultType="com.integratedbookinfo.system.shared.domain.BookOptionDTO">
-	
+
 		SELECT
 			store_books.store_id,
 			m_books.book_id,
@@ -131,8 +131,13 @@
 			m_books.book_id = t_inventories.book_id
 		WHERE
 			t_inventories.book_id IS NULL
-		OR
-			t_inventories.deleted_flag = 1
+		OR(
+				t_inventories.deleted_flag = 1
+		    AND
+				t_inventories.inventory_status = 'discontinued'
+			AND
+				t_inventories.amount = 0
+		)
 		ORDER BY
 			store_books.store_id;
 	
