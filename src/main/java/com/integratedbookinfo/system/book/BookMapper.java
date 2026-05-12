@@ -48,6 +48,8 @@ public interface BookMapper {
 	
 	public List<BookOptionDTO> selectBookOptions();
 	
+	public List<BookOptionDTO> selectBookOptionsByStoreId(String storeId);
+	
 	public int insertBook(BookDTO bookDto);
 
 	public int insertStoreBook(StoreBookDTO storeBookDto);
