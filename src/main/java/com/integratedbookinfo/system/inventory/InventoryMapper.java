@@ -27,6 +27,9 @@ public interface InventoryMapper {
 
 	public int updateInventory(InventoryRequestDTO inventoryRequest);
 
+	// 在庫復活処理
+	public int updateResumeInventory(InventoryRequestDTO inventoryRequest);
+
 	public int deleteInventoryByStoreIdAndBookId(String storeId, String bookId);
 
 	public int deleteInventoryByBookId(String bookId);
