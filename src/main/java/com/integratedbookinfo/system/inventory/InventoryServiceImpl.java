@@ -88,7 +88,7 @@ public class InventoryServiceImpl implements InventoryService {
 	public void removeInventory(String storeId, String bookId) {
 		
 		inventoryMapper.deleteInventoryByStoreIdAndBookId(storeId, bookId);
-		
-		bookMapper.deleteStoreBookByBookIdAndStoreId(bookId, storeId);
+		/* TODO 削除必要↓ */
+		// bookMapper.deleteStoreBookByBookIdAndStoreId(bookId, storeId);
 	}
 }
