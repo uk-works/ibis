@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">	
+	<title>在庫登録 | IBIS</title>
+</head>
+<header th:replace="~{common/admin_header :: page_header}"></header>
+<body>
+	<p>在庫登録</p>
+	
+	<form th:action="@{/inventory/create}" method="post" th:object="${inventoryRequest}">
+		<label>書店
+			<select id="storeSelect" th:field="*{storeId}">
+				<option th:each="store : ${storeOptions}" th:value="${store.storeId}">[[${store.storeName}]]</option>
+			</select>
+		</label>
+		<label>書籍
+			<select id="bookSelect" th:field="*{bookId}">
+				<option th:value="1"></option>
+			</select>
+		</label>
+		<p th:errors="*{amount}"></p>
+		<label>在庫数
+			<input type="number" th:field="*{amount}" />
+		</label>
+		<button>登録</button>
+		<button type="button" onclick="location.href='/inventory/list'">戻る</button>
+	</form>
+	
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
+	<script th:inline="javascript">
+	    const bookOptions = /*[[${bookOptions}]]*/ [];
+	    const select = document.getElementById("storeSelect");
+
+
+		function update(){
+		    const storeId = select.value;
+			const data = bookOptions.filter(
+			    book => book.storeId === storeId
+			);
+
+			const bookSelect = document.getElementById("bookSelect");
+
+			// 一旦中身を空にする
+			bookSelect.innerHTML = "";
+
+			// option生成
+			data.forEach(book => {
+
+			    const option = document.createElement("option");
+
+			    option.value = book.bookId;
+			    option.textContent = book.bookTitle;
+
+			    bookSelect.appendChild(option);
+
+			});
+			
+		}
+
+	    // 変更時
+	    select.addEventListener("change", update);
+
+	    // 初期表示
+	    document.addEventListener("DOMContentLoaded", update);
+	</script>
+</body>
+
+</html>

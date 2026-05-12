@@ -1,4 +1,4 @@
-package com.integratedbookinfo.system.inventory.dto;
+package com.integratedbookinfo.system.shared.domain;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class BookOptionDTO {
 
+	private String storeId;
 	private String bookId;
 	private String bookTitle;
 }

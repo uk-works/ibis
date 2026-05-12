@@ -9,7 +9,7 @@
 	<title>取扱書籍編集 | IBIS</title>
 </head>
 
-<header th:replace="~{common/admin_header :: page_header}"></header>
+<header th:replace="~{common/store_header :: page_header}"></header>
 <body>
 
 	<p>取扱書籍編集</p>
@@ -84,8 +84,16 @@
 		
 		<!-- 書店個別項目 -->
 		<input type="hidden" th:field="*{storeBook.storeId}" />
+		<p th:errors="*{storeBook.storeGenre}"></p>
+		<label>書店ジャンル<input type="text" id="storeGenre" th:field="*{storeBook.storeGenre}" /></label>
+		
+		<p th:errors="*{storeBook.storePrice}"></p>
 		<label>店頭価格<input type="text" id="storePrice" th:field="*{storeBook.storePrice}"></label>
+
+		<p th:errors="*{storeBook.storeComment}"></p>
 		<label>紹介文<input type="text" id="storeComment" th:field="*{storeBook.storeComment}"></label>
+
+		<p th:errors="*{storeBook.note}"></p>
 		<label>備考<input type="text" id="note" th:field="*{storeBook.note}"></label>
 		
 	</form>

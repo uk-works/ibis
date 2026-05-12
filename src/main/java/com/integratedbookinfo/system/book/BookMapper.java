@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import com.integratedbookinfo.system.book.dto.BookSummaryDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
+import com.integratedbookinfo.system.shared.domain.BookOptionDTO;
 import com.integratedbookinfo.system.shared.domain.Genre;
 import com.integratedbookinfo.system.shared.domain.Publisher;
 import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
@@ -45,6 +46,10 @@ public interface BookMapper {
 	
 	public List<StoreBookDTO> selectStoreBooksByBookId(String bookId);
 	
+	public List<BookOptionDTO> selectBookOptions();
+	
+	public List<BookOptionDTO> selectBookOptionsByStoreId(String storeId);
+	
 	public int insertBook(BookDTO bookDto);
 
 	public int insertStoreBook(StoreBookDTO storeBookDto);
@@ -56,6 +61,8 @@ public interface BookMapper {
 	/* 該当書籍に関するデータが保持されているものはすべて論理削除
 	 * 書籍マスタ・書店書籍・在庫・書籍編集提案 削除 */
 	public int deleteBookByBookId(String bookId);
+	
+	public int deleteStoreBookByBookIdAndStoreId(@Param("bookId") String bookId, @Param("storeId") String storeId);
 	
 	public int deleteStoreBookByBookId(String bookId);
 

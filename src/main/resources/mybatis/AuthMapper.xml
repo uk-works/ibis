@@ -34,4 +34,29 @@
 	
 	</select>
 
+
+	<insert id="insertAccount"
+			parameterType="com.integratedbookinfo.system.store.dto.AccountDTO"
+			useGeneratedKeys="true"
+			keyProperty="accountId">
+	
+		INSERT INTO
+			user_accounts(
+				login_id,
+				password,
+				account_role,
+				created_at,
+				updated_at,
+				deleted_flag
+			)
+		VALUE (
+			#{loginId},
+			#{password},
+			'store',
+			NOW(),
+			NOW(),
+			0
+		);
+		
+	</insert>
 </mapper>
