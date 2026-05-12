@@ -118,61 +118,60 @@
 
 
 	<!-- 在庫編集モーダル -->
-<!--	<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"-->
-<!--		aria-labelledby="staticBackdropLabel" aria-hidden="true">-->
-<!--		<div class="modal-dialog modal-dialog-centered">-->
-<!--			<div class="modal-content">-->
+	<div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
 
-<!--					<div class="modal-header">-->
+					<div class="modal-header">
 
-<!--						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>-->
-<!--						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-<!--					</div>-->
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
 
-<!--					<form id="editForm" th:action="@{/inventory/edit}" method="post">-->
-<!--						<input type="hidden" name="storeId" id="storeIdInput">-->
-<!--						<input type="hidden" name="bookId" id="bookIdInput">-->
+					<form id="editForm" th:action="@{/inventory/edit}" method="post">
+						<input type="hidden" name="storeId" id="storeIdInput">
+						<input type="hidden" name="bookId" id="bookIdInput">
 
-<!--						<div class="modal-body">-->
-<!--							<p>以下の在庫情報を編集できます。<br>-->
-<!--								変更後、「完了」ボタンを押してください。</p>-->
-<!--							<p>書店名：<span id="storeName"></span></p>-->
-<!--							<p>書籍名：<span id="bookTitle"></span></p>-->
-<!--							<p>在庫数：<input type="number" name="amount" id="amountInput" /></p>-->
-<!--							<div id="inventoryStatusArea" style="display:none;">-->
-<!--								<p>-->
-<!--									在庫数が0のとき、在庫の状態を以下の項目から選択-->
-<!--								</p>-->
-<!--								<label>-->
-<!--									在庫状態-->
-<!--									<select name="inventoryStatus" id="inventoryStatusInput">-->
-<!--										<option value="ACTIVE">-->
-<!--											販売中-->
-<!--										</option>-->
+						<div class="modal-body">
+							<p>以下の在庫情報を編集できます。<br>
+								変更後、「完了」ボタンを押してください。</p>
+							<p>書籍名：<span id="bookTitle"></span></p>
+							<p>在庫数：<input type="number" name="amount" id="amountInput" /></p>
+							<div id="inventoryStatusArea" style="display:none;">
+								<p>
+									在庫数が0のとき、在庫の状態を以下の項目から選択
+								</p>
+								<label>
+									在庫状態
+									<select name="inventoryStatus" id="inventoryStatusInput">
+										<option value="ACTIVE">
+											販売中
+										</option>
 
-<!--										<option value="RESTOCK_PLANNED">-->
-<!--											再入荷予定あり-->
-<!--										</option>-->
+										<option value="RESTOCK_PLANNED">
+											再入荷予定あり
+										</option>
 
-<!--										<option value="RESTOCK_UNDECIDED">-->
-<!--											再入荷未定-->
-<!--										</option>-->
+										<option value="RESTOCK_UNDECIDED">
+											再入荷未定
+										</option>
 
-<!--										<option value="DISCONTINUED">-->
-<!--											取扱休止-->
-<!--										</option>-->
-<!--									</select>-->
-<!--								</label>-->
-<!--							</div>-->
-<!--						</div>-->
-<!--						<div class="modal-footer">-->
-<!--							<button type="button" id="editButton" class="btn btn-primary">完了</button>-->
-<!--							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>-->
-<!--						</div>-->
-<!--					</form>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--	</div>-->
+										<option value="DISCONTINUED">
+											取扱休止
+										</option>
+									</select>
+								</label>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button type="button" id="editButton" class="btn btn-primary">完了</button>
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+						</div>
+					</form>
+			</div>
+		</div>
+	</div>
 
 	
 <!--	<div class="modal fade" id="inventoryDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"-->
@@ -207,7 +206,82 @@
 <!--	</div>-->
 		
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
+	<script th:inline="javascript">
+		const storeInventories = /*[[${storeInventoryResponse.inventorySummaries}]]*/[];
 
+		document.querySelectorAll(".inventoryEditButton").forEach(button => {
+
+			button.addEventListener("click", () => {
+
+				
+				const storeId = button.dataset.storeId;
+				const bookId = button.dataset.bookId;
+
+				const storeInventory = storeInventories.find((sis) => sis.storeId === storeId && sis.bookId === bookId);
+				console.log("storeInventory:", storeInventory)
+
+			
+				document.getElementById("bookTitle").textContent = storeInventory.bookTitle;
+				
+				document.getElementById("storeIdInput").value
+				    = storeId;
+
+				document.getElementById("bookIdInput").value
+				    = bookId;
+
+				document.getElementById("amountInput").value
+				    = storeInventory.amount;
+
+				document.getElementById("inventoryStatusInput").value
+				    = storeInventory.inventoryStatus;
+					
+				updateInventoryStatusVisibility();
+			});
+		});
+		
+		const editButton =
+		    document.getElementById("editButton");
+
+		const editForm =
+		    document.getElementById("editForm");
+
+		editButton.addEventListener("click", () => {
+
+		    editForm.submit();
+
+		});
+		
+		/* ============================================================ */
+		const amountInput =
+			document.getElementById("amountInput");
+
+		const inventoryStatusArea =
+			document.getElementById("inventoryStatusArea");
+
+		function updateInventoryStatusVisibility() {
+
+			const value = amountInput.value;
+
+			if (value !== "" && Number(value) >= 1) {
+
+			    inventoryStatusInput.value = "ACTIVE";
+
+			    inventoryStatusArea.style.display = "none";
+
+			} else if (value !== "" && Number(value) === 0) {
+			    inventoryStatusArea.style.display = "block";
+			} else {
+			    inventoryStatusArea.style.display = "none";
+			}
+		}
+
+		amountInput.addEventListener(
+			"input",
+			updateInventoryStatusVisibility
+		);
+
+
+	</script>
 </body>
 
 </html>
