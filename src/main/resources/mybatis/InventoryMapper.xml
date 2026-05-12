@@ -113,7 +113,7 @@
 	
 	</select>
 
-	<select id="countInventoryByStoreIdAndBookId" resultType="Long">
+	<select id="countInventoryByStoreIdAndBookId" resultType="long">
 	
 		SELECT
 			count(*)
