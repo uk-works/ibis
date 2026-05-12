@@ -113,6 +113,18 @@
 	
 	</select>
 
+	<select id="countInventoryByStoreIdAndBookId" resultType="int">
+	
+		SELECT
+			count(*)
+		FROM
+			t_inventories
+		WHERE
+			store_id = #{storeId}
+		AND
+			book_id = #{bookId};
+	</select>
+
 	<insert id="insertInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
 	
 		INSERT INTO
