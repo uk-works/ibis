@@ -3,19 +3,23 @@ package com.integratedbookinfo.system.inventory;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.book.BookMapper;
 import com.integratedbookinfo.system.inventory.dto.AdminInventoryResponseDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.StoreInventoryResponseDTO;
 import com.integratedbookinfo.system.shared.domain.BookOptionDTO;
 import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
+import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.store.StoreMapper;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class InventoryServiceImpl implements InventoryService {
 
 	private final InventoryMapper inventoryMapper;
@@ -73,9 +77,19 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 	
 	@Override
-	public void saveInventory(InventoryRequestDTO inventoryRequest) {
+	public List<BookOptionDTO> getBookOptionsByStoreId(String storeId) {
+		return bookMapper.selectBookOptionsByStoreId(storeId);
+	}
+	
+	@Override
+	public void saveInventory(InventoryRequestDTO inventoryRequest, LoginUserRequestDTO loginUser) {
+		
+		if (loginUser.getAccountRole().equals(AccountRole.STORE)) {
+			inventoryRequest.setStoreId(loginUser.getStoreId());
+		}
+		
 		// 新規在庫追加の場合 or 廃止された在庫復活の場合で処理が分かれる
-		int countInventory = inventoryMapper.countInventoryByStoreIdAndBookId(inventoryRequest.getStoreId(), inventoryRequest.getBookId());
+		long countInventory = inventoryMapper.countInventoryByStoreIdAndBookId(inventoryRequest.getStoreId(), inventoryRequest.getBookId());
 		int countUpdateResumeInventory = 0;
 		int countInsertInventory = 0;
 		

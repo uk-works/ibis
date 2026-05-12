@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.AdminInventoryResponseDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.StoreInventoryResponseDTO;
@@ -24,8 +25,10 @@ public interface InventoryService {
 	public List<StoreOptionDTO> getStoreOptions();
 	
 	public List<BookOptionDTO> getBookOptions();
-	
-	public void saveInventory(InventoryRequestDTO inventoryRequest);
+
+	public List<BookOptionDTO> getBookOptionsByStoreId(String storeId);	
+
+	public void saveInventory(InventoryRequestDTO inventoryRequest, LoginUserRequestDTO loginUser);
 
 	public void modifyInventory(InventoryRequestDTO InventoryRequest);
 
