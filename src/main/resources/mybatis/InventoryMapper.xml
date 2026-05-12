@@ -113,7 +113,7 @@
 	
 	</select>
 
-	<select id="countInventoryByStoreIdAndBookId" resultType="int">
+	<select id="countInventoryByStoreIdAndBookId" resultType="Long">
 	
 		SELECT
 			count(*)
@@ -123,6 +123,26 @@
 			store_id = #{storeId}
 		AND
 			book_id = #{bookId};
+	</select>
+
+	<select id="countInventorySummariesByStoreIdAndKeyword" resultType="Long">
+	
+		SELECT
+			count(*)
+		FROM
+			t_inventories
+		INNER JOIN
+			m_books
+		ON
+			t_inventories.book_id = m_books.book_id
+		WHERE
+			t_inventories.deleted_flag = 0
+			<if test="keyword != null and keyword != ''">
+	  		    AND m_books.book_title LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		AND
+			t_inventories.store_id = #{storeId};
+	
 	</select>
 
 	<insert id="insertInventory" parameterType="com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO">
