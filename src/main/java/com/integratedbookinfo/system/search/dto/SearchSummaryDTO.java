@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 public class SearchSummaryDTO {
 
-	private String shopId;
-	private String shopName;
+	private String storeId;
+	private String storeName;
 	private int amount;
 	private InventoryStatus inventoryStatus;
 }
