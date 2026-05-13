@@ -13,8 +13,10 @@ import com.integratedbookinfo.system.search.dto.StoreBookDTO;
 @Mapper
 public interface SearchMapper {
 
-	public List<SearchSummaryListDTO> selectSearchSummayList(@Param("offset") int offset, @Param("limit")int limit, @Param("keyword") String keyword, @Param("genreId") String genreId);
+	public List<SearchSummaryListDTO> selectSearchSummaryList(@Param("offset") int offset, @Param("limit")int limit, @Param("keyword") String keyword, @Param("genreId") String genreId);
 
+	public Long countSearchSummary(@Param("keyword") String keyword, @Param("genreId") String genreId);
+	
 	public BookBasicInfoDTO selectBookBasicInfo(String bookId);
 
 	public List<StoreBookDTO> selectStoreBookInfo(String bookId);

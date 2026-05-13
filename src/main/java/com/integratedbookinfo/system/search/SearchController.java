@@ -13,19 +13,27 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/search")
 public class SearchController {
 
-	private final int NUM_PER_PAGE = 10;
+	private final int NUM_PER_PAGE = 5;
 	private final SearchService searchService;
 
+	@GetMapping("")
 	public String search(Model model) {
+		
+		model.addAttribute("genres", searchService.getGenres());
+		
 		return "search/book-search";
 	}
 
 	@GetMapping("/result")
 	public String showSearchResult(
-			@RequestParam(name = "keyword", required = true) String keyword,
+			@RequestParam(name = "keyword", required = false) String keyword,
+			@RequestParam(name = "genre", required = false) String genre,
 			@RequestParam(name = "page", defaultValue = "1") Integer page, 
-			@RequestParam(name = "genre", defaultValue = "0") String genre,
 			Model model){
+		
+		model.addAttribute("searchSummaries", searchService.getSearchResult(page, NUM_PER_PAGE, keyword, genre));
+		model.addAttribute("totalPages", searchService.getTotalPages(NUM_PER_PAGE, keyword, genre));
+		model.addAttribute("page", page);
 		
 		return "search/book-search-result";
 	}
