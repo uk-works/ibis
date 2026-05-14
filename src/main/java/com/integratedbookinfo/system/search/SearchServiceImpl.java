@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.integratedbookinfo.system.book.BookMapper;
+import com.integratedbookinfo.system.search.dto.BookBasicInfoDTO;
 import com.integratedbookinfo.system.search.dto.BookViewDTO;
 import com.integratedbookinfo.system.search.dto.SearchSummaryListDTO;
 import com.integratedbookinfo.system.search.dto.StoreBasicInfoDTO;
 import com.integratedbookinfo.system.shared.domain.Genre;
+import com.integratedbookinfo.system.shared.util.CCodeUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,13 +42,29 @@ public class SearchServiceImpl implements SearchService {
 	
 	@Override
 	public BookViewDTO getBookInfo(String bookId) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
+		BookViewDTO bookView = new BookViewDTO();
+		
+		BookBasicInfoDTO bookBasicInfo = bookMapper.selectBookBasicInfoByBookId(bookId);
+
+		bookBasicInfo.setCCodeName(CCodeUtil.convertCCodeToName("0055"));
+
+		bookView.setBookBasicInfo(bookBasicInfo);
+		bookView.setStoreBooks(bookMapper.selectSearchStoreBookByBookId(bookId));
+		
+		return bookView;
 	}
 	
 	@Override
 	public StoreBasicInfoDTO getStoreInfo(String storeId) {
 		// TODO 自動生成されたメソッド・スタブ
+		return null;
+	}
+	
+	
+	private String convertCCodeToName(String cCode) {
+
+		
+
 		return null;
 	}
 }

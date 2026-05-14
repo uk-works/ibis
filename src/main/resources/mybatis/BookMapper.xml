@@ -369,6 +369,64 @@
 	</update>
 	
 	
+	<resultMap id="resultBookInfo" type="com.integratedbookinfo.system.search.dto.BookBasicInfoDTO" autoMapping="true">
+		<association property="publisher" javaType="com.integratedbookinfo.system.shared.domain.Publisher" autoMapping="true"></association>
+		<association property="genre" javaType="com.integratedbookinfo.system.shared.domain.Genre" autoMapping="true"></association>
+	</resultMap>
+	
+	
+	<!-- 書籍閲覧で必要な情報を取得（検索機能） -->
+	<select id="selectBookBasicInfoByBookId" parameterType="String" resultMap="resultBookInfo">
+	
+		SELECT
+			book_id,
+			book_title,
+			author,
+			m_publishers.publisher_name,
+			book_size,
+			list_price,
+			c_code,
+			m_genres.genre_name,
+			isbn,
+			jan_code,
+			edition,
+			release_date
+		FROM
+			m_books
+		INNER JOIN
+			m_publishers
+		ON
+			m_books.publisher_id = m_publishers.publisher_id
+		INNER JOIN
+			m_genres
+		ON
+			m_books.genre_id = m_genres.genre_id
+		WHERE
+			book_id = #{bookId}
+	
+	</select>
+	
+
+	<select id="selectSearchStoreBookByBookId" parameterType="String" resultType="com.integratedbookinfo.system.search.dto.SearchStoreBookDTO">
+	
+		SELECT
+			store_name,
+			store_comment,
+			store_price,
+			store_genre,
+			store_books.note
+		FROM
+			store_books
+		INNER JOIN
+			m_stores
+		ON
+			store_books.store_id = m_stores.store_id
+		WHERE
+			book_id = #{bookId}
+		ORDER BY
+			store_books.store_id;
+	
+	</select>
 	<!-- 書籍・書店書籍 論理削除 -->
 	<update id="deleteStoreBookByBookId" parameterType="String">
 	

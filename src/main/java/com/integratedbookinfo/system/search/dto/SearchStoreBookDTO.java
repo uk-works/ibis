@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class StoreBookDTO {
+public class SearchStoreBookDTO {
 
 	private String storeName;
 	private String storeComment;

@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Param;
 
 import com.integratedbookinfo.system.book.dto.BookSummaryDTO;
 import com.integratedbookinfo.system.book.dto.StoreBookDTO;
+import com.integratedbookinfo.system.search.dto.BookBasicInfoDTO;
+import com.integratedbookinfo.system.search.dto.SearchStoreBookDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
 import com.integratedbookinfo.system.shared.domain.BookOptionDTO;
 import com.integratedbookinfo.system.shared.domain.Genre;
@@ -58,6 +60,11 @@ public interface BookMapper {
 
 	public int updateStoreBook(@Param("bookId") String bookId, @Param("storeBook") StoreBookDTO storeBook);
 
+	/* 書籍閲覧で必要な情報を取得（検索機能） */
+	public BookBasicInfoDTO selectBookBasicInfoByBookId(String bookId);
+	
+	public List<SearchStoreBookDTO> selectSearchStoreBookByBookId(String bookId);
+	
 	/* 該当書籍に関するデータが保持されているものはすべて論理削除
 	 * 書籍マスタ・書店書籍・在庫・書籍編集提案 削除 */
 	public int deleteBookByBookId(String bookId);
