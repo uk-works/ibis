@@ -77,7 +77,7 @@
 			<!-- その店舗に紐づく在庫リストをループ -->
 			<tbody>
 				<tr th:each="summary : *{summaries}">
-					<td><a th:href="@{/search/book/{storeId}(storeId = *{summary.storeId})}">[[${summary.storeName}]]</a></td>
+					<td><a th:href="@{/search/store/{storeId}(storeId = ${summary.storeId})}">[[${summary.storeName}]]</a></td>
 					<td>[[${summary.amount}]]</td>
 					<td>[[${summary.inventoryStatus.getLabel}]]</td>
 				</tr>
