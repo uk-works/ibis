@@ -40,6 +40,25 @@
 			
 	</select>
 
+	<select id="selectStoreDetailByStoreId" parameterType="String" resultType="com.integratedbookinfo.system.search.dto.StoreBasicInfoDTO">
+	
+		SELECT
+			store_name,
+			email,
+			tel,
+			postal_code,
+			address,
+			opening_hours,
+			closed_days,
+			store_status,
+			note	
+		FROM
+			m_stores
+		WHERE
+			store_id = #{storeId};
+	
+	</select>
+
 	<select id="selectLastStoreIdForUpdate" resultType="String">
 		SELECT
 			store_id
