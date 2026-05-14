@@ -22,9 +22,9 @@ public class BookBasicInfoDTO {
 	private Publisher publisher;
 	private String author;
 	private String bookTitle;
-	private BookSize size;
+	private BookSize bookSize;
 	private int listPrice;
 	private String edition;
-	private  LocalDate releaseDate;
+	private LocalDate releaseDate;
 	private String coverImagePath;
 }
