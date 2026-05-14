@@ -77,10 +77,9 @@
 			<!-- その店舗に紐づく在庫リストをループ -->
 			<tbody>
 				<tr th:each="summary : *{summaries}">
-					<td th:text="${summary.storeName}"></td>
-					<td th:text="${summary.amount}"></td>
-					<!-- Enumのメソッド呼び出しはプロパティ形式かカッコありで -->
-					<td th:text="${summary.inventoryStatus.getLabel}"></td>
+					<td><a th:href="@{/search/book/{storeId}(storeId = *{summary.storeId})}">[[${summary.storeName}]]</a></td>
+					<td>[[${summary.amount}]]</td>
+					<td>[[${summary.inventoryStatus.getLabel}]]</td>
 				</tr>
 				<!-- 店舗間の区切りとして少しスペースを空ける行（任意） -->
 				<tr style="height: 10px; border: none;">
