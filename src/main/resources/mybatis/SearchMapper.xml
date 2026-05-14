@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.search.SearchMapper">
+
+	<resultMap id="resultSearchBook" type="com.integratedbookinfo.system.search.dto.SearchSummaryListDTO" autoMapping="true">
+		<id property="bookId" column="book_Id" />
+		<association property="publisher" javaType="com.integratedbookinfo.system.shared.domain.Publisher" autoMapping="true">
+			<id property="publisherId" column="publisher_id" />
+		</association>
+		<collection property="summaries" ofType="com.integratedbookinfo.system.search.dto.SearchSummaryDTO" autoMapping="true">
+			<id property="storeId" column="store_id" />
+		</collection>
+	
+	</resultMap>
+
+	<select id="selectSearchSummaryList" resultMap="resultSearchBook">
+	
+		SELECT
+			books.book_id,
+		    books.book_title,
+		    books.author,
+		    books.publisher_name,
+		    m_stores.store_id,
+		    m_stores.store_name,
+		    t_inventories.amount,
+		    t_inventories.inventory_status    
+		FROM (
+			SELECT
+				book_id,
+		        book_title,
+		        author,
+		        publisher_name
+			FROM
+				m_books
+			INNER JOIN
+				m_publishers
+			ON
+				m_books.publisher_id = m_publishers.publisher_id
+			WHERE
+				m_books.deleted_flag = 0
+			<if test="keyword != null and keyword.trim() != ''">
+				AND
+					book_title LIKE CONCAT('%', #{keyword} ,'%')
+			</if>
+			<if test="genreId != null and genreId.trim() != '' and genreId != 'g0000'">
+			    AND genre_id = #{genreId}
+			</if>		
+			LIMIT #{offset}, #{limit}
+			) books
+		INNER JOIN
+			t_inventories
+		ON
+			books.book_id = t_inventories.book_id
+		INNER JOIN
+			m_stores
+		ON
+			t_inventories.store_id = m_stores.store_id
+		WHERE
+			t_inventories.deleted_flag = 0	
+	
+	</select>
+
+	<select id="countSearchSummary" resultType="long">
+	
+		SELECT
+			COUNT(DISTINCT t_inventories.book_id)  
+		FROM (
+			SELECT
+				book_id,
+		        book_title,
+		        author,
+		        publisher_name
+			FROM
+				m_books
+			INNER JOIN
+				m_publishers
+			ON
+				m_books.publisher_id = m_publishers.publisher_id
+			WHERE
+				m_books.deleted_flag = 0
+			<if test="keyword != null and keyword.trim() != ''">
+				AND
+					book_title LIKE CONCAT('%', #{keyword} ,'%')
+			</if>
+			<if test="genreId != null and genreId.trim() != '' and genreId != 'g0000'">
+			    AND genre_id = #{genreId}
+			</if>		
+			) books
+		INNER JOIN
+			t_inventories
+		ON
+			books.book_id = t_inventories.book_id
+		INNER JOIN
+			m_stores
+		ON
+			t_inventories.store_id = m_stores.store_id
+		WHERE
+			t_inventories.deleted_flag = 0		
+	
+	</select>
+
+</mapper>

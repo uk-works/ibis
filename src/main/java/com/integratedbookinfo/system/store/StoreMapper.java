@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.integratedbookinfo.system.search.dto.StoreBasicInfoDTO;
 import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
 import com.integratedbookinfo.system.store.dto.AccountDTO;
 import com.integratedbookinfo.system.store.dto.StoreDTO;
@@ -21,6 +22,8 @@ public interface StoreMapper {
 	public String selectLastStoreIdForUpdate();
 
 	public StoreEditRequestDTO selectStoreEditByStoreId(String storeId);
+
+	public StoreBasicInfoDTO selectStoreDetailByStoreId(String storeId);
 
 	public int insertStore(StoreDTO store);
 

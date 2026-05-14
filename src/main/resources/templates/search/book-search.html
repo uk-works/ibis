@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/common_header.css" rel="stylesheet">	
+	<title>書籍検索 | IBIS</title>
+</head>
+
+<header th:replace="~{common/customer_header :: page_header}"></header>
+
+<body>
+	<h1>システムロゴ</h1>
+	
+	<form th:action="@{/search/result}" method="get">
+		
+		<input type="text" th:name="keyword" th:value="${keyword}" />
+		<select th:name="genre" th:value="${genre}">
+			<option th:value="g0000">未選択</option>
+			<option th:each="genre : ${genres}" th:value="${genre.genreId}">
+				[[${genre.genreName}]]
+			</option>
+		</select>
+		<button>検索</button>
+	</form>
+	
+		<script src="../js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

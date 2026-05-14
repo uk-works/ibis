@@ -59,8 +59,4 @@ public class DemoController {
 		return bookMapper.selectStoreBookByStoreIdAndBookId("book0001","store0001");
 	}
 	
-	@GetMapping("/demo8")
-	public List<StoreBookDTO> demo8(){
-		return bookMapper.selectStoreBooks();
-	}
 }
