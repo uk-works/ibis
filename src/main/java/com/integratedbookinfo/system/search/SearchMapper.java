@@ -6,9 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.integratedbookinfo.system.search.dto.BookBasicInfoDTO;
+import com.integratedbookinfo.system.search.dto.SearchStoreBookDTO;
 import com.integratedbookinfo.system.search.dto.SearchSummaryListDTO;
 import com.integratedbookinfo.system.search.dto.StoreBasicInfoDTO;
-import com.integratedbookinfo.system.search.dto.StoreBookDTO;
 
 @Mapper
 public interface SearchMapper {
@@ -19,7 +19,7 @@ public interface SearchMapper {
 	
 	public BookBasicInfoDTO selectBookBasicInfo(String bookId);
 
-	public List<StoreBookDTO> selectStoreBookInfo(String bookId);
+	public List<SearchStoreBookDTO> selectStoreBookInfo(String bookId);
 
 	public StoreBasicInfoDTO selectStoreInfo(String storeId);
 

@@ -5,11 +5,20 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
 	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<title>[画面名] | IBIS</title>
+	<title>書籍閲覧画面 | IBIS</title>
 </head>
 
-<body>
+<body th:object="${bookView}">
 
+	書籍基本情報
+	
+	<img />
+	
+	<div>
+		<div>書籍名</div>
+		<div>[[*{bookBasicInfo.bookTitle}]]</div>
+	</div>
+	
 	<script src="js/bootstrap.bundle.min.js"></script>
 </body>
 
