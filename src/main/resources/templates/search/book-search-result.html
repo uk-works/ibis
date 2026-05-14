@@ -62,7 +62,7 @@
 			<thead style="background-color: #eee;">
 				<tr>
 					<th colspan="5">
-						書籍名：[[*{bookTitle}]]<br>
+						<a th:href="@{/search/book/{bookId}(bookId = *{bookId})}">書籍名：[[*{bookTitle}]]</a><br>
 						著者：[[*{author}]]<br>
 						出版社：[[*{publisher.publisherName}]]
 					</th>

@@ -3,10 +3,12 @@ package com.integratedbookinfo.system.search;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,8 +40,17 @@ public class SearchController {
 		return "search/book-search-result";
 	}
 
-	@GetMapping("/book")
-	public String showBookInfo(Model model) {
+	@GetMapping("/book/{bookId}")
+	public String showBookInfo(
+			@PathVariable String bookId,
+			Model model) {
+		
+		System.out.println(new ObjectMapper()
+				.writerWithDefaultPrettyPrinter()
+				.writeValueAsString(searchService.getBookInfo("book0001")));
+		
+		model.addAttribute("bookView", searchService.getBookInfo(bookId));
+		
 		return "search/book-detail";
 	}
 
