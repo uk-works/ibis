@@ -54,8 +54,15 @@ public class SearchController {
 		return "search/book-detail";
 	}
 
-	@GetMapping("/store")
-	public String showStoreInfo(Model model) {
+	@GetMapping("/store/{storeId}")
+	public String showStoreInfo(
+			@PathVariable String storeId,
+			Model model) {
+		
+		System.out.println(new ObjectMapper()
+				.writerWithDefaultPrettyPrinter()
+				.writeValueAsString(searchService.getStoreInfo("store0001")));
+		
 		return "search/store-detail";
 	}
 }
