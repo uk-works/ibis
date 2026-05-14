@@ -11,6 +11,7 @@ import com.integratedbookinfo.system.search.dto.SearchSummaryListDTO;
 import com.integratedbookinfo.system.search.dto.StoreBasicInfoDTO;
 import com.integratedbookinfo.system.shared.domain.Genre;
 import com.integratedbookinfo.system.shared.util.CCodeUtil;
+import com.integratedbookinfo.system.store.StoreMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,7 @@ public class SearchServiceImpl implements SearchService {
 
 	private final SearchMapper searchMapper;
 	private final BookMapper bookMapper;
+	private final StoreMapper storeMapper;
 	
 	@Override
 	public List<SearchSummaryListDTO> getSearchResult(int page, int numPerPage, String keyword, String genreId) {
@@ -56,15 +58,8 @@ public class SearchServiceImpl implements SearchService {
 	
 	@Override
 	public StoreBasicInfoDTO getStoreInfo(String storeId) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
-	
-	
-	private String convertCCodeToName(String cCode) {
-
 		
-
-		return null;
+		return storeMapper.selectStoreDetailByStoreId(storeId);
 	}
+
 }
