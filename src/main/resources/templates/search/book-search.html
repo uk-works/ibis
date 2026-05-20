@@ -4,29 +4,51 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="../css/bootstrap.min.css" rel="stylesheet">
-	<link href="../css/common_header.css" rel="stylesheet">	
+	<link th:href="@{../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../css/common_header.css}" rel="stylesheet">
 	<title>書籍検索 | IBIS</title>
 </head>
 
 <header th:replace="~{common/customer_header :: page_header}"></header>
 
 <body>
-	<h1>システムロゴ</h1>
-	
-	<form th:action="@{/search/result}" method="get">
-		
-		<input type="text" th:name="keyword" th:value="${keyword}" />
-		<select th:name="genre" th:value="${genre}">
-			<option th:value="g0000">未選択</option>
-			<option th:each="genre : ${genres}" th:value="${genre.genreId}">
-				[[${genre.genreName}]]
-			</option>
-		</select>
-		<button>検索</button>
-	</form>
-	
-		<script src="../js/bootstrap.bundle.min.js"></script>
+	<main class="container mt-4">
+		<div class="d-flex justify-content-center align-items-center mb-4">
+			<div>
+				<h2>システムロゴ</h2>
+			</div>
+		</div>
+
+
+		<form th:action="@{/search/result}" method="get">
+			<div class="row justify-content-center align-items-center mb-2">
+				<div class="col-md-auto"></div>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:name="keyword" th:value="${keyword}" placeholder="キーワードを入力してください"/>
+				</div>
+			</div>
+				
+			<div class="row justify-content-center  align-items-center mb-4">
+				<label for="genre" class="col-md-auto col-form-label">ジャンル：</label>
+				<div class="col-md-4">
+					<select id="genre" class="form-select" th:name="genre" th:value="${genre}">
+						<option th:value="g0000">ジャンルを選択</option>
+						<option th:each="genre : ${genres}" th:value="${genre.genreId}">
+							[[${genre.genreName}]]
+						</option>
+					</select>
+				</div>
+			</div>
+			<div class="row justify-content-center mb-4">
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">検索</button>						
+				</div>
+			</div>
+		</form>
+	</main>
+
+
+	<script th:src="@{../js/bootstrap.bundle.min.js}"></script>
 </body>
 
 </html>
