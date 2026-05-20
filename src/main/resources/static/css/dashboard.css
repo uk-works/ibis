@@ -1,55 +1,16 @@
 @charset "UTF-8";
 
-main {
-
-	
-}
-
-.dashboard {
+.flex-cards {
 	display: flex;
-	margin: 50px 0 auto auto;
-	max-width: 1440px;
-	gap: 40px;
-	align-items: center;     /* 縦 */
+	flex-direction: column;
+	gap: 30px;
+	flex: 1;
 }
 
-	.nav-submenu {
-		display: flex;
-		flex-direction: column;
-		width: 200px;
-	}
 
-		.nav-sub-item {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			text-align: center;
-			width: 100%;
-			margin: 0 0 0 0; /*上 右 下 左*/
-			padding: 20px;
-			border: 1px solid;
-		}
-
-	.flex-cards {
-		display: flex;
-		flex-direction: column;
-		gap: 30px;
-		flex: 1;
-	}
-
-		.table-item {
-			width: 500px;
-			margin-bottom: 50px;
-			border: 1px solid;
-		}
-		
-			.table-item table {
-				width: 100%;
-				border-collapse: collapse;
-			}
-
-			.table-item th,
-			.table-item td {
-				padding: 8px;
-				border: 1px solid #ccc;
-			}
+.menu-btn {
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;	
+}			
