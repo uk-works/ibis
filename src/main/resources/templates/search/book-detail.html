@@ -4,22 +4,108 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
 	<title>書籍閲覧画面 | IBIS</title>
 </head>
 
+<header th:replace="~{common/customer_header :: page_header}"></header>
+
 <body th:object="${bookView}">
 
-	書籍基本情報
-	
-	<img />
-	
-	<div>
-		<div>書籍名</div>
-		<div>[[*{bookBasicInfo.bookTitle}]]</div>
+	<div class="container mt-4">
+		<h2>書籍基本情報</h2>
+		<div class="row mb-5">
+			<!-- 画像 -->
+			<div class="col-md-4">
+				<!-- 画像データ取得バグがあるため直で取得 要修正 -->
+				<img th:src="@{/images/20220227-A7401467_TP_V4.jpg}" width="300">
+			</div>
+			<!-- 書籍情報 -->
+			<div class="col-md-8">
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">書籍名</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.bookTitle}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">著者
+					</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.author}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">出版社</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.publisher.publisherName}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">サイズ</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.bookSize}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">定価</div>
+					<div class="col-md-9">
+						[[*{#numbers.formatInteger(bookBasicInfo.listPrice, 3, 'COMMA')}]]円
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">図書分類</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.cCodeName}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">ジャンル</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.genre.genreName}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">ISBN</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.isbn}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">JANコード</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.janCode}]]
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="card mb-3">
+			<div class="card-body">
+				<h5>[[*{storeBooks.[0].storeName}]]</h5>
+				<div class="row mb-2">
+					<div class="col-md-2 fw-bold">
+						紹介文
+					</div>
+					<div class="col-md-10">
+						[[*{storeBooks.[0].storeComment}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-2 fw-bold">
+						店頭価格
+					</div>
+					<div class="col-md-10">
+
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	
-	<script src="js/bootstrap.bundle.min.js"></script>
+
+
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 </body>
 
 </html>
