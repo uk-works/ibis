@@ -4,15 +4,62 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
 	<title>書店閲覧 | IBIS</title>
 </head>
-
+<header th:replace="~{common/customer_header :: page_header}"></header>
 <body>
+	
+	<main class="container mt-4" th:object="${storeBasicInfo}">
+		<h2>書店基本情報</h2>
+		
+		<div class="row justify-content-center mb-5">
+			<div class="col-md-8">
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">書店名</div>
+					<div class="col-md-9">[[*{storeName}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">メールアドレス</div>
+					<div class="col-md-9">[[*{email}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">電話番号</div>
+					<div class="col-md-9">[[*{tel}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">郵便番号</div>
+					<div class="col-md-9">[[*{postalCode}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">住所</div>
+					<div class="col-md-9">[[*{address}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">営業時間</div>
+					<div class="col-md-9">[[*{openingHours}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">定休日</div>
+					<div class="col-md-9">[[*{closedDays}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">書店営業状態</div>
+					<div class="col-md-9">[[*{storeStatus.getLabel}]]</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">備考</div>
+					<div class="col-md-9">[[*{note}]]</div>
+				</div>
+			</div>
+		</div>
+	</main>
+	
 	<div class="d-flex justify-content-center mb-4">
 		<button class="btn btn-secondary" th:onclick="|location.href='@{/search/result(keyword=${keyword}, genre=${genre}, page=${page})}'|">戻る</button>			
 	</div>
-	<script src="js/bootstrap.bundle.min.js"></script>
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 </body>
 
 </html>
