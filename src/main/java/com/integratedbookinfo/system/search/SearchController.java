@@ -77,6 +77,8 @@ public class SearchController {
 				.writerWithDefaultPrettyPrinter()
 				.writeValueAsString(searchService.getStoreInfo("store0001")));
 		
+		model.addAttribute("storeBasicInfo", searchService.getStoreInfo(storeId));
+		
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("genre", genre);		
 		model.addAttribute("page", page);
