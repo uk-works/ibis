@@ -14,32 +14,52 @@
 
 <body>
 
-	<main>
-		<div class="dashboard">
-			<nav class="nav-submenu">
-			    <a href="/book/list" class="nav-sub-item">書籍管理</a>
-			    <a href="/inventory/list" class="nav-sub-item">在庫管理</a>
-			    <a href="/store/list" class="nav-sub-item">書店管理</a>
-			    <a href="/bookeditproposal/list" class="nav-sub-item">書籍編集提案<br>申請結果</a>
-			</nav>
+	<main class="container mt-4">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="d-grid">
+					<a href="/book/list" class="btn btn-light border text-center menu-btn">書籍管理</a>
+					<a href="/inventory/list" class="btn btn-light border text-center menu-btn">在庫管理</a>
+					<a href="/store/edit" class="btn btn-light border text-center menu-btn">書店管理</a>
+					<a href="#" class="btn btn-light border text-center menu-btn">書籍編集提案<br>申請結果（未実装）</a>					
+				</div>
+			</div>
 			
 			<div class="flex-cards">
-				
-				<div class="table-item">
-					営業状態：<span>[[${dashboardInfo.storeStatus.getLabel}]]</span>
+				<div class="card">
+					<div class="card-header">
+						書店営業状態
+					</div>
+					<div class="card-body">
+						<div class="row">
+						    <div class="col-4 fw-bold">
+						        営業状態
+						    </div>
+						    <div class="col-8">
+						        [[${dashboardInfo.storeStatus.getLabel}]]
+						    </div>
+						</div>
+					</div>
 				</div>
+
 				
-				<div class="table-item">
-					<table border="1" >
-						<tr><th>承認ステータス</th><th>書籍名</th><th>最終更新日時</th><th>提案日時</th></tr>
-						<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
-							<td>[[*{proposalStatus.getLabel}]]</td>
-							<td>[[*{bookTitle}]]</td>
-							<td>[[*{#temporals.format(updatedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
-							<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
-							<td><a href="#">詳細</a></td>
-						</tr>
-					</table>
+				<div class="card">
+					<div class="card-header">
+						書籍編集提案申請状況
+					</div>
+					<div class="card-body p-0">
+						<table class="table table-striped">
+							<tr><th>承認ステータス</th><th>書籍名</th><th>最終更新日時</th><th>提案日時</th><th></th></tr>
+							<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
+								<td>[[*{proposalStatus.getLabel}]]</td>
+								<td>[[*{bookTitle}]]</td>
+								<td>[[*{#temporals.format(updatedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+								<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+								<td><button class="btn btn-secondary" th:onclick="|location.href='@{#}'|">詳細（未実装）</button></td>
+							</tr>
+						</table>						
+					</div>
+
 				</div>
 			</div>
 			
