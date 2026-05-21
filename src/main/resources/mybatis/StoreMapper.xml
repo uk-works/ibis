@@ -177,7 +177,14 @@
 		ON 
 			m_books.book_id = t_inventories.book_id
 		WHERE
-			t_inventories.book_id IS NULL;
+			t_inventories.book_id IS NULL
+		OR(
+				t_inventories.deleted_flag = 1
+			AND
+				t_inventories.inventory_status = 'discontinued'
+			AND
+				t_inventories.amount = 0
+		);
 	
 	</select>
 
