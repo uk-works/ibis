@@ -18,9 +18,14 @@
 		<div class="row mb-5">
 			<!-- 画像 -->
 			<div class="col-md-4">
-				<!-- 画像データ取得バグがあるため直で取得 要修正 -->
-				<img th:src="@{/images/20220227-A7401467_TP_V4.jpg}" class="img-fluid">
+				<th:block th:if="*{bookBasicInfo.coverImagePath} != null and *{bookBasicInfo.coverImagePath} != ''">
+					<img th:src="@{/images/{path}(path = *{bookBasicInfo.coverImagePath})}" class="img-fluid">					
+				</th:block>
+				<th:block th:unless="*{bookBasicInfo.coverImagePath} != null and *{bookBasicInfo.coverImagePath} != ''">
+					<h6>画像イメージがありません</h5>	
+				</th:block>
 			</div>
+
 			<!-- 書籍情報 -->
 			<div class="col-md-8">
 				<div class="row mb-2">
