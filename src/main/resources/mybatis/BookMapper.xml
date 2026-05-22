@@ -390,7 +390,8 @@
 			isbn,
 			jan_code,
 			edition,
-			release_date
+			release_date,
+			cover_image_path
 		FROM
 			m_books
 		INNER JOIN
