@@ -10,17 +10,27 @@
 </head>
 
 <header th:replace="~{common/admin_header :: page_header}"></header>
+
 <body>
 	<main class="container mt-4">
 		<h2>書籍編集</h2>
 
-		<form th:action="@{/book/edit/{bookId}(bookId = *{book.bookId})}" method="post" th:object="${bookEditRequest}" enctype="multipart/form-data">
+		<form th:action="@{/book/edit/{bookId}(bookId = *{book.bookId})}" method="post" th:object="${bookEditRequest}"
+			enctype="multipart/form-data">
 			<div class="row justify-content-center mb-4 gap-5">
+				<!-- 💡 追加：閲覧・編集切り替えチェックボックス -->
+				<div class="col-auto d-flex align-items-center">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="editToggle">
+						<label class="form-check-label fw-bold text-primary" for="editToggle">書籍情報を編集する</label>
+					</div>
+				</div>
 				<div class="col-auto">
 					<button class="btn btn-primary btn-lg">完了</button>
 				</div>
 				<div class="col-auto">
-					<button type="button" class="btn btn-secondary btn-lg" onclick="location.href='/book/list'">戻る</button>
+					<button type="button" class="btn btn-secondary btn-lg"
+						onclick="location.href='/book/list'">戻る</button>
 				</div>
 			</div>
 
@@ -32,7 +42,7 @@
 					<p th:errors="*{book.isbn}"></p>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.janCode" class="col-md-2 col-form-label">JANコード</label>
 				<div class="col-md-7">
@@ -40,7 +50,7 @@
 					<p th:errors="*{book.janCode}"></p>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.bookTitle" class="col-md-2 col-form-label">書籍名</label>
 				<div class="col-md-7">
@@ -67,7 +77,7 @@
 					</select>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.author" class="col-md-2 col-form-label">著者</label>
 				<div class="col-md-7">
@@ -80,18 +90,21 @@
 				<label for="book.publisher.publisherId" class="col-md-2 col-form-label">出版社</label>
 				<div class="col-md-7">
 					<select class="form-select" th:field="*{book.publisher.publisherId}">
+						<option th:value="p0000">未選択</option>
 						<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
 							[[${publisher.publisherName}]]
 						</option>
 					</select>
 					<p>出版社リストに無い出版社で書籍登録したい場合は、<br>リストを未選択状態にして下記に入力してください。</p>
+					<p>※将来の機能拡張（リストにない出版社の直接登録）を見据えて、DTO構造および画面レイアウトを設計しています。<br>
+					    （現在は初回リリースのスピードを優先し、マスター選択のみ対応のため入力欄はロックされています）</p>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.publisher.publisherName" class="col-md-2 col-form-label">出版社（その他）</label>
 				<div class="col-md-7">
-					<input type="text" class="form-control" th:field="*{book.publisher.publisherName}" readonly />
+					<input type="text" class="form-control pe-none bg-body-secondary" th:field="*{book.publisher.publisherName}" readonly />
 					<p th:errors="*{book.publisher.publisherName}"></p>
 				</div>
 			</div>
@@ -114,7 +127,7 @@
 					<p th:errors="*{book.listPrice}"></p>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.edition" class="col-md-2 col-form-label">版</label>
 				<div class="col-md-7">
@@ -122,7 +135,7 @@
 					<p th:errors="*{book.edition}"></p>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.releaseDate" class="col-md-2 col-form-label">発売日</label>
 				<div class="col-md-7">
@@ -139,32 +152,32 @@
 					<p th:errors="*{book.coverImageFile}"></p>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center mb-3">
 				<div class="col-md-7 offset-2">
 					<input type="hidden" th:field="*{book.coverImagePath}" />
-					<p th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''">現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
-					<img th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''" th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">					
+					<p th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''">
+						現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
+					<img th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''"
+						th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">
 				</div>
 			</div>
-			
-			
-			
+
+
+
 			<!-- 書店個別項目 -->
 			<div class="row mb-1">
 				<div class="offset-1 col-md-auto">
 					<h5>書店個別項目</h4>
 				</div>
 			</div>
-			
+
 			<div class="row justify-content-center align-items-center mb-4">
 				<label for="storeSelect" class="col-md-2 col-form-label">書店</label>
 				<div class="col-md-7">
 					<select class="form-select" id="storeSelect" th:field="*{storeBook.storeId}">
-					  <option th:each="opt : ${storeOptions}"
-					          th:value="${opt.storeId}"
-					          th:text="${opt.storeName}">
-					  </option>
+						<option th:each="opt : ${storeOptions}" th:value="${opt.storeId}" th:text="${opt.storeName}">
+						</option>
 					</select>
 				</div>
 			</div>
@@ -200,53 +213,56 @@
 					<p th:errors="*{storeBook.note}"></p>
 				</div>
 			</div>
-			
+
 			<div class="d-flex justify-content-center align-items-center mb-4">
 
 				<div class="d-flex gap-5">
 					<button class="btn btn-primary btn-lg">完了</button>
-					<button type="button" class="btn btn-secondary btn-lg" onclick="location.href='/book/list'">戻る</button>				
+					<button type="button" class="btn btn-secondary btn-lg"
+						onclick="location.href='/book/list'">戻る</button>
 				</div>
 
 				<div class="ms-5">
-					<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">削除</button>
+					<button type="button" class="btn btn-danger" data-bs-toggle="modal"
+						data-bs-target="#deleteModal">削除</button>
 				</div>
 			</div>
-		</form>		
+		</form>
 	</main>
 
-	
+
 
 
 	<!-- Modal -->
-	<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered">
-	    <div class="modal-content">
-			<form id="deleteForm" method="post">
-	      <div class="modal-header">
+	<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<form id="deleteForm" method="post">
+					<div class="modal-header">
 
-	        <h1 class="modal-title fs-5" id="staticBackdropLabel">書籍削除確認</h1>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body">
-	        <p>以下の書籍を削除してもよろしいですか？</p>
-			<p>ISBN：<span id="isbn"></span></p>
-			<p>書籍名：<span id="bookTitle"></span></p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-	        <button type="button" id="deleteButton" class="btn btn-primary">削除</button>
-	      </div>
-		  </form>
-	    </div>
-	  </div>
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">書籍削除確認</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>以下の書籍を削除してもよろしいですか？</p>
+						<p>ISBN：<span id="isbn"></span></p>
+						<p>書籍名：<span id="bookTitle"></span></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+						<button type="button" id="deleteButton" class="btn btn-primary">削除</button>
+					</div>
+				</form>
+			</div>
+		</div>
 	</div>
-	
+
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 	<script th:inline="javascript">
-		const bookId = /*[[*{bookEditRequest.book.bookId}]]*/ [];
-		const isbn = /*[[*{bookEditRequest.book.isbn}]]*/ [];
-		const bookTitle = /*[[*{bookEditRequest.book.bookTitle}]]*/ [];
+		const bookId = /*[[*{bookEditRequest.book.bookId}]]*/[];
+		const isbn = /*[[*{bookEditRequest.book.isbn}]]*/[];
+		const bookTitle = /*[[*{bookEditRequest.book.bookTitle}]]*/[];
 
 		// モーダル内の表示要素を更新
 		document.getElementById("isbn").textContent = isbn;
@@ -258,46 +274,94 @@
 		const deleteForm = document.getElementById("deleteForm");
 
 		deleteButton.addEventListener('click', () => {
-		    // 1. 実行時にURLを組み立てる (例: /books/delete/123)
-		    const baseUrl = /*[[@{/book/delete/}]]*/ '/books/delete/';
-		    deleteForm.action = baseUrl + bookId;
-		    console.log("Formです" + deleteForm.action)
-		    // 2. フォームを送信する
-		    deleteForm.submit();
+			// 1. 実行時にURLを組み立てる (例: /books/delete/123)
+			const baseUrl = /*[[@{/book/delete/}]]*/ '/books/delete/';
+			deleteForm.action = baseUrl + bookId;
+			console.log("Formです" + deleteForm.action)
+			// 2. フォームを送信する
+			deleteForm.submit();
 		});
-		
-		
-	    const storeBooks = /*[[${storeBooks}]]*/ [];
 
-	    const select = document.getElementById("storeSelect");
+
+		const storeBooks = /*[[${storeBooks}]]*/[];
+
+		const select = document.getElementById("storeSelect");
 		const genre = document.getElementById("storeGenre");
-	    const price = document.getElementById("storePrice");
-	    const comment = document.getElementById("storeComment");
-	    const note = document.getElementById("note");
+		const price = document.getElementById("storePrice");
+		const comment = document.getElementById("storeComment");
+		const note = document.getElementById("note");
 
-	    function update() {
-	        const storeId = select.value;
-	        const data = storeBooks.find(sb => sb.storeId === storeId);
+		function update() {
+			const storeId = select.value;
+			const data = storeBooks.find(sb => sb.storeId === storeId);
 
-	        if (!data) {
-	            price.value = "";
-	            comment.value = "";
-	            note.value = "";
+			if (!data) {
+				price.value = "";
+				comment.value = "";
+				note.value = "";
 				genre.value = "";
-	            return;
-	        }
+				return;
+			}
 
 			price.value = data.storePrice || "";
-	        comment.value = data.storeComment || "";
-	        note.value = data.note || "";
+			comment.value = data.storeComment || "";
+			note.value = data.note || "";
 			genre.value = data.storeGenre || "";
-	    }
+		}
 
-	    // 変更時
-	    select.addEventListener("change", update);
+		// 変更時
+		select.addEventListener("change", update);
 
-	    // 初期表示
-	    document.addEventListener("DOMContentLoaded", update);
+		// 初期表示
+		document.addEventListener("DOMContentLoaded", update);
+		
+		/* ================================== */
+		const editToggle = document.getElementById("editToggle");
+		const submitButtons = document.querySelectorAll("form button:not([type='button'])"); // 「完了」ボタンを取得
+
+		function toggleEditMode() {
+		    // チェックボックスが「チェックされていない（閲覧モード）」なら true（無効化）
+		    const isReadOnly = !editToggle.checked;
+
+		    // 1. すべての input, select を取得して disabled (または readonly) を切り替える
+		    // ※ ただし、type="hidden" や 切り替えスイッチ自体、出版社(その他)のreadonlyは除外したいので調整
+		    const inputs = document.querySelectorAll(".form-control, .form-select");
+		    
+		    inputs.forEach(input => {
+		        // 「出版社（その他）」など、もともとreadonly固定のものは触らない
+		        if (input.id === "book.publisher.publisherName") return;
+		        
+		        if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
+		            // selectやdate, fileは disabled でグレーアウト制御
+		            input.disabled = isReadOnly;
+		        } else {
+		            // 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
+		            input.readOnly = isReadOnly;
+		            
+		            // 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
+		            if (isReadOnly) {
+		                input.classList.add("bg-body-secondary");
+		            } else {
+		                input.classList.remove("bg-body-secondary");
+		            }
+		        }
+		    });
+
+		    // 2. 「完了」ボタンも、閲覧モードの時は押せないようにする（誤送信防止）
+		    submitButtons.forEach(btn => {
+		        btn.disabled = isReadOnly;
+		    });
+		}
+
+		// チェックボックスの切り替えイベント
+		editToggle.addEventListener("change", toggleEditMode);
+
+		// 初期表示の時に一度実行して、最初を「閲覧モード」にする
+		// 既存の DOMContentLoaded 処理があるため、その中か、もしくはその後に追記します
+		document.addEventListener("DOMContentLoaded", () => {
+		    // 既存の update() の後に実行
+		    toggleEditMode(); 
+		});
 	</script>
 </body>
 
