@@ -138,7 +138,8 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser) {
 
-		BookDTO originBook = bookMapper.selectFindBookByIsbnOrJan(bookCreateRequestDTO.getBook().getIsbn(), bookCreateRequestDTO.getBook().getJanCode());
+		BookDTO originBook = bookMapper.selectFindBookByIsbnOrJan(
+				bookCreateRequestDTO.getBook().getIsbn(), bookCreateRequestDTO.getBook().getJanCode());
 		String recentBookId = "";
 		String nextBookId = "";
 		
@@ -206,6 +207,11 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public String generateBookId(String recentBookId) {
+		
+		if (recentBookId == null) {
+			return "book0001";
+		}
+		
 		String numberPart = recentBookId.substring(4);
 		int next = Integer.parseInt(numberPart) + 1;
 
