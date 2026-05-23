@@ -130,26 +130,38 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	public BookDTO getBookByIsbnOrJanCode(String isbn, String janCode) {
+		
+		return bookMapper.selectFindBookByIsbnOrJan(isbn, janCode);
+	}	
+	
+	@Override
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser) {
 
-		String recentBookId = bookMapper.selectLastBookIdForUpdate();
+		BookDTO originBook = bookMapper.selectFindBookByIsbnOrJan(bookCreateRequestDTO.getBook().getIsbn(), bookCreateRequestDTO.getBook().getJanCode());
+		String recentBookId = "";
+		String nextBookId = "";
+		
+		if (originBook == null) {
+			recentBookId = bookMapper.selectLastBookIdForUpdate();
 
-		String nextBookId = generateBookId(recentBookId);
+			nextBookId = generateBookId(recentBookId);
 
-		BookDTO book = bookCreateRequestDTO.getBook();
-		book.setBookId(nextBookId);
+			BookDTO book = bookCreateRequestDTO.getBook();
+			book.setBookId(nextBookId);
+			
+			// 画像登録処理
+			saveImageFile(bookCreateRequestDTO.getBook());
 
+			bookMapper.insertBook(book);
+		}
+		
 		StoreBookDTO storeBook = bookCreateRequestDTO.getStoreBook();
 		storeBook.setBookId(nextBookId);
 
 		if (loginUser.getAccountRole() == AccountRole.STORE) {
 			storeBook.setStoreId(loginUser.getStoreId());
 		}
-
-		// 画像登録処理
-		saveImageFile(bookCreateRequestDTO.getBook());
-
-		bookMapper.insertBook(book);
 
 		bookMapper.insertStoreBook(storeBook);
 
