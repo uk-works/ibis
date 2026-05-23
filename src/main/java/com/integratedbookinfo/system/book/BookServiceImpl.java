@@ -130,6 +130,12 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	public BookDTO getBookByIsbnOrJanCode(String isbn, String janCode) {
+		
+		return bookMapper.selectFindBookByIsbnOrJan(isbn, janCode);
+	}	
+	
+	@Override
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser) {
 
 		String recentBookId = bookMapper.selectLastBookIdForUpdate();

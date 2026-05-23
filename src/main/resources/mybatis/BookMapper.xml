@@ -237,6 +237,32 @@
 			book_id = #{bookId};	
 	</select>
 
+	<select id="selectFindBookByIsbnOrJan" resultType="com.integratedbookinfo.system.shared.domain.BookDTO">
+
+		SELECT 
+			* 
+		FROM 
+			m_books
+	 	WHERE 
+	 		(
+	 			isbn = #{isbn} 
+	 		AND 
+	 			isbn IS NOT NULL 
+	 		AND 
+	 			isbn != ''
+	 		)
+         OR 
+         	(
+         		jan_code = #{janCode} 
+         	AND 
+         		jan_code IS NOT NULL 
+         	AND 
+         		jan_code != ''
+         	)
+      	LIMIT 1	
+	
+	</select>
+
 	<insert id="insertBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
 		INSERT INTO 
 			m_books(
