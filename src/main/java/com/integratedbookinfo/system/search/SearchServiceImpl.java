@@ -48,7 +48,7 @@ public class SearchServiceImpl implements SearchService {
 		
 		BookBasicInfoDTO bookBasicInfo = bookMapper.selectBookBasicInfoByBookId(bookId);
 
-		bookBasicInfo.setCCodeName(CCodeUtil.convertCCodeToName("0055"));
+		bookBasicInfo.setCCodeName(CCodeUtil.convertCCodeToName(bookBasicInfo.getCCode()));
 
 		bookView.setBookBasicInfo(bookBasicInfo);
 		bookView.setStoreBooks(bookMapper.selectSearchStoreBookByBookId(bookId));
