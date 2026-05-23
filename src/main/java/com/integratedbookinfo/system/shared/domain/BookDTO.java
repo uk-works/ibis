@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.integratedbookinfo.system.shared.enums.BookSize;
+import com.integratedbookinfo.system.validationgroup.BookCreateGroup;
+import com.integratedbookinfo.system.validationgroup.BookEditGroup;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,41 +25,49 @@ public class BookDTO {
 
 	private String bookId;
 
-	@NotBlank
-	@Pattern(regexp = "^(\\d{10}|\\d{13})$", message = "ISBNは10桁または13桁の半角数字で入力してください")
+	@NotBlank(groups = {BookCreateGroup.class, BookEditGroup.class})
+	@Pattern(regexp = "^(\\d{10}|\\d{13})$", 
+			message = "ISBNは10桁または13桁の半角数字で入力してください", 
+			groups = {BookCreateGroup.class, BookEditGroup.class})
 	private String isbn;
 	
-	@NotBlank
-	@Pattern(regexp="\\d{4}", message="Cコードは4桁の半角数字で入力してください")
+	@NotBlank(groups = {BookCreateGroup.class, BookEditGroup.class})
+	@Pattern(regexp="\\d{4}", 
+			message="Cコードは4桁の半角数字で入力してください",
+			groups = {BookCreateGroup.class, BookEditGroup.class})
 	private String cCode;
 	
 	private String cCodeName;
 	
-	@NotBlank
-	@Pattern(regexp = "^\\d{13}$", message = "JANコードは13桁の半角数字で入力してください")
+	@NotBlank(groups = {BookCreateGroup.class, BookEditGroup.class})
+	@Pattern(regexp = "^\\d{13}$", 
+			message = "JANコードは13桁の半角数字で入力してください",
+			groups = {BookCreateGroup.class, BookEditGroup.class})
 	private String janCode;
 	
 	private Genre genre;
 	
 	private Publisher publisher;
 	
-	@NotBlank
+	@NotBlank(groups = {BookCreateGroup.class, BookEditGroup.class})
 	private String author;
 	
-	@NotBlank
+	@NotBlank(groups = {BookCreateGroup.class, BookEditGroup.class})
 	private String bookTitle;
 	
 	private BookSize bookSize;
 	
-	@NotNull
-	@Min(1)
+	@NotNull(groups = {BookCreateGroup.class, BookEditGroup.class})
+	@Min(value = 1, groups = {BookCreateGroup.class, BookEditGroup.class})
 	private int listPrice;
 
-	@NotBlank
-	@Pattern(regexp = "^\\d{1,2}$", message = "版は最大2桁の半角数字で入力してください")
+	@NotBlank(groups = {BookCreateGroup.class, BookEditGroup.class})
+	@Pattern(regexp = "^\\d{1,2}$", 
+			message = "版は最大2桁の半角数字で入力してください", 
+			groups = {BookCreateGroup.class, BookEditGroup.class})
 	private String edition;
 	
-	@NotNull
+	@NotNull(groups = {BookCreateGroup.class, BookEditGroup.class})
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private  LocalDate releaseDate;
 
