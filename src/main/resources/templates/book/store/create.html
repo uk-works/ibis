@@ -35,14 +35,39 @@
 				</div>
 			</div>
 
-			<div class="row justify-content-center align-items-center mb-2">
+			<div class="row justify-content-center align-items-center mb-1">
 				<label for="book.janCode" class="col-md-2 col-form-label">JANコード</label>
-				<div class="col-md-7">
-					<input type="text" class="form-control" th:field="*{book.janCode}" />
+				<div class="col-md-5">
+					<input type="text" class="form-control flex-grow-1" th:field="*{book.janCode}" />
 					<p th:errors="*{book.janCode}"></p>
 				</div>
+				<div class="col-md-2">
+					<button type="submit" class="btn btn-secondary text-nowrap" th:formaction="@{/book/search}">書籍検索</button>
+				</div>
 			</div>
+			
+			<div class="row justify-content-center align-items-center mb-2">
+				<div class="offset-md-2 col-md-7">
+					<p>※システム登録済みの書籍かを確認するため、ISBNまたはJANコードを入力して「書籍検索ボタン」を押してください。</p>					
+				</div>
+			</div>
+			
+			<div th:if="${isFound != null}" class="message-area row justify-content-center align-items-center mb-2">
 
+			    <!-- ヒットした場合（isFound == true） -->
+			    <div th:if="${isFound}" class="col-md-9 alert alert-success">
+			        <strong>登録済みの書籍情報が見つかりました。</strong><br>
+			        書籍情報の入力は不要です。画面下部の「書店個別項目」を入力して登録してください。
+			    </div>
+
+			    <!-- ヒットしなかった場合（isFound == false） -->
+			    <div th:if="${!isFound}" class="col-md-9 alert alert-warning">
+			        <strong>システム未登録の書籍です。</strong><br>
+			        お手数ですが、書籍情報（タイトル・著者など）と書店個別項目のすべての欄を入力してください。
+			    </div>
+
+			</div>
+			
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="book.bookTitle" class="col-md-2 col-form-label">書籍名</label>
 				<div class="col-md-7">
@@ -173,6 +198,16 @@
 				<div class="col-md-7">
 					<input type="text" class="form-control" th:field="*{storeBook.note}" />
 					<p th:errors="*{storeBook.note}"></p>
+				</div>
+			</div>
+			
+			<div class="row justify-content-center mb-4 gap-5">
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">登録</button>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary btn-lg"
+						onclick="location.href='/book/list'">戻る</button>
 				</div>
 			</div>
 		</form>

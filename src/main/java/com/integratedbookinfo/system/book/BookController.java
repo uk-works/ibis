@@ -3,7 +3,6 @@ package com.integratedbookinfo.system.book;
 import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +24,9 @@ import com.integratedbookinfo.system.book.dto.StoreBookDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.shared.enums.BookSize;
+import com.integratedbookinfo.system.validationgroup.BookCreateGroup;
+import com.integratedbookinfo.system.validationgroup.BookDuplicateCheckGroup;
+import com.integratedbookinfo.system.validationgroup.BookEditGroup;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
@@ -99,7 +101,7 @@ public class BookController {
 
 	@PostMapping("/create")
 	public String createBook(
-			@Validated @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
+			@Validated(BookCreateGroup.class) @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
 			Errors errors,
 			HttpSession session,
 			Model model) {
@@ -144,6 +146,87 @@ public class BookController {
 		return "redirect:/book/list";
 	}
 
+	@PostMapping("/search")
+	public String searchBook(
+			@Validated(BookDuplicateCheckGroup.class) @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
+			Errors errors,
+			HttpSession session,
+			Model model) {
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		String pageName = "";
+		
+		model.addAttribute("displayName", loginUser.getDisplayName());
+		model.addAttribute("accountRole", loginUser.getAccountRole());
+
+		model.addAttribute("publishers", bookService.getPublishers());
+		model.addAttribute("genres", bookService.getGenres());
+		model.addAttribute("stores", bookService.getStoreOptions());
+		model.addAttribute("bookSizes", BookSize.values());
+
+		String inputIsbn = form.getBook().getIsbn();
+		String inputJanCode = form.getBook().getJanCode();
+		
+		if (inputIsbn.isBlank() && inputJanCode.isBlank()) {
+			errors.rejectValue("book.isbn", "error.search.required", "ISBNまたはJANコードのどちらか一方を入力してください。");
+		}
+		
+		// ISBNが入力済みであるが、13桁または10桁の数字でなければNG
+		if (!inputIsbn.isBlank() && !inputIsbn.matches("^(\\d{10}|\\d{13})$")) {
+			errors.rejectValue("book.isbn", "error.pattern", "ISBNは10桁または13桁の数字で入力してください。");
+		}
+		
+		// JANコードが入力済みであるが、13桁の数字でなければNG
+		if (!inputJanCode.isBlank() && !inputJanCode.matches("^\\d{13}$")) {
+			errors.rejectValue("book.janCode", "error.pattern", "JANコードは13桁の数字で入力してください。");
+		}
+		
+		if (errors.hasErrors()) {
+			
+			model.addAttribute("bookCreateRequest", form);
+			
+			if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+
+				return "book/admin/create";
+			} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+
+				return "book/store/create";
+			}
+			
+		}
+
+		//BookDTO book = bookMapper.selectFindByIsbnOrJan("9784815608750", "1920055028004");
+
+		
+		BookDTO book = bookService.getBookByIsbnOrJanCode(inputIsbn, inputJanCode);
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(book));		
+		
+		if(book != null) {
+			form.setBook(book);
+			model.addAttribute("isFound", true);
+		} else {
+			BookDTO emptyBook = new BookDTO();
+			
+			emptyBook.setIsbn(inputIsbn);
+			emptyBook.setJanCode(inputJanCode);
+			
+			form.setBook(emptyBook);
+			
+			model.addAttribute("isFound", false);
+		}
+		
+		model.addAttribute("bookCreateRequest", form);
+		
+		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			pageName = "book/admin/create";
+
+		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+			pageName = "book/store/create";
+
+		}
+		
+		return pageName;
+	}
+	
 	@GetMapping("/edit/{bookId}")
 	public String editBook(@PathVariable String bookId, Model model, HttpSession session) {
 		
@@ -176,7 +259,7 @@ public class BookController {
 	@PostMapping("/edit/{bookId}")
 	public String editBook(
 			@PathVariable String bookId,
-			@Valid @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
+			@Validated(BookEditGroup.class) @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
 			Errors errors,
 			HttpSession session,
 			Model model) {

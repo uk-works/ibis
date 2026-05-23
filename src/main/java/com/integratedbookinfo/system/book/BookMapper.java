@@ -52,6 +52,8 @@ public interface BookMapper {
 	
 	public List<BookOptionDTO> selectBookOptionsByStoreId(String storeId);
 	
+	public BookDTO selectFindBookByIsbnOrJan(@Param("isbn") String isbn, @Param("janCode") String janCode);
+	
 	public int insertBook(BookDTO bookDto);
 
 	public int insertStoreBook(StoreBookDTO storeBookDto);
