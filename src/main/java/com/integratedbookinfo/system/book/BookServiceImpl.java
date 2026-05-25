@@ -142,6 +142,8 @@ public class BookServiceImpl implements BookService {
 				bookCreateRequestDTO.getBook().getIsbn(), bookCreateRequestDTO.getBook().getJanCode());
 		String recentBookId = "";
 		String nextBookId = "";
+
+		StoreBookDTO storeBook = bookCreateRequestDTO.getStoreBook();
 		
 		if (originBook == null) {
 			recentBookId = bookMapper.selectLastBookIdForUpdate();
@@ -155,10 +157,12 @@ public class BookServiceImpl implements BookService {
 			saveImageFile(bookCreateRequestDTO.getBook());
 
 			bookMapper.insertBook(book);
+			
+			storeBook.setBookId(nextBookId);
+		} else {
+			storeBook.setBookId(originBook.getBookId());			
 		}
-		
-		StoreBookDTO storeBook = bookCreateRequestDTO.getStoreBook();
-		storeBook.setBookId(nextBookId);
+
 
 		if (loginUser.getAccountRole() == AccountRole.STORE) {
 			storeBook.setStoreId(loginUser.getStoreId());

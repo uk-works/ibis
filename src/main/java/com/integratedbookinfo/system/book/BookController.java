@@ -36,7 +36,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("/book")
 public class BookController {
 
-	private final int NUM_PER_PAGE = 10;
+	private final int NUM_PER_PAGE = 1;
 	private final BookService bookService;
 	
 	@GetMapping("/list")

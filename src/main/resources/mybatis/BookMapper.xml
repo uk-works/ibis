@@ -118,26 +118,31 @@
 		SELECT
 			store_books.store_id,
 			m_books.book_id,
-		    m_books.book_title
+			m_books.book_title
 		FROM
 			m_books
 		INNER JOIN
 			store_books
 		ON
 			m_books.book_id = store_books.book_id
-		LEFT JOIN
+		LEFT OUTER JOIN
 			t_inventories
 		ON 
 			m_books.book_id = t_inventories.book_id
-		WHERE
-			t_inventories.book_id IS NULL
-		OR(
+		AND
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
 				t_inventories.deleted_flag = 1
-		    AND
-				t_inventories.inventory_status = 'discontinued'
-			AND
-				t_inventories.amount = 0
-		)
+			))
 		ORDER BY
 			store_books.store_id;
 	
@@ -155,23 +160,28 @@
 			store_books
 		ON
 			m_books.book_id = store_books.book_id
-		LEFT JOIN
+		LEFT OUTER JOIN
 			t_inventories
 		ON 
 			m_books.book_id = t_inventories.book_id
-		WHERE
-			t_inventories.book_id IS NULL
 		AND
-			store_books.store_id = #{storeId}
-		OR(
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND
+				store_books.store_id = #{storeId}
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
+				t_inventories.store_id = #{storeId}
+			AND
 				t_inventories.deleted_flag = 1
-			AND
-				t_inventories.inventory_status = 'discontinued'
-			AND
-				t_inventories.amount = 0
-		)
-		ORDER BY
-			store_books.store_id;
+			));
 	
 	</select>
 
