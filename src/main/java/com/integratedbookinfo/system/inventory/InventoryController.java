@@ -30,7 +30,7 @@ public class InventoryController {
 
     private final AuthController authController;
 
-	private final int NUM_PER_PAGE = 2;
+	private final int NUM_PER_PAGE = 1;
 	private final InventoryService inventoryService;
 
 
