@@ -161,7 +161,7 @@
 	
 		SELECT
 			DISTINCT m_stores.store_id, 
-		    m_stores.store_name
+			m_stores.store_name
 		FROM
 			m_books
 		INNER JOIN
@@ -172,19 +172,26 @@
 			m_stores
 		ON
 			store_books.store_id = m_stores.store_id
-		LEFT JOIN
+		LEFT OUTER JOIN
 			t_inventories
 		ON 
 			m_books.book_id = t_inventories.book_id
-		WHERE
-			t_inventories.book_id IS NULL
-		OR(
+		AND
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
 				t_inventories.deleted_flag = 1
-			AND
-				t_inventories.inventory_status = 'discontinued'
-			AND
-				t_inventories.amount = 0
-		);
+			))
+		ORDER BY
+			m_stores.store_id;
 	
 	</select>
 
