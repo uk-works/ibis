@@ -17,6 +17,15 @@
 
 		<form th:action="@{/inventory/create}" method="post" th:object="${inventoryRequest}">
 
+			<div th:if="${#fields.hasGlobalErrors()}"
+				class="row justify-content-center align-items-center message-area mb-2">
+				<div class="col-md-7 offset-2 alert alert-warning">
+					<p th:each="error : ${#fields.globalErrors()}">
+						<strong>[[${error}]]</strong>
+					</p>
+				</div>
+			</div>
+			
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="storeId" class="col-md-2 col-form-label">書店</label>
 				<div class="col-md-7">
@@ -41,7 +50,7 @@
 			<div class="row justify-content-center align-items-center mb-2">
 				<label for="amount" class="col-md-2 col-form-label">在庫数</label>
 				<div class="col-md-7">
-					<input type="number" class="form-control" th:field="*{amount}" min="0" />				
+					<input type="number" class="form-control" th:field="*{amount}" min="1"/>				
 					<p th:errors="*{amount}"></p>
 				</div>
 			</div>
