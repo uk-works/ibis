@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.integratedbookinfo.system.auth.AuthController;
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.shared.enums.InventoryStatus;
+import com.integratedbookinfo.system.validationgroup.InventoryEditGroup;
 import com.integratedbookinfo.system.validationgroup.InventoryRegisterGroup;
 
 import lombok.RequiredArgsConstructor;
@@ -140,10 +142,27 @@ public class InventoryController {
 
 	@PostMapping("/edit")
 	public String editInventory(
-			@Validated(InventoryRegisterGroup.class) @ModelAttribute InventoryRequestDTO form,
+			@Validated(InventoryEditGroup.class) @ModelAttribute("inventoryRequest") InventoryRequestDTO form,
 			Errors errors,
+			HttpSession session,
+			RedirectAttributes ra,
 			Model model
 			) {
+
+		boolean isStoreIdError = form.getStoreId() == null || form.getStoreId().isBlank();
+		
+		boolean isAmountZero = form.getAmount() < 0;
+		
+		if(errors.hasErrors() || isStoreIdError || isAmountZero) {
+			
+			ra.addFlashAttribute("errorMsg", "更新対象の在庫情報が不正です。");
+			
+			if (isAmountZero) {
+				ra.addFlashAttribute("InvalidMsg", "在庫更新時は0以上の値を設定してください。");
+			}
+
+			return "redirect:/inventory/list";
+		}
 		
 		inventoryService.modifyInventory(form);
 		
