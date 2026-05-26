@@ -1,7 +1,6 @@
 package com.integratedbookinfo.system.inventory;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +17,7 @@ import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.shared.enums.InventoryStatus;
+import com.integratedbookinfo.system.validationgroup.InventoryRegisterGroup;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
@@ -73,6 +73,7 @@ public class InventoryController {
 		String pageName = "";
 		LoginUserRequestDTO loginUser = getLoginUser(session);
 		InventoryRequestDTO inventoryRequest = new InventoryRequestDTO();
+		inventoryRequest.setAmount(1);
 		
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
@@ -96,16 +97,19 @@ public class InventoryController {
 
 	@PostMapping("/create")
 	public String createInventory(
-			@Validated @ModelAttribute("inventoryRequest") InventoryRequestDTO form,
+			@Validated(InventoryRegisterGroup.class) @ModelAttribute("inventoryRequest") InventoryRequestDTO form,
 			Errors errors,
 			HttpSession session,
 			Model model) {
 
 		LoginUserRequestDTO loginUser = getLoginUser(session);
-
-		form.setInventoryStatus(InventoryStatus.ACTIVE);
 		
-		if(errors.hasErrors()) {
+		boolean isStoreIdError = (loginUser.getAccountRole().equals(AccountRole.ADMIN) 
+				&& (form.getStoreId() == null || form.getStoreId().isBlank()));
+			
+		if(errors.hasErrors() || isStoreIdError) {
+			
+			errors.reject("error.inventory.no-available-stock");
 			
 			model.addAttribute("displayName", loginUser.getDisplayName());
 			model.addAttribute("accountRole", loginUser.getAccountRole());
@@ -125,6 +129,7 @@ public class InventoryController {
 
 		}
 
+		form.setInventoryStatus(InventoryStatus.ACTIVE);
 		
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
@@ -135,7 +140,7 @@ public class InventoryController {
 
 	@PostMapping("/edit")
 	public String editInventory(
-			@Valid @ModelAttribute InventoryRequestDTO form,
+			@Validated(InventoryRegisterGroup.class) @ModelAttribute InventoryRequestDTO form,
 			Errors errors,
 			Model model
 			) {
