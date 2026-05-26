@@ -54,7 +54,7 @@ public class BookController {
 		
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
-		
+		model.addAttribute("keyword", keyword);
 		if(loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
 			model.addAttribute("books", bookService.getBookList(page, NUM_PER_PAGE, loginUser.getAccountRole(), null, keyword).getBooks());
 			model.addAttribute("totalPages", bookService.getTotalPages(NUM_PER_PAGE, loginUser.getAccountRole(), null, keyword));
