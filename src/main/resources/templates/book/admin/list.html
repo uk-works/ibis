@@ -45,7 +45,7 @@
 							<a class="page-link" href="">&laquo;</a>
 						</li>
 						<li th:case="*" class="page-item">
-							<a class="page-link" th:href="@{/book/list(page=${page - 1})}">&laquo;</a>
+							<a class="page-link" th:href="@{/book/list(page=${page - 1}, keyword=${keyword})}">&laquo;</a>
 						</li>
 					</th:block>
 
@@ -56,7 +56,7 @@
 								<a class="page-link" href="">[[${index}]]</a>
 							</li>
 							<li th:case="*" class="page-item">
-								<a class="page-link" th:href="@{/book/list(page=${index})}">[[${index}]]</a>
+								<a class="page-link" th:href="@{/book/list(page=${index}, keyword=${keyword})}">[[${index}]]</a>
 							</li>
 						</th:block>
 					</th:block>
@@ -67,7 +67,7 @@
 							<a class="page-link" href="">&raquo;</a>
 						</li>
 						<li th:case="*" class="page-item">
-							<a class="page-link" th:href="@{/book/list(page=${page + 1})}">&raquo;</a>
+							<a class="page-link" th:href="@{/book/list(page=${page + 1}, keyword=${keyword})}">&raquo;</a>
 						</li>
 					</th:block>
 				</ul>
@@ -115,7 +115,7 @@
 							<a class="page-link" href="">&laquo;</a>
 						</li>
 						<li th:case="*" class="page-item">
-							<a class="page-link" th:href="@{/book/list(page=${page - 1})}">&laquo;</a>
+							<a class="page-link" th:href="@{/book/list(page=${page - 1}, keyword=${keyword})}">&laquo;</a>
 						</li>
 					</th:block>
 
@@ -126,7 +126,7 @@
 								<a class="page-link" href="">[[${index}]]</a>
 							</li>
 							<li th:case="*" class="page-item">
-								<a class="page-link" th:href="@{/book/list(page=${index})}">[[${index}]]</a>
+								<a class="page-link" th:href="@{/book/list(page=${index}, keyword=${keyword})}">[[${index}]]</a>
 							</li>
 						</th:block>
 					</th:block>
@@ -137,7 +137,7 @@
 							<a class="page-link" href="">&raquo;</a>
 						</li>
 						<li th:case="*" class="page-item">
-							<a class="page-link" th:href="@{/book/list(page=${page + 1})}">&raquo;</a>
+							<a class="page-link" th:href="@{/book/list(page=${page + 1}, keyword=${keyword})}">&raquo;</a>
 						</li>
 					</th:block>
 				</ul>
