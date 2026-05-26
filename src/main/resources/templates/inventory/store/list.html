@@ -33,6 +33,14 @@
 			</div>
 		</div>
 
+		<div th:if="${errorMsg}" class="mb-4 alert alert-danger">
+			[[${errorMsg}]]
+		</div>
+
+		<div th:if="${InvalidMsg}" class="mb-4 alert alert-danger">
+			[[${InvalidMsg}]]
+		</div>			
+		
 		<div class="d-flex justify-content-between align-items-center mb-2">
 			<h2>取扱書籍一覧</h2>
 
