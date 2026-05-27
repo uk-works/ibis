@@ -36,6 +36,8 @@ public interface BookMapper {
 
 	public String selectLastBookIdForUpdate();
 	
+	public int countStoreBookByStoreIdAndBookId(@Param("bookId") String bookId, @Param("storeId") String storeId);
+	
 	public List<Publisher> selectPublishers();
 	
 	public List<Genre> selectGenres();
@@ -51,6 +53,8 @@ public interface BookMapper {
 	public List<BookOptionDTO> selectBookOptions();
 	
 	public List<BookOptionDTO> selectBookOptionsByStoreId(String storeId);
+	
+	public BookDTO selectFindBookByIsbnOrJan(@Param("isbn") String isbn, @Param("janCode") String janCode);
 	
 	public int insertBook(BookDTO bookDto);
 

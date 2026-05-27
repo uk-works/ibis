@@ -130,54 +130,89 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
+	public BookDTO getBookByIsbnOrJanCode(String isbn, String janCode) {
+		
+		return bookMapper.selectFindBookByIsbnOrJan(isbn, janCode);
+	}	
+	
+	@Override
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser) {
 
-		String recentBookId = bookMapper.selectLastBookIdForUpdate();
-
-		String nextBookId = generateBookId(recentBookId);
-
-		BookDTO book = bookCreateRequestDTO.getBook();
-		book.setBookId(nextBookId);
+		BookDTO originBook = bookMapper.selectFindBookByIsbnOrJan(
+				bookCreateRequestDTO.getBook().getIsbn(), bookCreateRequestDTO.getBook().getJanCode());
+		String recentBookId = "";
+		String nextBookId = "";
 
 		StoreBookDTO storeBook = bookCreateRequestDTO.getStoreBook();
-		storeBook.setBookId(nextBookId);
+		
+		if (originBook == null) {
+			recentBookId = bookMapper.selectLastBookIdForUpdate();
+
+			nextBookId = generateBookId(recentBookId);
+
+			BookDTO book = bookCreateRequestDTO.getBook();
+			book.setBookId(nextBookId);
+			
+			// 画像登録処理
+			saveImageFile(bookCreateRequestDTO.getBook());
+
+			bookMapper.insertBook(book);
+			
+			storeBook.setBookId(nextBookId);
+		} else {
+			storeBook.setBookId(originBook.getBookId());			
+		}
+
 
 		if (loginUser.getAccountRole() == AccountRole.STORE) {
 			storeBook.setStoreId(loginUser.getStoreId());
 		}
-
-		// 画像登録処理
-		saveImageFile(bookCreateRequestDTO.getBook());
-
-		bookMapper.insertBook(book);
 
 		bookMapper.insertStoreBook(storeBook);
 
 	}
 
 	@Override
-	public void modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
-		
+	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(book));
+		System.out.println("");
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(storeBook));
 		int updateBookCount = 0;
+		int updateStoreBookCount = 0;
 		// 画像登録処理
 		saveImageFile(book);
 		
 		if (accountRole.equals(AccountRole.ADMIN)) {
+			System.out.println("bookMapper.updateBook(book)");
 			updateBookCount = bookMapper.updateBook(book);
 		}
 
-		int updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
-		
-		// 書籍編集（書店書籍 新規追加の場合）
-		// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
-		if (updateStoreBookCount == 0) {
-			storeBook.setBookId(book.getBookId());
-			bookMapper.insertStoreBook(storeBook);
+		if (!storeBook.isRegisterIntent()) {
+			System.out.println("bookMapper.updateStoreBook(book.getBookId(), storeBook)");
+			updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
+			
+			if (updateStoreBookCount == 0) {
+				return false;
+			}
+			
+		} else {
+			// 書籍編集（書店書籍 新規追加の場合）
+			// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
+			int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
+			
+			if (existStoreBook == 0) {
+				System.out.println("bookMapper.insertStoreBook(storeBook)");
+				storeBook.setBookId(book.getBookId());
+				bookMapper.insertStoreBook(storeBook);
+			} else {
+				return false;
+			}
+			
 		}
-		
+
 		System.out.println("updateBook : " + updateBookCount);
 		System.out.println("updateStoreBook : " + updateStoreBookCount);
-		
+		return true;
 	}
 
 	@Override
@@ -194,6 +229,11 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public String generateBookId(String recentBookId) {
+		
+		if (recentBookId == null) {
+			return "book0001";
+		}
+		
 		String numberPart = recentBookId.substring(4);
 		int next = Integer.parseInt(numberPart) + 1;
 

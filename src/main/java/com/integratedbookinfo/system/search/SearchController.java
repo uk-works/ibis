@@ -37,17 +37,28 @@ public class SearchController {
 		model.addAttribute("totalPages", searchService.getTotalPages(NUM_PER_PAGE, keyword, genre));
 		model.addAttribute("page", page);
 		
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("genre", genre);
+		
 		return "search/book-search-result";
 	}
 
 	@GetMapping("/book/{bookId}")
 	public String showBookInfo(
 			@PathVariable String bookId,
+			@RequestParam(name = "keyword", required = false) String keyword,
+			@RequestParam(name = "genre", required = false) String genre,
+			@RequestParam(name = "page", defaultValue = "1") Integer page,
 			Model model) {
 		
 		System.out.println(new ObjectMapper()
 				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(searchService.getBookInfo("book0001")));
+				.writeValueAsString(searchService.getBookInfo(bookId)));
+		
+		
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("genre", genre);		
+		model.addAttribute("page", page);
 		
 		model.addAttribute("bookView", searchService.getBookInfo(bookId));
 		
@@ -57,11 +68,20 @@ public class SearchController {
 	@GetMapping("/store/{storeId}")
 	public String showStoreInfo(
 			@PathVariable String storeId,
+			@RequestParam(name = "keyword", required = false) String keyword,
+			@RequestParam(name = "genre", required = false) String genre,
+			@RequestParam(name = "page", defaultValue = "1") Integer page,
 			Model model) {
 		
 		System.out.println(new ObjectMapper()
 				.writerWithDefaultPrettyPrinter()
 				.writeValueAsString(searchService.getStoreInfo("store0001")));
+		
+		model.addAttribute("storeBasicInfo", searchService.getStoreInfo(storeId));
+		
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("genre", genre);		
+		model.addAttribute("page", page);
 		
 		return "search/store-detail";
 	}

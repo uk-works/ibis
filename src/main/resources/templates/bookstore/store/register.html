@@ -4,58 +4,135 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
 	<title>書店登録 | IBIS</title>
 </head>
 
+<header th:replace="~{common/customer_header :: page_header}"></header>
+
 <body>
 
-	<p>書店登録</p>
-	
-	<form th:action="@{/store/create}" method="post" th:object="${storeCreateRequest}">
-		<button>登録</button>
-		<button type="button" onclick="location.href='/auth/login'">戻る</button>
+	<main class="container mt-4">
+		<h2>書店登録</h2>
+		<form th:action="@{/store/create}" method="post" th:object="${storeCreateRequest}">
 
-		<p th:errors="*{account.loginId}"></p>
-		<label>ID<input type="text" th:field="*{account.loginId}" /></label>
-		
-		<p th:errors="*{account.password}"></p>
-		<label>パスワード<input type="password" th:field="*{account.password}" /></label>
+			<div class="row justify-content-center mb-4 gap-5">
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">登録</button>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary btn-lg"
+						onclick="location.href='/auth/login'">戻る</button>
+				</div>
+			</div>
 
-		<p th:errors="*{store.storeName}"></p>
-		<label>書店名<input type="text" th:field="*{store.storeName}" /></label>
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="account.loginId" class="col-md-2 col-form-label">ID</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{account.loginId}" />
+					<p th:errors="*{account.loginId}"></p>
+				</div>
+			</div>
 
-		<p th:errors="*{store.email}"></p>
-		<label>メールアドレス<input type="email" th:field="*{store.email}" /></label>
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="account.password" class="col-md-2 col-form-label">パスワード</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{account.password}" />
+					<p th:errors="*{account.password}"></p>
+				</div>
+			</div>
 
-		<p th:errors="*{store.tel}"></p>
-		<label>電話番号<input type="text" th:field="*{store.tel}" /></label>
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.storeName" class="col-md-2 col-form-label">書店名</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.storeName}" />
+					<p th:errors="*{store.storeName}"></p>
+				</div>
+			</div>
 
-		<p th:errors="*{store.postalCode}"></p>
-		<label>郵便番号<input type="text" th:field="*{store.postalCode}" /></label>
-		
-		<p th:errors="*{store.address}"></p>
-		<label>住所<input type="text" th:field="*{store.address}" /></label>
-		
-		<p th:errors="*{store.openingHours}"></p>
-		<label>営業時間<input type="text" th:field="*{store.openingHours}" /></label>
-		
-		<p th:errors="*{store.closedDays}"></p>
-		<label>定休日<input type="text" th:field="*{store.closedDays}" /></label>
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.email" class="col-md-2 col-form-label">Email</label>
+				<div class="col-md-7">
+					<input type="email" class="form-control" th:field="*{store.email}" />
+					<p th:errors="*{store.email}"></p>
+				</div>
+			</div>
 
-		<label>書店営業状態
-			<select th:field="*{store.storeStatus}">
-				<option th:each="status : ${storeStatuses}" th:value="${status}">
-					[[${status.label}]]
-				</option>
-			</select>
-		</label>
-		
-		<label>備考<input type="text" th:field="*{store.note}" /></label>
-	</form>
-	
-	
-	<script src="js/bootstrap.bundle.min.js"></script>
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.tel" class="col-md-2 col-form-label">電話番号</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.tel}" />
+					<p th:errors="*{store.tel}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.postalCode" class="col-md-2 col-form-label">郵便番号</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.postalCode}" />
+					<p th:errors="*{store.postalCode}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.address" class="col-md-2 col-form-label">住所</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.address}" />
+					<p th:errors="*{store.address}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.openingHours" class="col-md-2 col-form-label">営業時間</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.openingHours}" />
+					<p th:errors="*{store.openingHours}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.closedDays" class="col-md-2 col-form-label">定休日</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.closedDays}" />
+					<p th:errors="*{store.closedDays}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.storeStatus" class="col-md-2 col-form-label">書店営業状態</label>
+				<div class="col-md-7">
+					<select class="form-select" th:field="*{store.storeStatus}">
+						<option th:each="status : ${storeStatuses}" th:value="${status}">
+							[[${status.label}]]
+						</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="store.note" class="col-md-2 col-form-label">備考</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{store.note}" />
+				</div>
+			</div>
+
+			<div class="row justify-content-center mb-4 gap-5">
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">登録</button>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary btn-lg" onclick="location.href='/dashboard'">戻る</button>
+				</div>
+			</div>
+		</form>
+	</main>
+
+
+
+
+
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 </body>
 
 </html>

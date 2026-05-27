@@ -4,145 +4,180 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
-	<link href="../../css/bootstrap.min.css" rel="stylesheet">
-	<link href="../css/common_header.css" rel="stylesheet">
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../css/common_header.css}" rel="stylesheet">
 	<title>在庫管理 | IBIS</title>
 </head>
 
 <header th:replace="~{common/admin_header :: page_header}"></header>
 
 <body>
-	在庫検索
-	<form th:action="@{/inventory/list}" method="get">
-		<input type="text" name="keyword" />
-		<input type="submit" value="検索" />
-	</form>
 
-	在庫一覧
-	<!-- ページネーション-->
-	<div th:if="${totalPages >= 2}" class="container">
-		<ul class="pagination">
-			<!-- 前ページへ -->
-			<th:block th:switch="${page}">
-				<li th:case="1" class="page-item disabled">
-					<a class="page-link" href="">&laquo;</a>
-				</li>
-				<li th:case="*" class="page-item">
-					<a class="page-link" th:href="@{/inventory/list(page=${page - 1})}">&laquo;</a>
-				</li>
-			</th:block>
+	<div class="container mt-4">
+		<h2 class="mb-4">在庫検索</h2>
 
-			<!-- ページ番号 -->
-			<th:block th:each="index : ${#numbers.sequence(1, totalPages)}">
-				<th:block th:switch="${index}">
-					<li th:case="${page}" class="page-item active">
-						<a class="page-link" href="">[[${index}]]</a>
-					</li>
-					<li th:case="*" class="page-item">
-						<a class="page-link" th:href="@{/inventory/list(page=${index})}">[[${index}]]</a>
-					</li>
-				</th:block>
-			</th:block>
+		<div class="mb-4">
+			<div>
+				<form class="row g-3 align-items-center" th:action="@{/inventory/list}" method="get">
+					<!-- 検索ボックス -->
+					<div class="col-md-4">
+						<input type="text" class="form-control" name="keyword" />
+					</div>
+					<!-- 検索ボタン -->
+					<div class="col-md-1 d-grid">
+						<button class="btn btn-primary">検索</button>
+					</div>
+				</form>
+			</div>
+		</div>
 
-			<!-- 次ページへ -->
-			<th:block th:switch="${page}">
-				<li th:case="${totalPages}" class="page-item disabled">
-					<a class="page-link" href="">&raquo;</a>
-				</li>
-				<li th:case="*" class="page-item">
-					<a class="page-link" th:href="@{/inventory/list(page=${page + 1})}">&raquo;</a>
-				</li>
+		<div th:if="${errorMsg}" class="mb-4 alert alert-danger">
+			[[${errorMsg}]]
+		</div>
+		
+		<div th:if="${InvalidMsg}" class="mb-4 alert alert-danger">
+			[[${InvalidMsg}]]
+		</div>		
+		
+		<div class="d-flex justify-content-between align-items-center mb-2">
+
+
+			<h2>在庫一覧</h2>
+
+			<!-- ページネーション-->
+			<div th:if="${totalPages >= 2}">
+				<ul class="pagination">
+					<!-- 前ページへ -->
+					<th:block th:switch="${page}">
+						<li th:case="1" class="page-item disabled">
+							<a class="page-link" href="">&laquo;</a>
+						</li>
+						<li th:case="*" class="page-item">
+							<a class="page-link" th:href="@{/inventory/list(page=${page - 1}, keyword=${keyword})}">&laquo;</a>
+						</li>
+					</th:block>
+
+					<!-- ページ番号 -->
+					<th:block th:each="index : ${#numbers.sequence(1, totalPages)}">
+						<th:block th:switch="${index}">
+							<li th:case="${page}" class="page-item active">
+								<a class="page-link" href="">[[${index}]]</a>
+							</li>
+							<li th:case="*" class="page-item">
+								<a class="page-link" th:href="@{/inventory/list(page=${index}, keyword=${keyword})}">[[${index}]]</a>
+							</li>
+						</th:block>
+					</th:block>
+
+					<!-- 次ページへ -->
+					<th:block th:switch="${page}">
+						<li th:case="${totalPages}" class="page-item disabled">
+							<a class="page-link" href="">&raquo;</a>
+						</li>
+						<li th:case="*" class="page-item">
+							<a class="page-link" th:href="@{/inventory/list(page=${page + 1}, keyword=${keyword})}">&raquo;</a>
+						</li>
+					</th:block>
+				</ul>
+			</div>
+			
+			<div class="col-md-1 d-grid">
+				<button type="button" class="btn btn-primary" th:onclick="|location.href='@{/inventory/create}'|">登録</button>
+			</div>
+		</div>
+		
+		<table border="1" class="table table-striped">
+			<!-- 1店舗ごとのまとまりをループ -->
+			<th:block th:each="storeInventory : ${storeInventoryResponse.storeInventories}" th:object="${storeInventory}">
+
+				<!-- 店舗名セクション（1行使って目立たせる） -->
+				<thead style="background-color: #eee;">
+					<tr>
+						<th colspan="5" th:text="'店舗名：' + *{storeName}"></th>
+					</tr>
+					<tr>
+						<th>書籍名</th>
+						<th>在庫数</th>
+						<th>在庫状態</th>
+						<th>更新日時</th>
+					</tr>
+				</thead>
+
+				<!-- その店舗に紐づく在庫リストをループ -->
+				<tbody>
+					<tr th:each="summary : *{inventorySummaries}">
+						<td th:text="${summary.bookTitle}"></td>
+						<td th:text="${summary.amount}"></td>
+						<!-- Enumのメソッド呼び出しはプロパティ形式かカッコありで -->
+						<td th:text="${summary.inventoryStatus.getLabel}"></td>
+						<td th:text="${#temporals.format(summary.updatedAt, 'yyyy/MM/dd')}"></td>
+						<td>
+							<button type="button" class="btn btn-secondary inventoryEditButton" data-bs-toggle="modal"
+								th:data-store-id="${summary.storeId}" th:data-book-id="${summary.bookId}"
+								data-bs-target="#editModal">
+								編集
+							</button>
+							<button type="button" class="btn btn-danger inventoryDeleteButton" data-bs-toggle="modal"
+								th:data-store-id="${summary.storeId}" th:data-book-id="${summary.bookId}"
+								data-bs-target="#inventoryDeleteModal">
+								削除
+							</button>
+						</td>
+					</tr>
+					<!-- 店舗間の区切りとして少しスペースを空ける行（任意） -->
+					<tr style="height: 10px; border: none;">
+						<td colspan="5" style="border: none;"></td>
+					</tr>
+				</tbody>
+
 			</th:block>
-		</ul>
+		</table>
+		
+		<div class="d-flex justify-content-center  mt-3">
+			<!-- ページネーション-->
+			<div th:if="${totalPages >= 2}">
+				<ul class="pagination">
+					<!-- 前ページへ -->
+					<th:block th:switch="${page}">
+						<li th:case="1" class="page-item disabled">
+							<a class="page-link" href="">&laquo;</a>
+						</li>
+						<li th:case="*" class="page-item">
+							<a class="page-link" th:href="@{/inventory/list(page=${page - 1}, keyword=${keyword})}">&laquo;</a>
+						</li>
+					</th:block>
+
+					<!-- ページ番号 -->
+					<th:block th:each="index : ${#numbers.sequence(1, totalPages)}">
+						<th:block th:switch="${index}">
+							<li th:case="${page}" class="page-item active">
+								<a class="page-link" href="">[[${index}]]</a>
+							</li>
+							<li th:case="*" class="page-item">
+								<a class="page-link" th:href="@{/inventory/list(page=${index}, keyword=${keyword})}">[[${index}]]</a>
+							</li>
+						</th:block>
+					</th:block>
+
+					<!-- 次ページへ -->
+					<th:block th:switch="${page}">
+						<li th:case="${totalPages}" class="page-item disabled">
+							<a class="page-link" href="">&raquo;</a>
+						</li>
+						<li th:case="*" class="page-item">
+							<a class="page-link" th:href="@{/inventory/list(page=${page + 1}, keyword=${keyword})}">&raquo;</a>
+						</li>
+					</th:block>
+				</ul>
+			</div>
+		</div>
 	</div>
 
-	<a class="button" th:href="@{/inventory/create}">登録</a>
-	<table border="1">
-		<!-- 1店舗ごとのまとまりをループ -->
-		<th:block th:each="storeInventory : ${storeInventoryResponse.storeInventories}" th:object="${storeInventory}">
 
-			<!-- 店舗名セクション（1行使って目立たせる） -->
-			<thead style="background-color: #eee;">
-				<tr>
-					<th colspan="5" th:text="'店舗名：' + *{storeName}"></th>
-				</tr>
-				<tr>
-					<th>書籍名</th>
-					<th>在庫数</th>
-					<th>在庫状態</th>
-					<th>更新日時</th>
-					<th>アクション</th>
-				</tr>
-			</thead>
 
-			<!-- その店舗に紐づく在庫リストをループ -->
-			<tbody>
-				<tr th:each="summary : *{inventorySummaries}">
-					<td th:text="${summary.bookTitle}"></td>
-					<td th:text="${summary.amount}"></td>
-					<!-- Enumのメソッド呼び出しはプロパティ形式かカッコありで -->
-					<td th:text="${summary.inventoryStatus.getLabel}"></td>
-					<td th:text="${#temporals.format(summary.updatedAt, 'yyyy/MM/dd')}"></td>
-					<td>
-						<button type="button" class="btn btn-primary inventoryEditButton" data-bs-toggle="modal"
-							th:data-store-id="${summary.storeId}" th:data-book-id="${summary.bookId}"
-							data-bs-target="#editModal">
-							編集
-						</button>
-						<button type="button" class="btn btn-primary inventoryDeleteButton" data-bs-toggle="modal"
-							th:data-store-id="${summary.storeId}" th:data-book-id="${summary.bookId}"
-							data-bs-target="#inventoryDeleteModal">
-							削除
-						</button>
-					</td>
-				</tr>
-				<!-- 店舗間の区切りとして少しスペースを空ける行（任意） -->
-				<tr style="height: 10px; border: none;">
-					<td colspan="5" style="border: none;"></td>
-				</tr>
-			</tbody>
 
-		</th:block>
-	</table>
 
-	<!-- ページネーション-->
-	<div th:if="${totalPages >= 2}" class="container">
-		<ul class="pagination">
-			<!-- 前ページへ -->
-			<th:block th:switch="${page}">
-				<li th:case="1" class="page-item disabled">
-					<a class="page-link" href="">&laquo;</a>
-				</li>
-				<li th:case="*" class="page-item">
-					<a class="page-link" th:href="@{/inventory/list(page=${page - 1})}">&laquo;</a>
-				</li>
-			</th:block>
-
-			<!-- ページ番号 -->
-			<th:block th:each="index : ${#numbers.sequence(1, totalPages)}">
-				<th:block th:switch="${index}">
-					<li th:case="${page}" class="page-item active">
-						<a class="page-link" href="">[[${index}]]</a>
-					</li>
-					<li th:case="*" class="page-item">
-						<a class="page-link" th:href="@{/inventory/list(page=${index})}">[[${index}]]</a>
-					</li>
-				</th:block>
-			</th:block>
-
-			<!-- 次ページへ -->
-			<th:block th:switch="${page}">
-				<li th:case="${totalPages}" class="page-item disabled">
-					<a class="page-link" href="">&raquo;</a>
-				</li>
-				<li th:case="*" class="page-item">
-					<a class="page-link" th:href="@{/inventory/list(page=${page + 1})}">&raquo;</a>
-				</li>
-			</th:block>
-		</ul>
-	</div>
-
-	<script src="js/bootstrap.bundle.min.js"></script>
+	<script th:src="@{../js/bootstrap.bundle.min.js}"></script>
 
 
 	<!-- 在庫編集モーダル -->
@@ -151,89 +186,89 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 
-					<div class="modal-header">
+				<div class="modal-header">
 
-						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+
+				<form id="editForm" th:action="@{/inventory/edit}" method="post">
+					<input type="hidden" name="storeId" id="storeIdInput">
+					<input type="hidden" name="bookId" id="bookIdInput">
+
+					<div class="modal-body">
+						<p>以下の在庫情報を編集できます。<br>
+							変更後、「完了」ボタンを押してください。</p>
+						<p>書店名：<span id="storeName"></span></p>
+						<p>書籍名：<span id="bookTitle"></span></p>
+						<p>在庫数：<input type="number" name="amount" id="amountInput" min="0" /></p>
+						<div id="inventoryStatusArea" style="display:none;">
+							<p>
+								在庫数が0のとき、在庫の状態を以下の項目から選択
+							</p>
+							<label>
+								在庫状態
+								<select name="inventoryStatus" id="inventoryStatusInput">
+									<option value="ACTIVE">
+										販売中
+									</option>
+									
+									<option value="RESTOCK_PLANNED">
+										再入荷予定
+									</option>
+
+									<option value="RESTOCK_UNDECIDED">
+										再入荷未定
+									</option>
+
+									<option value="DISCONTINUED">
+										取扱休止
+									</option>
+								</select>
+							</label>
+						</div>
 					</div>
-
-					<form id="editForm" th:action="@{/inventory/edit}" method="post">
-						<input type="hidden" name="storeId" id="storeIdInput">
-						<input type="hidden" name="bookId" id="bookIdInput">
-
-						<div class="modal-body">
-							<p>以下の在庫情報を編集できます。<br>
-								変更後、「完了」ボタンを押してください。</p>
-							<p>書店名：<span id="storeName"></span></p>
-							<p>書籍名：<span id="bookTitle"></span></p>
-							<p>在庫数：<input type="number" name="amount" id="amountInput" /></p>
-							<div id="inventoryStatusArea" style="display:none;">
-								<p>
-									在庫数が0のとき、在庫の状態を以下の項目から選択
-								</p>
-								<label>
-									在庫状態
-									<select name="inventoryStatus" id="inventoryStatusInput">
-										<option value="ACTIVE">
-											販売中
-										</option>
-
-										<option value="RESTOCK_PLANNED">
-											再入荷予定あり
-										</option>
-
-										<option value="RESTOCK_UNDECIDED">
-											再入荷未定
-										</option>
-
-										<option value="DISCONTINUED">
-											取扱休止
-										</option>
-									</select>
-								</label>
-							</div>
-						</div>
-						<div class="modal-footer">
-							<button type="button" id="editButton" class="btn btn-primary">完了</button>
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-						</div>
-					</form>
+					<div class="modal-footer">
+						<button type="button" id="editButton" class="btn btn-primary">完了</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
 
-	
+
 	<div class="modal fade" id="inventoryDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
 		aria-labelledby="staticBackdropLabel" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content">
 
-					<div class="modal-header">
+				<div class="modal-header">
 
-						<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
-						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">在庫編集</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+
+				<form id="deleteForm" th:action="@{/inventory/delete}" method="post">
+					<input type="hidden" name="storeId" id="delStoreIdInput">
+					<input type="hidden" name="bookId" id="delBookIdInput">
+
+					<div class="modal-body">
+						<p>以下の在庫を削除しますか？</p>
+						<p>書店名：<span id="delStoreName"></span></p>
+						<p>書籍名：<span id="delBookTitle"></span></p>
+						<p>在庫数：<span id="delAmount"></span></p>
+
 					</div>
-
-					<form id="deleteForm" th:action="@{/inventory/delete}" method="post">
-						<input type="hidden" name="storeId" id="delStoreIdInput">
-						<input type="hidden" name="bookId" id="delBookIdInput">
-
-						<div class="modal-body">
-							<p>以下の在庫を削除しますか？</p>
-							<p>書店名：<span id="delStoreName"></span></p>
-							<p>書籍名：<span id="delBookTitle"></span></p>
-							<p>在庫数：<span id="delAmount" ></span></p>
-
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-							<button type="button" id="deleteButton" class="btn btn-primary">削除</button>
-						</div>
-					</form>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+						<button type="button" id="deleteButton" class="btn btn-danger">削除</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
-		
+
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 	<script th:inline="javascript">
 		const storeInventories = /*[[${storeInventoryResponse.storeInventories}]]*/[];
@@ -242,7 +277,7 @@
 
 			button.addEventListener("click", () => {
 
-				
+
 				const storeId = button.dataset.storeId;
 				const bookId = button.dataset.bookId;
 
@@ -251,37 +286,37 @@
 				const inventorySummary = storeInventory.inventorySummaries.find((si) => si.bookId === bookId);
 
 				document.getElementById("storeName").textContent = storeInventory.storeName;
-			
+
 				document.getElementById("bookTitle").textContent = inventorySummary.bookTitle;
-				
+
 				document.getElementById("storeIdInput").value
-				    = storeId;
+					= storeId;
 
 				document.getElementById("bookIdInput").value
-				    = bookId;
+					= bookId;
 
 				document.getElementById("amountInput").value
-				    = inventorySummary.amount;
+					= inventorySummary.amount;
 
 				document.getElementById("inventoryStatusInput").value
-				    = inventorySummary.inventoryStatus;
-					
+					= inventorySummary.inventoryStatus;
+
 				updateInventoryStatusVisibility();
 			});
 		});
-		
+
 		const editButton =
-		    document.getElementById("editButton");
+			document.getElementById("editButton");
 
 		const editForm =
-		    document.getElementById("editForm");
+			document.getElementById("editForm");
 
 		editButton.addEventListener("click", () => {
 
-		    editForm.submit();
+			editForm.submit();
 
 		});
-		
+
 		/* ============================================================ */
 		const amountInput =
 			document.getElementById("amountInput");
@@ -295,14 +330,14 @@
 
 			if (value !== "" && Number(value) >= 1) {
 
-			    inventoryStatusInput.value = "ACTIVE";
+				inventoryStatusInput.value = "ACTIVE";
 
-			    inventoryStatusArea.style.display = "none";
+				inventoryStatusArea.style.display = "none";
 
 			} else if (value !== "" && Number(value) === 0) {
-			    inventoryStatusArea.style.display = "block";
+				inventoryStatusArea.style.display = "block";
 			} else {
-			    inventoryStatusArea.style.display = "none";
+				inventoryStatusArea.style.display = "none";
 			}
 		}
 
@@ -330,30 +365,30 @@
 				document.getElementById("delStoreName").textContent = storeInventory.storeName;
 
 				document.getElementById("delBookTitle").textContent = inventorySummary.bookTitle;
-				
+
 				document.getElementById("delAmount").textContent = inventorySummary.amount;
 
 				document.getElementById("delStoreIdInput").value
-				    = storeId;
+					= storeId;
 
 				document.getElementById("delBookIdInput").value
-				    = bookId;
-			
+					= bookId;
+
 			});
-		});	
-			
+		});
+
 		const deleteButton =
-		    document.getElementById("deleteButton");
+			document.getElementById("deleteButton");
 
 		const deleteForm =
-		    document.getElementById("deleteForm");
+			document.getElementById("deleteForm");
 
 		deleteButton.addEventListener("click", () => {
 
-		    deleteForm.submit();
+			deleteForm.submit();
 
 		});
-		
+
 	</script>
 </body>
 

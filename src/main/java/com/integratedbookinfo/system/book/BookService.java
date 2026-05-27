@@ -45,9 +45,11 @@ public interface BookService {
 	
 	public BookEditRequestDTO getBookAndStoreBookForStore(AccountRole accountRole, String bookId, String storeId);
 	
+	public BookDTO getBookByIsbnOrJanCode(String isbn, String janCode);
+	
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser);
 
-	public void modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook);
+	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook);
 
 	public void removeBook(String bookId);
 

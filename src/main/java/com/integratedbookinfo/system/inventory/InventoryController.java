@@ -1,7 +1,6 @@
 package com.integratedbookinfo.system.inventory;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,12 +11,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.integratedbookinfo.system.auth.AuthController;
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.inventory.dto.InventoryRequestDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.shared.enums.InventoryStatus;
+import com.integratedbookinfo.system.validationgroup.InventoryEditGroup;
+import com.integratedbookinfo.system.validationgroup.InventoryRegisterGroup;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
@@ -47,7 +49,8 @@ public class InventoryController {
 
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
-
+		model.addAttribute("keyword", keyword);
+		
 		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
 			model.addAttribute("page", page);
 			model.addAttribute("storeInventoryResponse", inventoryService.getStoreInventoriesByKeyword(page, NUM_PER_PAGE, keyword));
@@ -73,6 +76,7 @@ public class InventoryController {
 		String pageName = "";
 		LoginUserRequestDTO loginUser = getLoginUser(session);
 		InventoryRequestDTO inventoryRequest = new InventoryRequestDTO();
+		inventoryRequest.setAmount(1);
 		
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
@@ -96,16 +100,19 @@ public class InventoryController {
 
 	@PostMapping("/create")
 	public String createInventory(
-			@Validated @ModelAttribute("inventoryRequest") InventoryRequestDTO form,
+			@Validated(InventoryRegisterGroup.class) @ModelAttribute("inventoryRequest") InventoryRequestDTO form,
 			Errors errors,
 			HttpSession session,
 			Model model) {
 
 		LoginUserRequestDTO loginUser = getLoginUser(session);
-
-		form.setInventoryStatus(InventoryStatus.ACTIVE);
 		
-		if(errors.hasErrors()) {
+		boolean isStoreIdError = (loginUser.getAccountRole().equals(AccountRole.ADMIN) 
+				&& (form.getStoreId() == null || form.getStoreId().isBlank()));
+			
+		if(errors.hasErrors() || isStoreIdError) {
+			
+			errors.reject("error.inventory.no-available-stock");
 			
 			model.addAttribute("displayName", loginUser.getDisplayName());
 			model.addAttribute("accountRole", loginUser.getAccountRole());
@@ -125,6 +132,7 @@ public class InventoryController {
 
 		}
 
+		form.setInventoryStatus(InventoryStatus.ACTIVE);
 		
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
@@ -135,10 +143,27 @@ public class InventoryController {
 
 	@PostMapping("/edit")
 	public String editInventory(
-			@Valid @ModelAttribute InventoryRequestDTO form,
+			@Validated(InventoryEditGroup.class) @ModelAttribute("inventoryRequest") InventoryRequestDTO form,
 			Errors errors,
+			HttpSession session,
+			RedirectAttributes ra,
 			Model model
 			) {
+
+		boolean isStoreIdError = form.getStoreId() == null || form.getStoreId().isBlank();
+		
+		boolean isAmountZero = form.getAmount() < 0;
+		
+		if(errors.hasErrors() || isStoreIdError || isAmountZero) {
+			
+			ra.addFlashAttribute("errorMsg", "更新対象の在庫情報が不正です。");
+			
+			if (isAmountZero) {
+				ra.addFlashAttribute("InvalidMsg", "在庫更新時は0以上の値を設定してください。");
+			}
+
+			return "redirect:/inventory/list";
+		}
 		
 		inventoryService.modifyInventory(form);
 		

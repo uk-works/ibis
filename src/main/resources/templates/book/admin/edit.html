@@ -10,133 +10,299 @@
 </head>
 
 <header th:replace="~{common/admin_header :: page_header}"></header>
+
 <body>
+	<main class="container mt-4">
+		<h2>書籍編集</h2>
 
-	<p>書籍編集</p>
-	
-	<form th:action="@{/book/edit/{bookId}(bookId = *{book.bookId})}" method="post" th:object="${bookEditRequest}" enctype="multipart/form-data">
-		<button>登録</button>
-		<button type="button" onclick="location.href='/book/list'">戻る</button>
+		<form th:action="@{/book/edit/{bookId}(bookId = *{book.bookId})}" method="post" th:object="${bookEditRequest}"
+			enctype="multipart/form-data">
+			<div class="row justify-content-center mb-4 gap-5">
+				<!-- 💡 追加：閲覧・編集切り替えチェックボックス -->
+				<div class="col-auto d-flex align-items-center">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="editBookToggle">
+						<label class="form-check-label fw-bold text-primary" for="editBookToggle">書籍情報を編集する</label>
+					</div>
+				</div>
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">完了</button>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary btn-lg"
+						onclick="location.href='/book/list'">戻る</button>
+				</div>
+			</div>
 
-		<input type="hidden" th:field="*{book.bookId}" />
-		<p th:errors="*{book.isbn}"></p>
-		<label>ISBN<input type="text" th:field="*{book.isbn}" /></label>
-		
-		<p th:errors="*{book.janCode}"></p>
-		<label>JANコード<input type="text" th:field="*{book.janCode}" /></label>
-		
-		<p th:errors="*{book.bookTitle}"></p>
-		<label>書籍名<input type="text" th:field="*{book.bookTitle}" /></label>
+			<div class="book">
+				<input type="hidden" th:field="*{book.bookId}" />
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.isbn" class="col-md-2 col-form-label">ISBN</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.isbn}" />
+						<p th:errors="*{book.isbn}"></p>
+					</div>
+				</div>
 
-		<p th:errors="*{book.cCode}"></p>
-		<label>Cコード<input type="text" th:field="*{book.cCode}" /></label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.janCode" class="col-md-2 col-form-label">JANコード</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.janCode}" />
+						<p th:errors="*{book.janCode}"></p>
+					</div>
+				</div>
 
-		<label>ジャンル名
-			<select th:field="*{book.genre.genreId}">
-				<option th:each="genre : ${genres}" th:value="${genre.genreId}">
-					[[${genre.genreName}]]
-				</option>
-			</select>
-		</label>
-		
-		<p th:errors="*{book.author}"></p>
-		<label>著者<input type="text" th:field="*{book.author}" /></label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.bookTitle" class="col-md-2 col-form-label">書籍名</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.bookTitle}" />
+						<p th:errors="*{book.bookTitle}"></p>
+					</div>
+				</div>
 
-		<label>出版社
-			<select th:field="*{book.publisher.publisherId}">
-				<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
-					[[${publisher.publisherName}]]
-				</option>
-			</select>
-		</label>
-		
-		<p th:errors="*{book.publisher.publisherName}"></p>
-		<p>出版社リストに無い出版社で書籍登録したい場合は、<br>リストを未選択状態にして上、入力してください</p>
-		<label>出版社（その他）<input type="text" th:field="*{book.publisher.publisherName}" readonly/></label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.cCode" class="col-md-2 col-form-label">Cコード</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.cCode}" />
+						<p th:errors="*{book.cCode}"></p>
+					</div>
+				</div>
 
-		<label>サイズ
-			<select th:field="*{book.bookSize}">
-				<option th:each="bookSize : ${bookSizes}" th:value="${bookSize}">
-					[[${bookSize.getLabel}]]
-				</option>
-			</select>
-		</label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.genre.genreId" class="col-md-2 col-form-label">ジャンル名</label>
+					<div class="col-md-7">
+						<select class="form-select" th:field="*{book.genre.genreId}">
+							<option th:each="genre : ${genres}" th:value="${genre.genreId}">
+								[[${genre.genreName}]]
+							</option>
+						</select>
+					</div>
+				</div>
 
-		<p th:errors="*{book.listPrice}"></p>
-		<label>定価(税込み)<input type="text" th:field="*{book.listPrice}" /></label>
-		
-		<p th:errors="*{book.edition}"></p>
-		<label>版<input type="text" th:field="*{book.edition}" /></label>
-		
-		<p th:errors="*{book.releaseDate}"></p>
-		<label>発売日<input type="date" th:field="*{book.releaseDate}" /></label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.author" class="col-md-2 col-form-label">著者</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.author}" />
+						<p th:errors="*{book.author}"></p>
+					</div>
+				</div>
 
-		<p th:errors="*{book.coverImageFile}"></p>
-		<p>※エラーがある場合は再度画像を選択してください</p>
-		<label>表紙画像<input type="file" th:field="*{book.coverImageFile}" /></label>
-		
-		<input type="hidden" th:field="*{book.coverImagePath}" />
-		<p th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''">現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
-		<img th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''" th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">
-		
-		
-		
-		<!-- 書店個別項目 -->
-		<select id="storeSelect" th:field="*{storeBook.storeId}">
-		  <option th:each="opt : ${storeOptions}"
-		          th:value="${opt.storeId}"
-		          th:text="${opt.storeName}">
-		  </option>
-		</select>
-		
-		<p th:errors="*{storeBook.storeGenre}"></p>
-		<label>書店ジャンル<input type="text" id="storeGenre" th:field="*{storeBook.storeGenre}" /></label>
+				<div class="row justify-content-center mb-2">
+					<label for="book.publisher.publisherId" class="col-md-2 col-form-label">出版社</label>
+					<div class="col-md-7">
+						<input type="hidden" th:field="*{book.publisher.publisherId}" />
+						<select class="form-select" th:field="*{book.publisher.publisherId}">
+							<option th:value="p0000">未選択</option>
+							<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
+								[[${publisher.publisherName}]]
+							</option>
+						</select>
+						<p>出版社リストに無い出版社で書籍登録したい場合は、<br>リストを未選択状態にして下記に入力してください。</p>
+						<p>※将来の機能拡張（リストにない出版社の直接登録）を見据えて、DTO構造および画面レイアウトを設計しています。<br>
+							（現在は初回リリースのスピードを優先し、マスター選択のみ対応のため入力欄はロックされています）</p>
+					</div>
+				</div>
 
-		<p th:errors="*{storeBook.storePrice}"></p>
-		<label>店頭価格<input type="text" id="storePrice" th:field="*{storeBook.storePrice}" /></label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.publisher.publisherName" class="col-md-2 col-form-label">出版社（その他）</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control pe-none bg-body-secondary"
+							th:field="*{book.publisher.publisherName}" readonly />
+						<p th:errors="*{book.publisher.publisherName}"></p>
+					</div>
+				</div>
 
-		<p th:errors="*{storeBook.storeComment}"></p>
-		<label>紹介文<input type="text" id="storeComment" th:field="*{storeBook.storeComment}" /></label>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.bookSize" class="col-md-2 col-form-label">サイズ</label>
+					<div class="col-md-7">
+						<select class="form-select" th:field="*{book.bookSize}">
+							<option th:each="bookSize : ${bookSizes}" th:value="${bookSize}">
+								[[${bookSize.getLabel}]]
+							</option>
+						</select>
+					</div>
+				</div>
 
-		<p th:errors="*{storeBook.note}"></p>
-		<label>備考<input type="text" id="note" th:field="*{storeBook.note}" /></label>
-		
-	</form>
-	
-	<!-- Button trigger modal -->
-	<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deleteModal">
-	  削除
-	</button>
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.listPrice" class="col-md-2 col-form-label">定価（税込み）</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.listPrice}" />
+						<p th:errors="*{book.listPrice}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.edition" class="col-md-2 col-form-label">版</label>
+					<div class="col-md-7">
+						<input type="text" class="form-control" th:field="*{book.edition}" />
+						<p th:errors="*{book.edition}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-2">
+					<label for="book.releaseDate" class="col-md-2 col-form-label">発売日</label>
+					<div class="col-md-7">
+						<input type="hidden" th:field="*{book.releaseDate}" />
+						<input type="date" class="form-control" th:field="*{book.releaseDate}" />
+						<p th:errors="*{book.releaseDate}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center">
+					<label for="book.coverImageFile" class="col-md-2 col-form-label">表紙画像</label>
+					<div class="col-md-7">
+						<input type="file" class="form-control" th:field="*{book.coverImageFile}" />
+						<p>※エラーがある場合は再度画像を選択してください</p>
+						<p th:errors="*{book.coverImageFile}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center mb-3">
+					<div class="col-md-7 offset-2">
+						<input type="hidden" th:field="*{book.coverImagePath}" />
+						<p th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''">
+							現在、保存されている画像ファイル：[[*{book.coverImagePath}]]</p>
+						<img th:if="*{book.coverImagePath} != null and *{book.coverImagePath} != ''"
+							th:src="@{/images/{path}(path = *{book.coverImagePath})}" width="120">
+					</div>
+				</div>
+			</div>
+
+
+
+
+			<!-- 書店個別項目 -->
+			<div class="store-book">
+				<div class="row mb-1">
+					<div class="offset-1 col-md-auto">
+						<h5>書店個別項目</h4>
+					</div>
+					<div class="col-auto d-flex align-items-center">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="manageStoreBookToggle">
+							<label class="form-check-label fw-bold text-primary"
+								for="manageStoreBookToggle">この項目を編集・新規登録する</label>
+						</div>
+					</div>
+
+					<div id="storeFields" class="col-auto justify-content-center d-flex align-items-center">
+						<div>
+							<input class="form-check-input" type="radio" id="editStoreBookRadio"
+								th:field="*{storeBook.registerIntent}" th:value="false">
+							<label class="form-check-label fw-bold text-primary me-3" for="editStoreBookRadio">既存項目の編集</label>							
+						</div>
+						<div>
+							<input class="form-check-input" type="radio" id="insertStoreBookRadio"
+								th:field="*{storeBook.registerIntent}" th:value="true">
+							<label class="form-check-label fw-bold text-primary" for="insertStoreBookRadio">新規登録</label>							
+						</div>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-2">
+					<div class="col-md-7 offset-2">
+						<p>【書店メニューの選び方】<br>
+							「既存項目の編集」を選択した場合➡ 以下の書店メニューから、通常の 「書店名」 を選択してください。<br>
+							「新規登録」を選択した場合➡ 以下の書店メニューから、「書店名（未登録）」 と書かれているものを選択してください。
+						</p>
+					</div>
+				</div>
+				
+				<div class="row justify-content-center align-items-center mb-4">
+					<label for="storeSelect" class="col-md-2 col-form-label">書店</label>
+					<div class="col-md-7">
+						<select class="form-select" id="storeSelect" th:field="*{storeBook.storeId}">
+							<option th:each="opt : ${storeOptions}" th:value="${opt.storeId}"
+								th:text="${opt.storeName}">
+							</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-4">
+					<label for="storeGenre" class="col-md-2 col-form-label">書店ジャンル</label>
+					<div class="col-md-7">
+						<input type="text" id="storeGenre" class="form-control" th:field="*{storeBook.storeGenre}" />
+						<p th:errors="*{storeBook.storeGenre}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-4">
+					<label for="storePrice" class="col-md-2 col-form-label">店頭価格</label>
+					<div class="col-md-7">
+						<input type="text" id="storePrice" class="form-control" th:field="*{storeBook.storePrice}" />
+						<p th:errors="*{storeBook.storePrice}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-4">
+					<label for="storeComment" class="col-md-2 col-form-label">紹介文</label>
+					<div class="col-md-7">
+						<input type="text" id="storeComment" class="form-control"
+							th:field="*{storeBook.storeComment}" />
+						<p th:errors="*{storeBook.storeComment}"></p>
+					</div>
+				</div>
+
+				<div class="row justify-content-center align-items-center mb-4">
+					<label for="note" class="col-md-2 col-form-label">備考</label>
+					<div class="col-md-7">
+						<input type="text" id="note" class="form-control" th:field="*{storeBook.note}" />
+						<p th:errors="*{storeBook.note}"></p>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="d-flex justify-content-center align-items-center mb-4">
+
+				<div class="d-flex gap-5">
+					<button class="btn btn-primary btn-lg">完了</button>
+					<button type="button" class="btn btn-secondary btn-lg"
+						onclick="location.href='/book/list'">戻る</button>
+				</div>
+
+				<div class="ms-5">
+					<button type="button" class="btn btn-danger" data-bs-toggle="modal"
+						data-bs-target="#deleteModal">削除</button>
+				</div>
+			</div>
+		</form>
+	</main>
+
+
+
 
 	<!-- Modal -->
-	<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	  <div class="modal-dialog modal-dialog-centered">
-	    <div class="modal-content">
-			<form id="deleteForm" method="post">
-	      <div class="modal-header">
+	<div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+		aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<form id="deleteForm" method="post">
+					<div class="modal-header">
 
-	        <h1 class="modal-title fs-5" id="staticBackdropLabel">書籍削除確認</h1>
-	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-	      </div>
-	      <div class="modal-body">
-	        <p>以下の書籍を削除してもよろしいですか？</p>
-			<p>ISBN：<span id="isbn"></span></p>
-			<p>書籍名：<span id="bookTitle"></span></p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
-	        <button type="button" id="deleteButton" class="btn btn-primary">削除</button>
-	      </div>
-		  </form>
-	    </div>
-	  </div>
+						<h1 class="modal-title fs-5" id="staticBackdropLabel">書籍削除確認</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p>以下の書籍を削除してもよろしいですか？</p>
+						<p>ISBN：<span id="isbn"></span></p>
+						<p>書籍名：<span id="bookTitle"></span></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+						<button type="button" id="deleteButton" class="btn btn-danger">削除</button>
+					</div>
+				</form>
+			</div>
+		</div>
 	</div>
-	
+
 	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
 	<script th:inline="javascript">
-		const bookId = /*[[*{bookEditRequest.book.bookId}]]*/ [];
-		const isbn = /*[[*{bookEditRequest.book.isbn}]]*/ [];
-		const bookTitle = /*[[*{bookEditRequest.book.bookTitle}]]*/ [];
+		const bookId = /*[[*{bookEditRequest.book.bookId}]]*/[];
+		const isbn = /*[[*{bookEditRequest.book.isbn}]]*/[];
+		const bookTitle = /*[[*{bookEditRequest.book.bookTitle}]]*/[];
 
 		// モーダル内の表示要素を更新
 		document.getElementById("isbn").textContent = isbn;
@@ -148,46 +314,159 @@
 		const deleteForm = document.getElementById("deleteForm");
 
 		deleteButton.addEventListener('click', () => {
-		    // 1. 実行時にURLを組み立てる (例: /books/delete/123)
-		    const baseUrl = /*[[@{/book/delete/}]]*/ '/books/delete/';
-		    deleteForm.action = baseUrl + bookId;
-		    console.log("Formです" + deleteForm.action)
-		    // 2. フォームを送信する
-		    deleteForm.submit();
+			// 1. 実行時にURLを組み立てる (例: /books/delete/123)
+			const baseUrl = /*[[@{/book/delete/}]]*/ '/books/delete/';
+			deleteForm.action = baseUrl + bookId;
+			console.log("Formです" + deleteForm.action)
+			// 2. フォームを送信する
+			deleteForm.submit();
+		});
+
+
+		const storeBooks = /*[[${storeBooks}]]*/[];
+
+		const select = document.getElementById("storeSelect");
+		const genre = document.getElementById("storeGenre");
+		const price = document.getElementById("storePrice");
+		const comment = document.getElementById("storeComment");
+		const note = document.getElementById("note");
+
+		const insertStoreBookRadio = document.getElementById("insertStoreBookRadio");
+		const editStoreBookRadio = document.getElementById("editStoreBookRadio");
+				
+		function update() {
+			const storeId = select.value;
+			const data = storeBooks.find(sb => sb.storeId === storeId);
+
+			if (!data) {
+				price.value = "";
+				comment.value = "";
+				note.value = "";
+				genre.value = "";
+				return;
+			}
+
+			price.value = data.storePrice || "";
+			comment.value = data.storeComment || "";
+			note.value = data.note || "";
+			genre.value = data.storeGenre || "";
+		}
+
+		// 変更時
+		select.addEventListener("change", update);
+
+		// 初期表示
+		document.addEventListener("DOMContentLoaded", update);
+
+		/* ================================== */
+		const editBookToggle = document.getElementById("editBookToggle");
+		const submitButtons = document.querySelectorAll("form button:not([type='button'])"); // 「完了」ボタンを取得
+
+		function toggleBookEditMode() {
+			// チェックボックスが「チェックされていない（閲覧モード）」なら true（無効化）
+			const isReadOnly = !editBookToggle.checked;
+
+			// 1. すべての input, select を取得して disabled (または readonly) を切り替える
+			// ※ ただし、type="hidden" や 切り替えスイッチ自体、出版社(その他)のreadonlyは除外したいので調整
+			const inputs = document.querySelectorAll(".book .form-control, .book .form-select");
+
+			inputs.forEach(input => {
+				// 「出版社（その他）」など、もともとreadonly固定のものは触らない
+				if (input.id === "book.publisher.publisherName") return;
+
+				if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
+					// selectやdate, fileは disabled でグレーアウト制御
+					input.disabled = isReadOnly;
+				} else {
+					// 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
+					input.readOnly = isReadOnly;
+
+					// 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
+					if (isReadOnly) {
+						input.classList.add("bg-body-secondary");
+					} else {
+						input.classList.remove("bg-body-secondary");
+					}
+				}
+			});
+			updateSubmitButtons();
+			// 2. 「完了」ボタンも、閲覧モードの時は押せないようにする（誤送信防止）
+//			submitButtons.forEach(btn => {
+//				btn.disabled = isReadOnly;
+//			});
+		}
+
+		// チェックボックスの切り替えイベント
+		editBookToggle.addEventListener("change", toggleBookEditMode);
+
+		// 初期表示の時に一度実行して、最初を「閲覧モード」にする
+		// 既存の DOMContentLoaded 処理があるため、その中か、もしくはその後に追記します
+		document.addEventListener("DOMContentLoaded", () => {
+			// 既存の update() の後に実行
+			toggleBookEditMode();
+		});
+
+		/* ================================== */
+		const manageStoreBookToggle = document.getElementById("manageStoreBookToggle");
+
+		function toggleStoreBookManageMode() {
+			// チェックボックスが「チェックされていない（閲覧モード）」なら true（無効化）
+			const isReadOnly = !manageStoreBookToggle.checked;
+
+			// 1. すべての input, select を取得して disabled (または readonly) を切り替える
+			// ※ ただし、type="hidden" や 切り替えスイッチ自体、出版社(その他)のreadonlyは除外したいので調整
+			const inputs = document.querySelectorAll(".store-book .form-control, .store-book .form-select");
+
+			inputs.forEach(input => {
+				// 「出版社（その他）」など、もともとreadonly固定のものは触らない
+				if (input.id === "book.publisher.publisherName") return;
+
+				if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
+					// selectやdate, fileは disabled でグレーアウト制御
+					input.disabled = isReadOnly;
+				} else {
+					// 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
+					input.readOnly = isReadOnly;
+
+					// 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
+					if (isReadOnly) {
+						input.classList.add("bg-body-secondary");
+					} else {
+						input.classList.remove("bg-body-secondary");
+					}
+				}
+			});
+			updateSubmitButtons();
+			// 2. 「完了」ボタンも、閲覧モードの時は押せないようにする（誤送信防止）
+//			submitButtons.forEach(btn => {
+//				btn.disabled = isReadOnly;
+//			});
+		}
+
+		// チェックボックスの切り替えイベント
+		manageStoreBookToggle.addEventListener("change", toggleStoreBookManageMode);
+
+		// 初期表示の時に一度実行して、最初を「閲覧モード」にする
+		// 既存の DOMContentLoaded 処理があるため、その中か、もしくはその後に追記します
+		document.addEventListener("DOMContentLoaded", () => {
+			// 既存の update() の後に実行
+			toggleStoreBookManageMode();
 		});
 		
+		// 共通：ボタンの有効/無効を判定する関数
+		function updateSubmitButtons() {
+		    const isBookEditable = editBookToggle.checked;
+		    const isStoreEditable = manageStoreBookToggle.checked;
+		    
+		    // 両方ともチェックされていない時だけ無効化
+		    const shouldDisable = !isBookEditable && !isStoreEditable;
+		    
+		    submitButtons.forEach(btn => {
+		        btn.disabled = shouldDisable;
+		    });
+		}
 		
-	    const storeBooks = /*[[${storeBooks}]]*/ [];
 
-	    const select = document.getElementById("storeSelect");
-		const genre = document.getElementById("storeGenre");
-	    const price = document.getElementById("storePrice");
-	    const comment = document.getElementById("storeComment");
-	    const note = document.getElementById("note");
-
-	    function update() {
-	        const storeId = select.value;
-	        const data = storeBooks.find(sb => sb.storeId === storeId);
-
-	        if (!data) {
-	            price.value = "";
-	            comment.value = "";
-	            note.value = "";
-				genre.value = "";
-	            return;
-	        }
-
-	        price.value = data.storePrice || "";
-	        comment.value = data.storeComment || "";
-	        note.value = data.note || "";
-			genre.value = data.storeGenre || "";
-	    }
-
-	    // 変更時
-	    select.addEventListener("change", update);
-
-	    // 初期表示
-	    document.addEventListener("DOMContentLoaded", update);
 	</script>
 </body>
 

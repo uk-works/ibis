@@ -89,6 +89,17 @@
 		FOR UPDATE;
 	</select>
 
+	<select id="countStoreBookByStoreIdAndBookId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId}
+	</select>
+
 	<select id="selectPublishers" resultType="com.integratedbookinfo.system.shared.domain.Publisher">
 		SELECT 
 			publisher_id, 
@@ -118,26 +129,31 @@
 		SELECT
 			store_books.store_id,
 			m_books.book_id,
-		    m_books.book_title
+			m_books.book_title
 		FROM
 			m_books
 		INNER JOIN
 			store_books
 		ON
 			m_books.book_id = store_books.book_id
-		LEFT JOIN
+		LEFT OUTER JOIN
 			t_inventories
 		ON 
 			m_books.book_id = t_inventories.book_id
-		WHERE
-			t_inventories.book_id IS NULL
-		OR(
+		AND
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
 				t_inventories.deleted_flag = 1
-		    AND
-				t_inventories.inventory_status = 'discontinued'
-			AND
-				t_inventories.amount = 0
-		)
+			))
 		ORDER BY
 			store_books.store_id;
 	
@@ -155,23 +171,28 @@
 			store_books
 		ON
 			m_books.book_id = store_books.book_id
-		LEFT JOIN
+		LEFT OUTER JOIN
 			t_inventories
 		ON 
 			m_books.book_id = t_inventories.book_id
-		WHERE
-			t_inventories.book_id IS NULL
 		AND
-			store_books.store_id = #{storeId}
-		OR(
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND
+				store_books.store_id = #{storeId}
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
+				t_inventories.store_id = #{storeId}
+			AND
 				t_inventories.deleted_flag = 1
-			AND
-				t_inventories.inventory_status = 'discontinued'
-			AND
-				t_inventories.amount = 0
-		)
-		ORDER BY
-			store_books.store_id;
+			));
 	
 	</select>
 
@@ -235,6 +256,32 @@
 			store_books
 		WHERE
 			book_id = #{bookId};	
+	</select>
+
+	<select id="selectFindBookByIsbnOrJan" resultType="com.integratedbookinfo.system.shared.domain.BookDTO">
+
+		SELECT 
+			* 
+		FROM 
+			m_books
+	 	WHERE 
+	 		(
+	 			isbn = #{isbn} 
+	 		AND 
+	 			isbn IS NOT NULL 
+	 		AND 
+	 			isbn != ''
+	 		)
+         OR 
+         	(
+         		jan_code = #{janCode} 
+         	AND 
+         		jan_code IS NOT NULL 
+         	AND 
+         		jan_code != ''
+         	)
+      	LIMIT 1	
+	
 	</select>
 
 	<insert id="insertBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
@@ -390,7 +437,8 @@
 			isbn,
 			jan_code,
 			edition,
-			release_date
+			release_date,
+			cover_image_path
 		FROM
 			m_books
 		INNER JOIN

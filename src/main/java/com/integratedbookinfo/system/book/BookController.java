@@ -3,7 +3,6 @@ package com.integratedbookinfo.system.book;
 import java.util.List;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
@@ -25,6 +25,9 @@ import com.integratedbookinfo.system.book.dto.StoreBookDTO;
 import com.integratedbookinfo.system.shared.domain.BookDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 import com.integratedbookinfo.system.shared.enums.BookSize;
+import com.integratedbookinfo.system.validationgroup.BookCreateGroup;
+import com.integratedbookinfo.system.validationgroup.BookDuplicateCheckGroup;
+import com.integratedbookinfo.system.validationgroup.BookEditGroup;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
@@ -34,7 +37,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("/book")
 public class BookController {
 
-	private final int NUM_PER_PAGE = 10;
+	private final int NUM_PER_PAGE = 3;
 	private final BookService bookService;
 	
 	@GetMapping("/list")
@@ -52,7 +55,7 @@ public class BookController {
 		
 		model.addAttribute("displayName", loginUser.getDisplayName());
 		model.addAttribute("accountRole", loginUser.getAccountRole());
-		
+		model.addAttribute("keyword", keyword);
 		if(loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
 			model.addAttribute("books", bookService.getBookList(page, NUM_PER_PAGE, loginUser.getAccountRole(), null, keyword).getBooks());
 			model.addAttribute("totalPages", bookService.getTotalPages(NUM_PER_PAGE, loginUser.getAccountRole(), null, keyword));
@@ -99,7 +102,7 @@ public class BookController {
 
 	@PostMapping("/create")
 	public String createBook(
-			@Validated @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
+			@Validated(BookCreateGroup.class) @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
 			Errors errors,
 			HttpSession session,
 			Model model) {
@@ -144,6 +147,87 @@ public class BookController {
 		return "redirect:/book/list";
 	}
 
+	@PostMapping("/search")
+	public String searchBook(
+			@Validated(BookDuplicateCheckGroup.class) @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
+			Errors errors,
+			HttpSession session,
+			Model model) {
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		String pageName = "";
+		
+		model.addAttribute("displayName", loginUser.getDisplayName());
+		model.addAttribute("accountRole", loginUser.getAccountRole());
+
+		model.addAttribute("publishers", bookService.getPublishers());
+		model.addAttribute("genres", bookService.getGenres());
+		model.addAttribute("stores", bookService.getStoreOptions());
+		model.addAttribute("bookSizes", BookSize.values());
+
+		String inputIsbn = form.getBook().getIsbn();
+		String inputJanCode = form.getBook().getJanCode();
+		
+		if (inputIsbn.isBlank() && inputJanCode.isBlank()) {
+			errors.rejectValue("book.isbn", "error.search.required", "ISBNまたはJANコードのどちらか一方を入力してください。");
+		}
+		
+		// ISBNが入力済みであるが、13桁または10桁の数字でなければNG
+		if (!inputIsbn.isBlank() && !inputIsbn.matches("^(\\d{10}|\\d{13})$")) {
+			errors.rejectValue("book.isbn", "error.pattern", "ISBNは10桁または13桁の数字で入力してください。");
+		}
+		
+		// JANコードが入力済みであるが、13桁の数字でなければNG
+		if (!inputJanCode.isBlank() && !inputJanCode.matches("^\\d{13}$")) {
+			errors.rejectValue("book.janCode", "error.pattern", "JANコードは13桁の数字で入力してください。");
+		}
+		
+		if (errors.hasErrors()) {
+			
+			model.addAttribute("bookCreateRequest", form);
+			
+			if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+
+				return "book/admin/create";
+			} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+
+				return "book/store/create";
+			}
+			
+		}
+
+		//BookDTO book = bookMapper.selectFindByIsbnOrJan("9784815608750", "1920055028004");
+
+		
+		BookDTO book = bookService.getBookByIsbnOrJanCode(inputIsbn, inputJanCode);
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(book));		
+		
+		if(book != null) {
+			form.setBook(book);
+			model.addAttribute("isFound", true);
+		} else {
+			BookDTO emptyBook = new BookDTO();
+			
+			emptyBook.setIsbn(inputIsbn);
+			emptyBook.setJanCode(inputJanCode);
+			
+			form.setBook(emptyBook);
+			
+			model.addAttribute("isFound", false);
+		}
+		
+		model.addAttribute("bookCreateRequest", form);
+		
+		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			pageName = "book/admin/create";
+
+		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+			pageName = "book/store/create";
+
+		}
+		
+		return pageName;
+	}
+	
 	@GetMapping("/edit/{bookId}")
 	public String editBook(@PathVariable String bookId, Model model, HttpSession session) {
 		
@@ -176,9 +260,10 @@ public class BookController {
 	@PostMapping("/edit/{bookId}")
 	public String editBook(
 			@PathVariable String bookId,
-			@Valid @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
+			@Validated(BookEditGroup.class) @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
 			Errors errors,
 			HttpSession session,
+			RedirectAttributes ra,
 			Model model) {
 
 		LoginUserRequestDTO loginUser = getLoginUser(session);
@@ -216,10 +301,18 @@ public class BookController {
 			}
 		}
 		
-		bookService.modifyBook(loginUser.getAccountRole(), form.getBook(), form.getStoreBook());
+		boolean isSuccess = bookService.modifyBook(loginUser.getAccountRole(), form.getBook(), form.getStoreBook());
+
+		ra.addFlashAttribute("isSuccess", isSuccess);
 		
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
+		if(isSuccess) {
+			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しました。");
+		} else {
+			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しませんでした。もう一度お試しください");
+		}
+		
+		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
+		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
 		
 		return "redirect:/book/list";
 	}
