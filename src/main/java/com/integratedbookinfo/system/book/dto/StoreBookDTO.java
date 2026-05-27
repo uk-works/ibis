@@ -16,11 +16,13 @@ public class StoreBookDTO {
 
 	private String storeGenre;
 	
-	private String storePrice;
+	private Integer storePrice;
 	
 	private String note;
 	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private boolean deletedFlag;
+	
+	private boolean registerIntent;
 }

@@ -173,28 +173,46 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public void modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
-		
+	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(book));
+		System.out.println("");
+		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(storeBook));
 		int updateBookCount = 0;
+		int updateStoreBookCount = 0;
 		// 画像登録処理
 		saveImageFile(book);
 		
 		if (accountRole.equals(AccountRole.ADMIN)) {
+			System.out.println("bookMapper.updateBook(book)");
 			updateBookCount = bookMapper.updateBook(book);
 		}
 
-		int updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
-		
-		// 書籍編集（書店書籍 新規追加の場合）
-		// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
-		if (updateStoreBookCount == 0) {
-			storeBook.setBookId(book.getBookId());
-			bookMapper.insertStoreBook(storeBook);
+		if (!storeBook.isRegisterIntent()) {
+			System.out.println("bookMapper.updateStoreBook(book.getBookId(), storeBook)");
+			updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
+			
+			if (updateStoreBookCount == 0) {
+				return false;
+			}
+			
+		} else {
+			// 書籍編集（書店書籍 新規追加の場合）
+			// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
+			int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
+			
+			if (existStoreBook == 0) {
+				System.out.println("bookMapper.insertStoreBook(storeBook)");
+				storeBook.setBookId(book.getBookId());
+				bookMapper.insertStoreBook(storeBook);
+			} else {
+				return false;
+			}
+			
 		}
-		
+
 		System.out.println("updateBook : " + updateBookCount);
 		System.out.println("updateStoreBook : " + updateStoreBookCount);
-		
+		return true;
 	}
 
 	@Override
