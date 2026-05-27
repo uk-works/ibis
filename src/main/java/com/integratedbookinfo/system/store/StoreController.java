@@ -69,7 +69,7 @@ public class StoreController {
 		
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
-		//storeService.saveStore(form);
+		storeService.saveStore(form);
 		
 		return "redirect:/auth/login";
 	}
