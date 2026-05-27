@@ -1,7 +1,6 @@
 package com.integratedbookinfo.system.store;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +18,7 @@ import com.integratedbookinfo.system.store.dto.AccountDTO;
 import com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO;
 import com.integratedbookinfo.system.store.dto.StoreDTO;
 import com.integratedbookinfo.system.store.dto.StoreEditRequestDTO;
+import com.integratedbookinfo.system.validationgroup.StoreCreateGroup;
 import com.integratedbookinfo.system.validationgroup.StoreEditGroup;
 
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,7 @@ public class StoreController {
 
 	@PostMapping("/create")
 	public String createStore(
-			@Valid @ModelAttribute("storeCreateRequest") StoreCreateRequestDTO form,
+			@Validated(StoreCreateGroup.class) @ModelAttribute("storeCreateRequest") StoreCreateRequestDTO form,
 			Errors errors,
 			Model model
 			) {
@@ -69,7 +69,7 @@ public class StoreController {
 		
 		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
-		storeService.saveStore(form);
+		//storeService.saveStore(form);
 		
 		return "redirect:/auth/login";
 	}
