@@ -49,7 +49,7 @@ public interface BookService {
 	
 	public void saveBook(BookCreateRequestDTO bookCreateRequestDTO, LoginUserRequestDTO loginUser);
 
-	public void modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook);
+	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook);
 
 	public void removeBook(String bookId);
 

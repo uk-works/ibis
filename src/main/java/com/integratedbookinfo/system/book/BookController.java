@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
 import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
@@ -36,7 +37,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("/book")
 public class BookController {
 
-	private final int NUM_PER_PAGE = 1;
+	private final int NUM_PER_PAGE = 3;
 	private final BookService bookService;
 	
 	@GetMapping("/list")
@@ -262,6 +263,7 @@ public class BookController {
 			@Validated(BookEditGroup.class) @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
 			Errors errors,
 			HttpSession session,
+			RedirectAttributes ra,
 			Model model) {
 
 		LoginUserRequestDTO loginUser = getLoginUser(session);
@@ -299,10 +301,18 @@ public class BookController {
 			}
 		}
 		
-		bookService.modifyBook(loginUser.getAccountRole(), form.getBook(), form.getStoreBook());
+		boolean isSuccess = bookService.modifyBook(loginUser.getAccountRole(), form.getBook(), form.getStoreBook());
+
+		ra.addFlashAttribute("isSuccess", isSuccess);
 		
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
+		if(isSuccess) {
+			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しました。");
+		} else {
+			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しませんでした。もう一度お試しください");
+		}
+		
+		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
+		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
 		
 		return "redirect:/book/list";
 	}

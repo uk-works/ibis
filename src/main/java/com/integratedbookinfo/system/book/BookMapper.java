@@ -36,6 +36,8 @@ public interface BookMapper {
 
 	public String selectLastBookIdForUpdate();
 	
+	public int countStoreBookByStoreIdAndBookId(@Param("bookId") String bookId, @Param("storeId") String storeId);
+	
 	public List<Publisher> selectPublishers();
 	
 	public List<Genre> selectGenres();

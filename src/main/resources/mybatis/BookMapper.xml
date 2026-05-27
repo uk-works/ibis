@@ -89,6 +89,17 @@
 		FOR UPDATE;
 	</select>
 
+	<select id="countStoreBookByStoreIdAndBookId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId}
+	</select>
+
 	<select id="selectPublishers" resultType="com.integratedbookinfo.system.shared.domain.Publisher">
 		SELECT 
 			publisher_id, 
