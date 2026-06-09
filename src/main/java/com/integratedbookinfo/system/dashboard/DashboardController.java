@@ -30,7 +30,6 @@ public class DashboardController {
 	 */
 	@GetMapping("/dashboard")
 	public String showDashboard(Model model, HttpSession session) {
-		System.out.println("dashboard");
 		
 		LoginUserRequestDTO loginUser = (LoginUserRequestDTO) session.getAttribute("loginUser");
 		
