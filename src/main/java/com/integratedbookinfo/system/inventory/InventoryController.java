@@ -22,7 +22,6 @@ import com.integratedbookinfo.system.validationgroup.InventoryEditGroup;
 import com.integratedbookinfo.system.validationgroup.InventoryRegisterGroup;
 
 import lombok.RequiredArgsConstructor;
-import tools.jackson.databind.ObjectMapper;
 
 
 @Controller
@@ -62,8 +61,6 @@ public class InventoryController {
 			model.addAttribute("totalPages", inventoryService.getInventoryTotalPagesByKeyword(NUM_PER_PAGE, loginUser.getStoreId(), keyword));
 			pageName = "inventory/store/list";
 		}
-
-		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(inventoryService.getStoreInventoriesByKeyword(NUM_PER_PAGE, NUM_PER_PAGE, keyword)));
 
 		return pageName;
 	}
@@ -134,7 +131,6 @@ public class InventoryController {
 
 		form.setInventoryStatus(InventoryStatus.ACTIVE);
 		
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
 		inventoryService.saveInventory(form, loginUser);
 		
@@ -167,7 +163,6 @@ public class InventoryController {
 		
 		inventoryService.modifyInventory(form);
 		
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
 		return "redirect:/inventory/list";
 	}

@@ -99,8 +99,6 @@ public class InventoryServiceImpl implements InventoryService {
 			countInsertInventory = inventoryMapper.insertInventory(inventoryRequest);
 		}
 		
-		System.out.println("updateResumeInventory()：" + countUpdateResumeInventory + "件");
-		System.out.println("insertInventory()：" + countInsertInventory + "件");
 	}
 	
 	@Override
@@ -113,7 +111,6 @@ public class InventoryServiceImpl implements InventoryService {
 	public void removeInventory(String storeId, String bookId) {
 		
 		inventoryMapper.deleteInventoryByStoreIdAndBookId(storeId, bookId);
-		/* TODO 削除必要↓ */
-		// bookMapper.deleteStoreBookByBookIdAndStoreId(bookId, storeId);
+
 	}
 }
