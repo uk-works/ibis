@@ -20,7 +20,5 @@ public interface StoreService {
 
 	public void modifyStore(StoreEditRequestDTO storeEditRequest, LoginUserRequestDTO loginUser);
 
-	public void removeStore(String storeId);
-
 
 }

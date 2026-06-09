@@ -13,7 +13,6 @@ import com.integratedbookinfo.system.store.dto.StoreEditRequestDTO;
 import com.integratedbookinfo.system.store.dto.StoreListResponseDTO;
 
 import lombok.RequiredArgsConstructor;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +75,6 @@ public class StoreServiceImpl implements StoreService {
 		if(account.getPassword() == null || account.getPassword().isEmpty()) {
 			StoreEditRequestDTO originStoreEdit = storeMapper.selectStoreEditByStoreId(loginUser.getStoreId());
 			
-			System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(originStoreEdit));
 			account.setPassword(originStoreEdit.getAccount().getPassword());
 
 		} else {
@@ -88,12 +86,7 @@ public class StoreServiceImpl implements StoreService {
 		storeMapper.updateStore(store, loginUser.getStoreId());
 	}
 	
-	@Override
-	public void removeStore(String storeId) {
-		// TODO 自動生成されたメソッド・スタブ
-		
-	}
-	
+
 	public String generateStoreId(String recentStoreId) {
 		String numberPart = recentStoreId.substring(5);
 		int next = Integer.parseInt(numberPart) + 1;
