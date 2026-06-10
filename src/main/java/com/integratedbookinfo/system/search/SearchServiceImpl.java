@@ -33,7 +33,7 @@ public class SearchServiceImpl implements SearchService {
 	@Override
 	public int getTotalPages(int numPerPage, String keyword, String genreId) {
 		double totalNum = (double) searchMapper.countSearchSummary(keyword, genreId);
-		System.out.println(totalNum);
+
 		return (int) Math.ceil(totalNum / numPerPage);
 	}
 	

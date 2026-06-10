@@ -24,7 +24,6 @@ import com.integratedbookinfo.system.shared.domain.StoreOptionDTO;
 import com.integratedbookinfo.system.shared.enums.AccountRole;
 
 import lombok.RequiredArgsConstructor;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -87,10 +86,7 @@ public class BookServiceImpl implements BookService {
 	    	}
 	    	
 	    });
-	    	    
-	    System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(storeOptions));
-		System.out.println("=====");	    
-	    
+
 	    return storeOptions;
 	}
 	
@@ -174,21 +170,18 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(book));
-		System.out.println("");
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(storeBook));
+
 		int updateBookCount = 0;
 		int updateStoreBookCount = 0;
 		// 画像登録処理
 		saveImageFile(book);
 		
 		if (accountRole.equals(AccountRole.ADMIN)) {
-			System.out.println("bookMapper.updateBook(book)");
 			updateBookCount = bookMapper.updateBook(book);
 		}
 
 		if (!storeBook.isRegisterIntent()) {
-			System.out.println("bookMapper.updateStoreBook(book.getBookId(), storeBook)");
+
 			updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
 			
 			if (updateStoreBookCount == 0) {
@@ -201,7 +194,7 @@ public class BookServiceImpl implements BookService {
 			int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
 			
 			if (existStoreBook == 0) {
-				System.out.println("bookMapper.insertStoreBook(storeBook)");
+
 				storeBook.setBookId(book.getBookId());
 				bookMapper.insertStoreBook(storeBook);
 			} else {
@@ -210,8 +203,6 @@ public class BookServiceImpl implements BookService {
 			
 		}
 
-		System.out.println("updateBook : " + updateBookCount);
-		System.out.println("updateStoreBook : " + updateStoreBookCount);
 		return true;
 	}
 

@@ -1,13 +1,10 @@
 package com.integratedbookinfo.system.book;
 
-import java.util.List;
-
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,7 +27,6 @@ import com.integratedbookinfo.system.validationgroup.BookDuplicateCheckGroup;
 import com.integratedbookinfo.system.validationgroup.BookEditGroup;
 
 import lombok.RequiredArgsConstructor;
-import tools.jackson.databind.ObjectMapper;
 
 @Controller
 @RequiredArgsConstructor
@@ -137,9 +133,6 @@ public class BookController {
 			}
 		}
 
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
-
 		// Serive呼び出し
 		bookService.saveBook(form, loginUser);
 		
@@ -194,12 +187,8 @@ public class BookController {
 			}
 			
 		}
-
-		//BookDTO book = bookMapper.selectFindByIsbnOrJan("9784815608750", "1920055028004");
-
 		
 		BookDTO book = bookService.getBookByIsbnOrJanCode(inputIsbn, inputJanCode);
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(book));		
 		
 		if(book != null) {
 			form.setBook(book);
@@ -270,11 +259,7 @@ public class BookController {
 		
 		MultipartFile imageFile = form.getBook().getCoverImageFile();
 		
-		List<ObjectError> objList = errors.getAllErrors();
-		for(ObjectError obj : objList) {
-			System.out.println(obj.toString());
-		}
-		
+
 		if (errors.hasErrors() || isInvalidImage(imageFile)) {
 			
 			if (isInvalidImage(imageFile)) {
@@ -310,9 +295,6 @@ public class BookController {
 		} else {
 			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しませんでした。もう一度お試しください");
 		}
-		
-		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getBook()));
-		//System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form.getStoreBook()));
 		
 		return "redirect:/book/list";
 	}

@@ -1,13 +1,10 @@
 package com.integratedbookinfo.system.auth;
 
-import java.util.List;
-
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -57,14 +54,7 @@ public class AuthController {
 			@Validated @ModelAttribute("form") LoginUserRequestDTO form,
 			Errors errors,
 			HttpSession session) {
-		
-		System.out.println("ERROR:" + errors.getFieldErrorCount());
-		
-		List<ObjectError> objList = errors.getAllErrors();
-		for(ObjectError obj : objList) {
-			System.out.println(obj.toString());
-		}
-		
+	
 		if(errors.hasErrors()) {
 			return "common/login";
 		}
@@ -77,7 +67,7 @@ public class AuthController {
 		}
 		
 		loginUser.setPassword(null);
-		System.out.println(loginUser.getAccountRole());
+
 		session.setAttribute("loginUser", loginUser);
 		
 		return "redirect:/dashboard";

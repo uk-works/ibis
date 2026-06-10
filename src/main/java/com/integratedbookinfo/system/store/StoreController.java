@@ -22,7 +22,6 @@ import com.integratedbookinfo.system.validationgroup.StoreCreateGroup;
 import com.integratedbookinfo.system.validationgroup.StoreEditGroup;
 
 import lombok.RequiredArgsConstructor;
-import tools.jackson.databind.ObjectMapper;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,13 +31,6 @@ public class StoreController {
 	private final int NUM_PER_PAGE = 10;
 	private final StoreService storeService;
 	
-	@GetMapping("/list")
-	public String showStoreList(
-			@RequestParam(name = "keyword", required = false) String keyword,
-			@RequestParam(name = "page", defaultValue = "1") Integer page, 
-			Model model) {
-		return null;
-	}
 
 	@GetMapping("/create")
 	public String createStore(
@@ -67,7 +59,6 @@ public class StoreController {
 			return "bookstore/store/register";
 		}
 		
-		System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(form));
 		
 		storeService.saveStore(form);
 		

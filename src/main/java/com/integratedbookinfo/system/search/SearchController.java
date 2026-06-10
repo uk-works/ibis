@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
-import tools.jackson.databind.ObjectMapper;
 
 @Controller
 @RequiredArgsConstructor
@@ -51,11 +50,6 @@ public class SearchController {
 			@RequestParam(name = "page", defaultValue = "1") Integer page,
 			Model model) {
 		
-		System.out.println(new ObjectMapper()
-				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(searchService.getBookInfo(bookId)));
-		
-		
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("genre", genre);		
 		model.addAttribute("page", page);
@@ -72,10 +66,6 @@ public class SearchController {
 			@RequestParam(name = "genre", required = false) String genre,
 			@RequestParam(name = "page", defaultValue = "1") Integer page,
 			Model model) {
-		
-		System.out.println(new ObjectMapper()
-				.writerWithDefaultPrettyPrinter()
-				.writeValueAsString(searchService.getStoreInfo("store0001")));
 		
 		model.addAttribute("storeBasicInfo", searchService.getStoreInfo(storeId));
 		
