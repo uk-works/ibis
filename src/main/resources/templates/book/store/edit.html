@@ -8,7 +8,11 @@
 	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
 	<title>取扱書籍編集 | IBIS</title>
 </head>
-
+<style>
+	.no-select {
+	  pointer-events: none; /* マウス操作を無効化 */
+	}	
+</style>
 <header th:replace="~{common/store_header :: page_header}"></header>
 
 <body>
@@ -240,7 +244,17 @@
 					const isEnabled = toggleSwitch.checked;
 					
 					inputs.forEach(input => {
-						input.disabled = !isEnabled;
+						
+						if (!isEnabled) {
+							input.classList.add("bg-body-secondary");
+							input.classList.add("no-select");
+							input.setAttribute("tabindex", "-1");
+						} else {
+							input.classList.remove("bg-body-secondary");
+							input.classList.remove("no-select");
+							input.setAttribute("tabindex", "-1");
+						}
+						
 					});
 				}
 
