@@ -95,7 +95,6 @@
 				<div class="row justify-content-center mb-2">
 					<label for="book.publisher.publisherId" class="col-md-2 col-form-label">出版社</label>
 					<div class="col-md-7">
-<!--						<input type="hidden" th:field="*{book.publisher.publisherId}" />-->
 						<select class="form-select" th:field="*{book.publisher.publisherId}">
 							<option th:value="p0000">未選択</option>
 							<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
@@ -147,7 +146,6 @@
 				<div class="row justify-content-center align-items-center mb-2">
 					<label for="book.releaseDate" class="col-md-2 col-form-label">発売日</label>
 					<div class="col-md-7">
-<!--						<input type="hidden" th:field="*{book.releaseDate}" />-->
 						<input type="date" class="form-control" th:field="*{book.releaseDate}" />
 						<p th:errors="*{book.releaseDate}"></p>
 					</div>
