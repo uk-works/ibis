@@ -8,7 +8,12 @@
 	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
 	<title>書籍編集 | IBIS</title>
 </head>
-
+<style>
+	.no-select {
+	  pointer-events: none; /* マウス操作を無効化 */
+	}	
+	
+</style>
 <header th:replace="~{common/admin_header :: page_header}"></header>
 
 <body>
@@ -90,7 +95,6 @@
 				<div class="row justify-content-center mb-2">
 					<label for="book.publisher.publisherId" class="col-md-2 col-form-label">出版社</label>
 					<div class="col-md-7">
-						<input type="hidden" th:field="*{book.publisher.publisherId}" />
 						<select class="form-select" th:field="*{book.publisher.publisherId}">
 							<option th:value="p0000">未選択</option>
 							<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
@@ -142,7 +146,6 @@
 				<div class="row justify-content-center align-items-center mb-2">
 					<label for="book.releaseDate" class="col-md-2 col-form-label">発売日</label>
 					<div class="col-md-7">
-						<input type="hidden" th:field="*{book.releaseDate}" />
 						<input type="date" class="form-control" th:field="*{book.releaseDate}" />
 						<p th:errors="*{book.releaseDate}"></p>
 					</div>
@@ -152,7 +155,10 @@
 					<label for="book.coverImageFile" class="col-md-2 col-form-label">表紙画像</label>
 					<div class="col-md-7">
 						<input type="file" class="form-control" th:field="*{book.coverImageFile}" />
-						<p>※エラーがある場合は再度画像を選択してください</p>
+						<p>画像ファイルの最大ファイルサイズは10MB<br>
+						   アップロード可能な画像の種類は .jpg .jpeg .png です。<br>
+						   ※エラーがある場合は再度画像を選択してください
+						</p>
 						<p th:errors="*{book.coverImageFile}"></p>
 					</div>
 				</div>
@@ -167,8 +173,6 @@
 					</div>
 				</div>
 			</div>
-
-
 
 
 			<!-- 書店個別項目 -->
@@ -304,21 +308,18 @@
 		const isbn = /*[[*{bookEditRequest.book.isbn}]]*/[];
 		const bookTitle = /*[[*{bookEditRequest.book.bookTitle}]]*/[];
 
-		// モーダル内の表示要素を更新
+		// モーダル内の表示要素
 		document.getElementById("isbn").textContent = isbn;
 		document.getElementById("bookTitle").textContent = bookTitle;
 
 		// 削除ボタンのクリックイベント
-		// 削除ボタン（青い「削除」ボタン）のクリックイベント
 		const deleteButton = document.getElementById("deleteButton");
 		const deleteForm = document.getElementById("deleteForm");
 
 		deleteButton.addEventListener('click', () => {
-			// 1. 実行時にURLを組み立てる (例: /books/delete/123)
 			const baseUrl = /*[[@{/book/delete/}]]*/ '/books/delete/';
 			deleteForm.action = baseUrl + bookId;
-			console.log("Formです" + deleteForm.action)
-			// 2. フォームを送信する
+
 			deleteForm.submit();
 		});
 
@@ -339,6 +340,9 @@
 			const data = storeBooks.find(sb => sb.storeId === storeId);
 
 			if (!data) {
+				
+				insertStoreBookRadio.checked = true;
+				
 				price.value = "";
 				comment.value = "";
 				note.value = "";
@@ -346,6 +350,8 @@
 				return;
 			}
 
+			editStoreBookRadio.checked = true;
+			
 			price.value = data.storePrice || "";
 			comment.value = data.storeComment || "";
 			note.value = data.note || "";
@@ -360,49 +366,53 @@
 
 		/* ================================== */
 		const editBookToggle = document.getElementById("editBookToggle");
-		const submitButtons = document.querySelectorAll("form button:not([type='button'])"); // 「完了」ボタンを取得
+		const submitButtons = document.querySelectorAll("form button:not([type='button'])");
 
 		function toggleBookEditMode() {
-			// チェックボックスが「チェックされていない（閲覧モード）」なら true（無効化）
+
 			const isReadOnly = !editBookToggle.checked;
 
-			// 1. すべての input, select を取得して disabled (または readonly) を切り替える
-			// ※ ただし、type="hidden" や 切り替えスイッチ自体、出版社(その他)のreadonlyは除外したいので調整
 			const inputs = document.querySelectorAll(".book .form-control, .book .form-select");
 
 			inputs.forEach(input => {
-				// 「出版社（その他）」など、もともとreadonly固定のものは触らない
+
 				if (input.id === "book.publisher.publisherName") return;
 
 				if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
-					// selectやdate, fileは disabled でグレーアウト制御
-					input.disabled = isReadOnly;
-				} else {
-					// 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
-					input.readOnly = isReadOnly;
 
-					// 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
 					if (isReadOnly) {
 						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
 					} else {
 						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.setAttribute("tabindex", "-1");
+					}
+					
+				} else {
+
+					input.readOnly = isReadOnly;
+
+					if (isReadOnly) {
+						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
+					} else {
+						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.removeAttribute("tabindex", "-1");
 					}
 				}
 			});
 			updateSubmitButtons();
-			// 2. 「完了」ボタンも、閲覧モードの時は押せないようにする（誤送信防止）
-//			submitButtons.forEach(btn => {
-//				btn.disabled = isReadOnly;
-//			});
 		}
 
 		// チェックボックスの切り替えイベント
 		editBookToggle.addEventListener("change", toggleBookEditMode);
 
 		// 初期表示の時に一度実行して、最初を「閲覧モード」にする
-		// 既存の DOMContentLoaded 処理があるため、その中か、もしくはその後に追記します
 		document.addEventListener("DOMContentLoaded", () => {
-			// 既存の update() の後に実行
 			toggleBookEditMode();
 		});
 
@@ -410,46 +420,47 @@
 		const manageStoreBookToggle = document.getElementById("manageStoreBookToggle");
 
 		function toggleStoreBookManageMode() {
-			// チェックボックスが「チェックされていない（閲覧モード）」なら true（無効化）
 			const isReadOnly = !manageStoreBookToggle.checked;
 
-			// 1. すべての input, select を取得して disabled (または readonly) を切り替える
-			// ※ ただし、type="hidden" や 切り替えスイッチ自体、出版社(その他)のreadonlyは除外したいので調整
 			const inputs = document.querySelectorAll(".store-book .form-control, .store-book .form-select");
 
 			inputs.forEach(input => {
-				// 「出版社（その他）」など、もともとreadonly固定のものは触らない
+
 				if (input.id === "book.publisher.publisherName") return;
 
-				if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
-					// selectやdate, fileは disabled でグレーアウト制御
-					input.disabled = isReadOnly;
-				} else {
-					// 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
-					input.readOnly = isReadOnly;
+				if (input.tagName === "SELECT") {
 
-					// 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
 					if (isReadOnly) {
 						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
 					} else {
 						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.setAttribute("tabindex", "-1");
+					}
+				} else {
+
+					input.readOnly = isReadOnly;
+
+					if (isReadOnly) {
+						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
+					} else {
+						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.setAttribute("tabindex", "-1");
 					}
 				}
 			});
 			updateSubmitButtons();
-			// 2. 「完了」ボタンも、閲覧モードの時は押せないようにする（誤送信防止）
-//			submitButtons.forEach(btn => {
-//				btn.disabled = isReadOnly;
-//			});
 		}
 
 		// チェックボックスの切り替えイベント
 		manageStoreBookToggle.addEventListener("change", toggleStoreBookManageMode);
 
-		// 初期表示の時に一度実行して、最初を「閲覧モード」にする
-		// 既存の DOMContentLoaded 処理があるため、その中か、もしくはその後に追記します
 		document.addEventListener("DOMContentLoaded", () => {
-			// 既存の update() の後に実行
 			toggleStoreBookManageMode();
 		});
 		
@@ -466,7 +477,6 @@
 		    });
 		}
 		
-
 	</script>
 </body>
 

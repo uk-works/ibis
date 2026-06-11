@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/book")
 public class BookController {
 
-	private final int NUM_PER_PAGE = 3;
+	private final int NUM_PER_PAGE = 10;
 	private final BookService bookService;
 	
 	@GetMapping("/list")
@@ -291,9 +291,9 @@ public class BookController {
 		ra.addFlashAttribute("isSuccess", isSuccess);
 		
 		if(isSuccess) {
-			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しました。");
+			ra.addFlashAttribute("msg", "更新が完了しました。");
 		} else {
-			ra.addFlashAttribute("msg", "書店個別項目の登録が完了しませんでした。もう一度お試しください");
+			ra.addFlashAttribute("msg", "更新に失敗しました。入力内容をご確認ください。");
 		}
 		
 		return "redirect:/book/list";

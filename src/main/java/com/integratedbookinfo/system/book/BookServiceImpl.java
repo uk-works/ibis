@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,9 @@ public class BookServiceImpl implements BookService {
 	private final BookMapper bookMapper;
 	private final InventoryMapper inventoryMapper;
 	private final BookEditProposalMapper bookEditProposalMapper;
+	
+	@Value("${upload.image.path:}")
+	private String UPLOAD_DIRECTORY;
 	
 	@Override
 	public BookListResponseDTO getBookList(int page, int numPerPage, AccountRole accountRole, String storeId,
@@ -171,15 +175,16 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
 
-		int updateBookCount = 0;
 		int updateStoreBookCount = 0;
-		// 画像登録処理
-		saveImageFile(book);
 		
 		if (accountRole.equals(AccountRole.ADMIN)) {
-			updateBookCount = bookMapper.updateBook(book);
+
+			saveImageFile(book);
+			
+			bookMapper.updateBook(book);
 		}
 
+		// isRegisterIntent:true 書店個別項目が新規登録(未登録), false 既存項目の編集
 		if (!storeBook.isRegisterIntent()) {
 
 			updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
@@ -191,16 +196,24 @@ public class BookServiceImpl implements BookService {
 		} else {
 			// 書籍編集（書店書籍 新規追加の場合）
 			// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
-			int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
-			
-			if (existStoreBook == 0) {
 
-				storeBook.setBookId(book.getBookId());
-				bookMapper.insertStoreBook(storeBook);
-			} else {
-				return false;
-			}
+			boolean isAllEmpty =
+					(storeBook.getStoreGenre() == null || storeBook.getStoreGenre().isBlank()) &&
+					(storeBook.getStorePrice() == null) &&
+					(storeBook.getStoreComment() == null || storeBook.getStoreComment().isBlank()) &&
+					(storeBook.getNote() == null || storeBook.getNote().isBlank());
 			
+			if (!isAllEmpty) {
+				int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
+				
+				if (existStoreBook == 0) {
+					storeBook.setBookId(book.getBookId());
+					bookMapper.insertStoreBook(storeBook);
+					
+				} else {
+					return false;
+				}	
+			}
 		}
 
 		return true;
@@ -238,9 +251,7 @@ public class BookServiceImpl implements BookService {
 	public void saveImageFile(BookDTO book) {
 		MultipartFile upFile = book.getCoverImageFile();
 		
-		final String UPLOAD_DIRECTORY = "C:/pleiades/workspace/images";
-		
-		if (upFile != null) {
+		if (upFile != null && !upFile.isEmpty()) {
 			String fileName = upFile.getOriginalFilename();
 
 			book.setCoverImagePath(fileName);
