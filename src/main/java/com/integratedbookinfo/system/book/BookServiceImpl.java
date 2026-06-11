@@ -184,7 +184,7 @@ public class BookServiceImpl implements BookService {
 			bookMapper.updateBook(book);
 		}
 
-		// isRegisterIntent:true 新規登録(未登録), false 既存項目の編集
+		// isRegisterIntent:true 書店個別項目が新規登録(未登録), false 既存項目の編集
 		if (!storeBook.isRegisterIntent()) {
 
 			updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
