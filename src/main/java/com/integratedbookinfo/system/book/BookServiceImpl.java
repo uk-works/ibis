@@ -196,16 +196,24 @@ public class BookServiceImpl implements BookService {
 		} else {
 			// 書籍編集（書店書籍 新規追加の場合）
 			// 書籍追加時に書店書籍の登録が無い書店については、書店書籍レコードが存在しないためINSERTを行う
-			int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
+
+			boolean isAllEmpty =
+					(storeBook.getStoreGenre() == null || storeBook.getStoreGenre().isBlank()) &&
+					(storeBook.getStorePrice() == null) &&
+					(storeBook.getStoreComment() == null || storeBook.getStoreComment().isBlank()) &&
+					(storeBook.getNote() == null || storeBook.getNote().isBlank());
 			
-			if (existStoreBook == 0) {
-				storeBook.setBookId(book.getBookId());
-				bookMapper.insertStoreBook(storeBook);
+			if (!isAllEmpty) {
+				int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
 				
-			} else {
-				return false;
+				if (existStoreBook == 0) {
+					storeBook.setBookId(book.getBookId());
+					bookMapper.insertStoreBook(storeBook);
+					
+				} else {
+					return false;
+				}	
 			}
-			
 		}
 
 		return true;
