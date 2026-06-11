@@ -341,6 +341,9 @@
 			const data = storeBooks.find(sb => sb.storeId === storeId);
 
 			if (!data) {
+				
+				insertStoreBookRadio.checked = true;
+				
 				price.value = "";
 				comment.value = "";
 				note.value = "";
@@ -348,6 +351,8 @@
 				return;
 			}
 
+			editStoreBookRadio.checked = true;
+			
 			price.value = data.storePrice || "";
 			comment.value = data.storeComment || "";
 			note.value = data.note || "";
