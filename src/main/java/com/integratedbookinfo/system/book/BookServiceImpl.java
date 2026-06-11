@@ -177,10 +177,11 @@ public class BookServiceImpl implements BookService {
 
 		int updateBookCount = 0;
 		int updateStoreBookCount = 0;
-		// 画像登録処理
-		saveImageFile(book);
 		
 		if (accountRole.equals(AccountRole.ADMIN)) {
+
+			saveImageFile(book);
+			
 			updateBookCount = bookMapper.updateBook(book);
 		}
 
@@ -242,7 +243,8 @@ public class BookServiceImpl implements BookService {
 	public void saveImageFile(BookDTO book) {
 		MultipartFile upFile = book.getCoverImageFile();
 		
-		if (upFile != null) {
+		
+		if (upFile != null && !upFile.isEmpty()) {
 			String fileName = upFile.getOriginalFilename();
 
 			book.setCoverImagePath(fileName);
