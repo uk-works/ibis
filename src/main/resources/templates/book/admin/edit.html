@@ -8,7 +8,12 @@
 	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
 	<title>書籍編集 | IBIS</title>
 </head>
-
+<style>
+	.no-select {
+	  pointer-events: none; /* マウス操作を無効化 */
+	}	
+	
+</style>
 <header th:replace="~{common/admin_header :: page_header}"></header>
 
 <body>
@@ -90,7 +95,7 @@
 				<div class="row justify-content-center mb-2">
 					<label for="book.publisher.publisherId" class="col-md-2 col-form-label">出版社</label>
 					<div class="col-md-7">
-						<input type="hidden" th:field="*{book.publisher.publisherId}" />
+<!--						<input type="hidden" th:field="*{book.publisher.publisherId}" />-->
 						<select class="form-select" th:field="*{book.publisher.publisherId}">
 							<option th:value="p0000">未選択</option>
 							<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
@@ -376,7 +381,17 @@
 
 				if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
 					// selectやdate, fileは disabled でグレーアウト制御
-					input.disabled = isReadOnly;
+					//input.disabled = isReadOnly;
+					if (isReadOnly) {
+						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
+					} else {
+						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.setAttribute("tabindex", "-1");
+					}
+					
 				} else {
 					// 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
 					input.readOnly = isReadOnly;
@@ -384,8 +399,12 @@
 					// 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
 					if (isReadOnly) {
 						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
 					} else {
 						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.removeAttribute("tabindex", "-1");
 					}
 				}
 			});
@@ -421,9 +440,17 @@
 				// 「出版社（その他）」など、もともとreadonly固定のものは触らない
 				if (input.id === "book.publisher.publisherName") return;
 
-				if (input.tagName === "SELECT" || input.type === "date" || input.type === "file") {
+				if (input.tagName === "SELECT") {
 					// selectやdate, fileは disabled でグレーアウト制御
-					input.disabled = isReadOnly;
+					if (isReadOnly) {
+						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
+					} else {
+						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.setAttribute("tabindex", "-1");
+					}
 				} else {
 					// 通常のテキスト入力は readonly で制御（見た目をform-controlに合わせるため）
 					input.readOnly = isReadOnly;
@@ -431,8 +458,12 @@
 					// 閲覧モードの時は背景を少しグレーにして「触れない感」を出す（Bootstrapのスタイル調整）
 					if (isReadOnly) {
 						input.classList.add("bg-body-secondary");
+						input.classList.add("no-select");
+						input.setAttribute("tabindex", "-1");
 					} else {
 						input.classList.remove("bg-body-secondary");
+						input.classList.remove("no-select");
+						input.setAttribute("tabindex", "-1");
 					}
 				}
 			});
