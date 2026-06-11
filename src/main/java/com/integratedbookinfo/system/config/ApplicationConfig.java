@@ -1,5 +1,6 @@
 package com.integratedbookinfo.system.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,9 @@ import com.integratedbookinfo.system.filter.AuthFilter;
 @Configuration
 public class ApplicationConfig implements WebMvcConfigurer{
 
+	@Value("${resource.image.path:}")
+	private String imagePath;
+	
 	@Override
 	public Validator getValidator() {
 		var validator = new LocalValidatorFactoryBean();
@@ -43,6 +47,6 @@ public class ApplicationConfig implements WebMvcConfigurer{
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:///C:/pleiades/workspace/images/");
+                .addResourceLocations(imagePath);
     }
 }

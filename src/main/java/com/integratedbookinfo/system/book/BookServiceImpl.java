@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +34,9 @@ public class BookServiceImpl implements BookService {
 	private final BookMapper bookMapper;
 	private final InventoryMapper inventoryMapper;
 	private final BookEditProposalMapper bookEditProposalMapper;
+	
+	@Value("${upload.image.path:}")
+	private String UPLOAD_DIRECTORY;
 	
 	@Override
 	public BookListResponseDTO getBookList(int page, int numPerPage, AccountRole accountRole, String storeId,
@@ -237,8 +241,6 @@ public class BookServiceImpl implements BookService {
 	
 	public void saveImageFile(BookDTO book) {
 		MultipartFile upFile = book.getCoverImageFile();
-		
-		final String UPLOAD_DIRECTORY = "C:/pleiades/workspace/images";
 		
 		if (upFile != null) {
 			String fileName = upFile.getOriginalFilename();
