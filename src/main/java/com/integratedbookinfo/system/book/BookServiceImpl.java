@@ -175,15 +175,16 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public boolean modifyBook(AccountRole accountRole, BookDTO book, StoreBookDTO storeBook) {
 
-		int updateBookCount = 0;
 		int updateStoreBookCount = 0;
-		// 画像登録処理
-		saveImageFile(book);
 		
 		if (accountRole.equals(AccountRole.ADMIN)) {
-			updateBookCount = bookMapper.updateBook(book);
+
+			saveImageFile(book);
+			
+			bookMapper.updateBook(book);
 		}
 
+		// isRegisterIntent:true 書店個別項目が新規登録(未登録), false 既存項目の編集
 		if (!storeBook.isRegisterIntent()) {
 
 			updateStoreBookCount = bookMapper.updateStoreBook(book.getBookId(), storeBook);
@@ -198,9 +199,9 @@ public class BookServiceImpl implements BookService {
 			int existStoreBook = bookMapper.countStoreBookByStoreIdAndBookId(book.getBookId(), storeBook.getStoreId());
 			
 			if (existStoreBook == 0) {
-
 				storeBook.setBookId(book.getBookId());
 				bookMapper.insertStoreBook(storeBook);
+				
 			} else {
 				return false;
 			}
@@ -242,7 +243,7 @@ public class BookServiceImpl implements BookService {
 	public void saveImageFile(BookDTO book) {
 		MultipartFile upFile = book.getCoverImageFile();
 		
-		if (upFile != null) {
+		if (upFile != null && !upFile.isEmpty()) {
 			String fileName = upFile.getOriginalFilename();
 
 			book.setCoverImagePath(fileName);
