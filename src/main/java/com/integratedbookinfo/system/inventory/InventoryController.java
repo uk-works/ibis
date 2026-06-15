@@ -106,6 +106,10 @@ public class InventoryController {
 		
 		boolean isStoreIdError = (loginUser.getAccountRole().equals(AccountRole.ADMIN) 
 				&& (form.getStoreId() == null || form.getStoreId().isBlank()));
+		
+		boolean isBookIdError = form.getBookId() == null || form.getBookId().isBlank();
+		
+		if(errors.hasErrors() || isStoreIdError || isBookIdError) {
 			
 		if(errors.hasErrors() || isStoreIdError) {
 			
@@ -148,9 +152,11 @@ public class InventoryController {
 
 		boolean isStoreIdError = form.getStoreId() == null || form.getStoreId().isBlank();
 		
-		boolean isAmountZero = form.getAmount() < 0;
+		boolean isAmountZero = form.getAmount() == null || form.getAmount() < 0;
 		
-		if(errors.hasErrors() || isStoreIdError || isAmountZero) {
+		boolean isBookIdError = form.getBookId() == null || form.getBookId().isBlank();
+		
+		if(errors.hasErrors() || isStoreIdError || isAmountZero || isBookIdError) {
 			
 			ra.addFlashAttribute("errorMsg", "更新対象の在庫情報が不正です。");
 			
