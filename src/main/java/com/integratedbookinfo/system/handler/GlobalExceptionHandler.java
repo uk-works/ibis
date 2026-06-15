@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         LoginUserRequestDTO user =
                 (LoginUserRequestDTO) session.getAttribute("loginUser");
 
-        if (user == null || user.getLoginId() == null) {
+        if (session == null || user == null || user.getLoginId() == null) {
             model.addAttribute("backUrl", "/auth/login");
             model.addAttribute("backLabel", "ログイン");
         } else {
