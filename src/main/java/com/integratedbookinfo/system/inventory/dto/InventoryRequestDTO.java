@@ -20,10 +20,10 @@ public class InventoryRequestDTO {
 	@NotBlank(groups = {InventoryRegisterGroup.class, InventoryEditGroup.class})
 	private String bookId;
 	
-	@NotNull
+	@NotNull(groups = {InventoryRegisterGroup.class, InventoryEditGroup.class})
 	@Min(value = 1, message = "在庫数は1以上を入力してください", 
 			groups = {InventoryRegisterGroup.class})
-	private int amount;
+	private Integer amount;
 	
 	@NotNull(groups = {InventoryEditGroup.class})
 	private InventoryStatus inventoryStatus;

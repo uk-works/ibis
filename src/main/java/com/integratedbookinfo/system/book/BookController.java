@@ -332,8 +332,7 @@ public class BookController {
 
 	    String lower = filename.toLowerCase();
 	    boolean extOk = lower.endsWith(".jpg")
-	                 || lower.endsWith(".jpeg")
-	                 || lower.endsWith(".png");
+	                 || lower.endsWith(".jpeg");
 
 	    return !(mimeOk && extOk);
 	    
