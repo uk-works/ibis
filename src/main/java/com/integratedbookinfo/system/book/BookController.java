@@ -1,7 +1,30 @@
 package com.integratedbookinfo.system.book;
 
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO;
+import com.integratedbookinfo.system.book.dto.BookCreateRequestDTO;
+import com.integratedbookinfo.system.book.dto.BookEditRequestDTO;
+import com.integratedbookinfo.system.book.dto.StoreBookDTO;
+import com.integratedbookinfo.system.shared.domain.BookDTO;
+import com.integratedbookinfo.system.shared.enums.AccountRole;
+import com.integratedbookinfo.system.shared.enums.BookSize;
+import com.integratedbookinfo.system.validationgroup.BookCreateGroup;
+import com.integratedbookinfo.system.validationgroup.BookDuplicateCheckGroup;
+import com.integratedbookinfo.system.validationgroup.BookEditGroup;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,4 +35,306 @@ public class BookController {
 
 	private final int NUM_PER_PAGE = 10;
 	private final BookService bookService;
+	
+	@GetMapping("/list")
+	public String showBookList(
+			@RequestParam(name = "keyword", required = false) String keyword ,
+			@RequestParam(name = "page", defaultValue = "1") Integer page, 
+			HttpSession session,
+			Model model) {
+
+		String pageName = "";
+		
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		
+		model.addAttribute("page", page);
+		
+		model.addAttribute("displayName", loginUser.getDisplayName());
+		model.addAttribute("accountRole", loginUser.getAccountRole());
+		model.addAttribute("keyword", keyword);
+		if(loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			model.addAttribute("books", bookService.getBookList(page, NUM_PER_PAGE, loginUser.getAccountRole(), null, keyword).getBooks());
+			model.addAttribute("totalPages", bookService.getTotalPages(NUM_PER_PAGE, loginUser.getAccountRole(), null, keyword));
+		
+			pageName = "book/admin/list";
+		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+			model.addAttribute("books", bookService.getBookList(page, NUM_PER_PAGE, loginUser.getAccountRole(), loginUser.getStoreId(), keyword).getBooks());
+			model.addAttribute("totalPages", bookService.getTotalPages(NUM_PER_PAGE, loginUser.getAccountRole(), loginUser.getStoreId(), keyword));
+
+			pageName = "book/store/list";
+		}
+
+		return pageName;
+	}
+
+	@GetMapping("/create")
+	public String createBook(Model model, HttpSession session) {
+		
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		String pageName = "";
+		
+		model.addAttribute("displayName", loginUser.getDisplayName());
+		model.addAttribute("accountRole", loginUser.getAccountRole());
+
+		BookCreateRequestDTO bookCreateRequest = new BookCreateRequestDTO();
+		bookCreateRequest.setBook(new BookDTO());
+		bookCreateRequest.setStoreBook(new StoreBookDTO());
+		
+		model.addAttribute("bookCreateRequest", bookCreateRequest);
+		
+		model.addAttribute("publishers", bookService.getPublishers());
+		model.addAttribute("genres", bookService.getGenres());
+		model.addAttribute("stores", bookService.getStoreOptions());
+		model.addAttribute("bookSizes", BookSize.values());
+		
+		if(loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			pageName = "book/admin/create";
+		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+			pageName = "book/store/create";
+		}
+		
+		return pageName;
+	}
+
+	@PostMapping("/create")
+	public String createBook(
+			@Validated(BookCreateGroup.class) @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
+			Errors errors,
+			HttpSession session,
+			Model model) {
+		
+		
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		
+		MultipartFile imageFile = form.getBook().getCoverImageFile();
+		
+		if (errors.hasErrors() || isInvalidImage(imageFile)) {
+			
+			if (isInvalidImage(imageFile)) {
+				errors.rejectValue("book.coverImageFile", "error.book.image.invalid");
+			}
+
+			model.addAttribute("displayName", loginUser.getDisplayName());
+			model.addAttribute("accountRole", loginUser.getAccountRole());
+
+			model.addAttribute("publishers", bookService.getPublishers());
+			model.addAttribute("genres", bookService.getGenres());
+			model.addAttribute("stores", bookService.getStoreOptions());
+			model.addAttribute("bookSizes", BookSize.values());
+			model.addAttribute("bookCreateRequest", form);
+			
+			
+			if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+
+				return "book/admin/create";
+			} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+
+				return "book/store/create";
+			}
+		}
+
+		// Serive呼び出し
+		bookService.saveBook(form, loginUser);
+		
+		// 画像登録処理
+		return "redirect:/book/list";
+	}
+
+	@PostMapping("/search")
+	public String searchBook(
+			@Validated(BookDuplicateCheckGroup.class) @ModelAttribute("bookCreateRequest") BookCreateRequestDTO form,
+			Errors errors,
+			HttpSession session,
+			Model model) {
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		String pageName = "";
+		
+		model.addAttribute("displayName", loginUser.getDisplayName());
+		model.addAttribute("accountRole", loginUser.getAccountRole());
+
+		model.addAttribute("publishers", bookService.getPublishers());
+		model.addAttribute("genres", bookService.getGenres());
+		model.addAttribute("stores", bookService.getStoreOptions());
+		model.addAttribute("bookSizes", BookSize.values());
+
+		String inputIsbn = form.getBook().getIsbn();
+		String inputJanCode = form.getBook().getJanCode();
+		
+		if (inputIsbn.isBlank() && inputJanCode.isBlank()) {
+			errors.rejectValue("book.isbn", "error.search.required", "ISBNまたはJANコードのどちらか一方を入力してください。");
+		}
+		
+		// ISBNが入力済みであるが、13桁または10桁の数字でなければNG
+		if (!inputIsbn.isBlank() && !inputIsbn.matches("^(\\d{10}|\\d{13})$")) {
+			errors.rejectValue("book.isbn", "error.pattern", "ISBNは10桁または13桁の数字で入力してください。");
+		}
+		
+		// JANコードが入力済みであるが、13桁の数字でなければNG
+		if (!inputJanCode.isBlank() && !inputJanCode.matches("^\\d{13}$")) {
+			errors.rejectValue("book.janCode", "error.pattern", "JANコードは13桁の数字で入力してください。");
+		}
+		
+		if (errors.hasErrors()) {
+			
+			model.addAttribute("bookCreateRequest", form);
+			
+			if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+
+				return "book/admin/create";
+			} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+
+				return "book/store/create";
+			}
+			
+		}
+		
+		BookDTO book = bookService.getBookByIsbnOrJanCode(inputIsbn, inputJanCode);
+		
+		if(book != null) {
+			form.setBook(book);
+			model.addAttribute("isFound", true);
+		} else {
+			BookDTO emptyBook = new BookDTO();
+			
+			emptyBook.setIsbn(inputIsbn);
+			emptyBook.setJanCode(inputJanCode);
+			
+			form.setBook(emptyBook);
+			
+			model.addAttribute("isFound", false);
+		}
+		
+		model.addAttribute("bookCreateRequest", form);
+		
+		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			pageName = "book/admin/create";
+
+		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+			pageName = "book/store/create";
+
+		}
+		
+		return pageName;
+	}
+	
+	@GetMapping("/edit/{bookId}")
+	public String editBook(@PathVariable String bookId, Model model, HttpSession session) {
+		
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+
+		String pageName = "";
+		
+		model.addAttribute("displayName", loginUser.getDisplayName());
+		model.addAttribute("accountRole", loginUser.getAccountRole());
+		
+		model.addAttribute("publishers", bookService.getPublishers());
+		model.addAttribute("genres", bookService.getGenres());
+		model.addAttribute("bookSizes", BookSize.values());
+
+		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+			model.addAttribute("storeOptions", bookService.getStoreOptionsByBookId(bookId));
+			model.addAttribute("storeBooks", bookService.getStoreBooksByBookId(bookId));
+			model.addAttribute("bookEditRequest", bookService.getBookAndStoreBookForAdmin(loginUser.getAccountRole(), bookId));
+
+			pageName = "book/admin/edit";
+		} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+			model.addAttribute("bookEditRequest", bookService.getBookAndStoreBookForStore(loginUser.getAccountRole(), bookId, loginUser.getStoreId()));
+
+			pageName = "book/store/edit";
+		}
+		
+		return pageName;
+	}
+
+	@PostMapping("/edit/{bookId}")
+	public String editBook(
+			@PathVariable String bookId,
+			@Validated(BookEditGroup.class) @ModelAttribute("bookEditRequest") BookEditRequestDTO form,
+			Errors errors,
+			HttpSession session,
+			RedirectAttributes ra,
+			Model model) {
+
+		LoginUserRequestDTO loginUser = getLoginUser(session);
+		
+		MultipartFile imageFile = form.getBook().getCoverImageFile();
+		
+
+		if (errors.hasErrors() || isInvalidImage(imageFile)) {
+			
+			if (isInvalidImage(imageFile)) {
+				errors.rejectValue("book.coverImageFile", "error.book.image.invalid");
+			}
+			
+			model.addAttribute("displayName", loginUser.getDisplayName());
+			model.addAttribute("accountRole", loginUser.getAccountRole());
+			
+			model.addAttribute("publishers", bookService.getPublishers());
+			model.addAttribute("genres", bookService.getGenres());
+			model.addAttribute("bookSizes", BookSize.values());
+			
+			if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
+				model.addAttribute("storeOptions", bookService.getStoreOptionsByBookId(bookId));
+				model.addAttribute("storeBooks", bookService.getStoreBooksByBookId(bookId));
+				model.addAttribute("bookEditRequest", form);
+
+				return "book/admin/edit";
+			} else if(loginUser.getAccountRole().equals(AccountRole.STORE)){
+				model.addAttribute("bookEditRequest", form);
+
+				return "book/store/edit";
+			}
+		}
+		
+		boolean isSuccess = bookService.modifyBook(loginUser.getAccountRole(), form.getBook(), form.getStoreBook());
+
+		ra.addFlashAttribute("isSuccess", isSuccess);
+		
+		if(isSuccess) {
+			ra.addFlashAttribute("msg", "更新が完了しました。");
+		} else {
+			ra.addFlashAttribute("msg", "更新に失敗しました。入力内容をご確認ください。");
+		}
+		
+		return "redirect:/book/list";
+	}
+
+	@PostMapping("/delete/{bookId}")
+	public String deleteBook(@PathVariable String bookId, HttpSession session) {
+		
+		bookService.removeBook(bookId);
+		
+		return "redirect:/book/list";
+	}
+	
+	private LoginUserRequestDTO getLoginUser(HttpSession session) {
+		LoginUserRequestDTO loginUser = new LoginUserRequestDTO();
+		loginUser = (LoginUserRequestDTO) session.getAttribute("loginUser");
+
+		return loginUser;
+	}
+	
+	private boolean isInvalidImage(MultipartFile file) {
+		
+		// 画像未選択時 チェック終了
+		if(file == null || file.isEmpty()) {
+			return false;
+		}
+		
+		// MIMEチェック
+	    String contentType = file.getContentType();
+
+	    boolean mimeOk = contentType != null && contentType.startsWith("image/");
+
+	    // 拡張子チェック（メイン）
+	    String filename = file.getOriginalFilename();
+	    if (filename == null) return true;
+
+	    String lower = filename.toLowerCase();
+	    boolean extOk = lower.endsWith(".jpg")
+	                 || lower.endsWith(".jpeg");
+
+	    return !(mimeOk && extOk);
+	    
+	}
 }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link th:href="@{../css/bootstrap.min.css}" rel="stylesheet">
+	<title>ログイン | IBIS</title>
+</head>
+
+<body>
+	
+	<main class="container mt-4">
+		<div class="d-flex justify-content-center align-items-center mb-4">
+			<div>
+				<h2>書籍情報統合システム IBIS</h2>
+			</div>
+		</div>
+
+
+		<form th:action="@{/auth/login}" method="post" th:object="${form}">
+			
+			<div class="row justify-content-center align-items-center mb-2">
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{loginId}" autocomplete="loginId" placeholder="ログインIDを入力"/>					
+					<p th:errors="*{loginId}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<div class="col-md-7">
+					<input type="password" class="form-control" th:field="*{password}" autocomplete="current-password" placeholder="パスワードを入力" />				
+					<p th:errors="*{password}"></p>					
+				</div>
+			</div>
+
+			<div class="row justify-content-center mb-4">
+				<div class="col-auto">
+					<button class="btn btn-primary">ログイン</button>
+				</div>
+			</div>
+			
+			<div class="row justify-content-center mb-4">
+				<a class="text-center" th:href="@{/store/create}">書店登録はこちら</a>
+			</div>
+		</form>
+	</main>
+	
+
+	<script th:src="@{../js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

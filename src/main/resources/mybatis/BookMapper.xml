@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.book.BookMapper">
+
+	<resultMap id="booksResult" type="com.integratedbookinfo.system.book.dto.BookSummaryDTO">
+		<id property="bookId" column="book_id" />
+		<result property="bookTitle" column="book_title" />
+		<result property="author" column="author" />
+		<result property="publisherName" column="publisher_name" />
+		<result property="releaseDate" column="release_date" />
+		<result property="isbn" column="isbn" />
+	</resultMap>
+
+
+	<select id="selectBookList" resultMap="booksResult">
+
+		SELECT 
+			m_books.book_id,
+		    book_title,
+		    author,
+		    publisher_name,
+			release_date,
+		    isbn
+		FROM
+			m_books
+		INNER JOIN
+			m_publishers
+		ON
+			m_books.publisher_id = m_publishers.publisher_id
+			
+		<if test="accountRole.name() == 'STORE'">
+			INNER JOIN
+				store_books
+			ON
+				m_books.book_id = store_books.book_id		
+		</if>	
+		
+		<where>
+			m_books.deleted_flag = 0
+		
+			<if test="accountRole.name() == 'STORE'">
+				AND store_books.store_id = #{storeId}
+			</if>
+			<if test="keyword != null and keyword.trim() != ''">
+				AND book_title LIKE CONCAT('%',#{keyword},'%') 
+			</if>
+		</where>
+
+		LIMIT 
+			#{offset}, #{limit};
+
+	</select>
+
+	<select id="countBookRecord" resultType="Long">
+	
+		SELECT 
+			count(*)
+		FROM
+			m_books
+			
+		<if test="accountRole.name() == 'STORE'">
+			INNER JOIN
+				store_books
+			ON
+				m_books.book_id = store_books.book_id		
+		</if>	
+		
+		<where>
+			m_books.deleted_flag = 0
+		
+			<if test="accountRole.name() == 'STORE'">
+				AND store_books.store_id = #{storeId}
+			</if>
+			<if test="keyword != null and keyword.trim() != ''">
+				AND book_title LIKE CONCAT('%',#{keyword},'%') 
+			</if>
+		</where>
+		
+	</select>
+
+	<select id="selectLastBookIdForUpdate" resultType="String">
+		SELECT
+			book_id
+		FROM
+			m_books
+		ORDER BY book_id DESC
+		LIMIT
+			1
+		FOR UPDATE;
+	</select>
+
+	<select id="countStoreBookByStoreIdAndBookId" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId}
+	</select>
+
+	<select id="selectPublishers" resultType="com.integratedbookinfo.system.shared.domain.Publisher">
+		SELECT 
+			publisher_id, 
+			publisher_name
+		FROM
+			m_publishers;
+	</select>
+
+	<select id="selectGenres" resultType="com.integratedbookinfo.system.shared.domain.Genre">
+		SELECT 
+			genre_id, 
+			genre_name
+		FROM
+			m_genres;	
+	</select>
+
+	<select id="selectStoreOptions" resultType="com.integratedbookinfo.system.shared.domain.StoreOptionDTO">
+		SELECT 
+			store_id, 
+			store_name
+		FROM
+			m_stores
+	</select>
+
+	<select id="selectBookOptions" resultType="com.integratedbookinfo.system.shared.domain.BookOptionDTO">
+
+		SELECT
+			store_books.store_id,
+			m_books.book_id,
+			m_books.book_title
+		FROM
+			m_books
+		INNER JOIN
+			store_books
+		ON
+			m_books.book_id = store_books.book_id
+		LEFT OUTER JOIN
+			t_inventories
+		ON 
+			m_books.book_id = t_inventories.book_id
+		AND
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
+				t_inventories.deleted_flag = 1
+			))
+		ORDER BY
+			store_books.store_id;
+	
+	</select>
+
+	<select id="selectBookOptionsByStoreId" parameterType="String" resultType="com.integratedbookinfo.system.shared.domain.BookOptionDTO">
+
+		SELECT
+			store_books.store_id,
+			m_books.book_id,
+			m_books.book_title
+		FROM
+			m_books
+		INNER JOIN
+			store_books
+		ON
+			m_books.book_id = store_books.book_id
+		LEFT OUTER JOIN
+			t_inventories
+		ON 
+			m_books.book_id = t_inventories.book_id
+		AND
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND
+				store_books.store_id = #{storeId}
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
+				t_inventories.store_id = #{storeId}
+			AND
+				t_inventories.deleted_flag = 1
+			));
+	
+	</select>
+
+
+	<resultMap id="bookResult" type="com.integratedbookinfo.system.shared.domain.BookDTO" autoMapping="true">
+		<id property="bookId" column="book_id" />
+		<association property="genre" javaType="com.integratedbookinfo.system.shared.domain.Genre">
+			<id property="genreId" column="genre_id"></id>
+		</association>
+		<association property="publisher" javaType="com.integratedbookinfo.system.shared.domain.Publisher">
+			<id property="publisherId" column="publisher_id"></id>
+		</association>
+	</resultMap>
+
+	<select id="selectBookByBookId" resultMap="bookResult" >
+		SELECT
+			book_id,
+			isbn, 
+		    c_code, 
+		    jan_code, 
+		    genre_id, 
+		    publisher_id, 
+		    author, 
+		    book_title, 
+		    book_size, 
+		    list_price, 
+		    edition, 
+		    release_date, 
+		    cover_image_path
+		FROM
+			m_books
+		WHERE
+			book_id = #{bookId};
+	</select>
+	
+	<select id="selectStoreBookByStoreIdAndBookId">
+		SELECT
+			book_id,
+			store_id,
+			store_comment,
+			store_genre,
+			store_price,
+			note
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId};
+	</select>
+
+	<select id="selectStoreBooksByBookId">
+		SELECT
+			book_id,
+			store_id,
+			store_comment,
+			store_genre,
+			store_price,
+			note
+		FROM
+			store_books
+		WHERE
+			book_id = #{bookId};	
+	</select>
+
+	<select id="selectFindBookByIsbnOrJan" resultType="com.integratedbookinfo.system.shared.domain.BookDTO">
+
+		SELECT 
+			* 
+		FROM 
+			m_books
+	 	WHERE 
+	 		(
+	 			isbn = #{isbn} 
+	 		AND 
+	 			isbn IS NOT NULL 
+	 		AND 
+	 			isbn != ''
+	 		)
+         OR 
+         	(
+         		jan_code = #{janCode} 
+         	AND 
+         		jan_code IS NOT NULL 
+         	AND 
+         		jan_code != ''
+         	)
+      	LIMIT 1	
+	
+	</select>
+
+	<insert id="insertBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
+		INSERT INTO 
+			m_books(
+				book_id,
+				isbn, 
+			    c_code, 
+			    jan_code, 
+			    genre_id, 
+			    publisher_id, 
+			    author, 
+			    book_title, 
+			    book_size, 
+			    list_price, 
+			    `edition`, 
+			    release_date, 
+			    created_at, 
+			    updated_at,
+			    cover_image_path)
+		VALUES
+			(#{bookId}, 
+			#{isbn}, 
+			#{cCode}, 
+			#{janCode}, 
+			#{genre.genreId}, 
+			#{publisher.publisherId}, 
+			#{author}, 
+			#{bookTitle}, 
+			#{bookSize}, 
+			#{listPrice}, 
+			#{edition}, 
+			#{releaseDate}, 
+			NOW(), 
+			NOW(),
+			#{coverImagePath});
+	</insert>
+
+	<insert id="insertStoreBook" parameterType="com.integratedbookinfo.system.book.dto.StoreBookDTO">
+		INSERT INTO 
+			store_books(
+				book_id, 
+		        store_id, 
+		        store_comment, 
+		        store_genre, 
+		        store_price, 
+		        note, 
+		        created_at,
+		        updated_at)
+		VALUES
+			(#{bookId}, 
+			#{storeId}, 
+			#{storeComment}, 
+			#{storeGenre}, 
+			#{storePrice}, 
+			#{note}, 
+			NOW(),
+			NOW())
+	</insert>
+
+	<resultMap id="storeProposalResult" type="com.integratedbookinfo.system.dashboard.dto.BookEditProposalSummaryDTO">
+		<id property="proposalId" column="proposal_id" />
+		<result property="bookTitle" column="book_title" />
+		<result property="storeName" column="store_name" />
+		<result property="proposedAt" column="proposed_at" />
+	</resultMap>
+
+	<select id="selectStoreBookEditProposalList" parameterType="String"  resultMap="storeProposalResult">
+
+		SELECT 
+			proposal_id, 
+			proposal_status, 
+			book_title, 
+			updated_at, 
+			proposed_at
+		FROM 
+			t_book_edit_proposals
+		WHERE 
+			t_book_edit_proposals.deleted_flag = 0
+		AND
+			store_id = #{storeId};
+
+	</select>
+
+
+	<select id="selectStoreStoreStatus" parameterType="String" resultType="com.integratedbookinfo.system.shared.enums.StoreStatus">
+	
+		SELECT 
+			store_status
+		FROM 
+			m_stores
+		WHERE 
+			store_id = #{storeId};
+	
+	</select>
+
+	<update id="updateBook" parameterType="com.integratedbookinfo.system.shared.domain.BookDTO">
+		UPDATE
+			m_books
+		SET	
+			isbn = #{isbn},
+		    c_code = #{cCode},
+		    jan_code = #{janCode},
+		    genre_id = #{genre.genreId},
+		    publisher_id = #{publisher.publisherId},
+		    author = #{author},
+		    book_title = #{bookTitle},
+		    book_size = #{bookSize},
+		    list_price = #{listPrice},
+		    `edition` = #{edition},
+		    release_date = #{releaseDate},
+		    updated_at = NOW(),
+		    cover_image_path = #{coverImagePath}
+		WHERE
+			book_id = #{bookId};
+	</update>
+
+	<update id="updateStoreBook">
+		
+		UPDATE
+			store_books
+		SET
+	        store_comment = #{storeBook.storeComment},
+	        store_genre = #{storeBook.storeGenre},
+	        store_price = #{storeBook.storePrice},
+	        note = #{storeBook.note},
+	        updated_at = NOW()
+		WHERE
+			book_id = #{bookId}
+		AND
+	        store_id = #{storeBook.storeId};
+	</update>
+	
+	
+	<resultMap id="resultBookInfo" type="com.integratedbookinfo.system.search.dto.BookBasicInfoDTO" autoMapping="true">
+		<association property="publisher" javaType="com.integratedbookinfo.system.shared.domain.Publisher" autoMapping="true"></association>
+		<association property="genre" javaType="com.integratedbookinfo.system.shared.domain.Genre" autoMapping="true"></association>
+	</resultMap>
+	
+	
+	<!-- 書籍閲覧で必要な情報を取得（検索機能） -->
+	<select id="selectBookBasicInfoByBookId" parameterType="String" resultMap="resultBookInfo">
+	
+		SELECT
+			book_id,
+			book_title,
+			author,
+			m_publishers.publisher_name,
+			book_size,
+			list_price,
+			c_code,
+			m_genres.genre_name,
+			isbn,
+			jan_code,
+			edition,
+			release_date,
+			cover_image_path
+		FROM
+			m_books
+		INNER JOIN
+			m_publishers
+		ON
+			m_books.publisher_id = m_publishers.publisher_id
+		INNER JOIN
+			m_genres
+		ON
+			m_books.genre_id = m_genres.genre_id
+		WHERE
+			book_id = #{bookId}
+	
+	</select>
+	
+
+	<select id="selectSearchStoreBookByBookId" parameterType="String" resultType="com.integratedbookinfo.system.search.dto.SearchStoreBookDTO">
+	
+		SELECT
+			store_name,
+			store_comment,
+			store_price,
+			store_genre,
+			store_books.note
+		FROM
+			store_books
+		INNER JOIN
+			m_stores
+		ON
+			store_books.store_id = m_stores.store_id
+		WHERE
+			book_id = #{bookId}
+		ORDER BY
+			store_books.store_id;
+	
+	</select>
+	<!-- 書籍・書店書籍 論理削除 -->
+	<update id="deleteStoreBookByBookId" parameterType="String">
+	
+		UPDATE
+			store_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}
+	
+	</update>
+	
+	<update id="deleteStoreBookByBookIdAndStoreId">
+	
+		UPDATE
+			store_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}
+		AND
+			store_id = #{storeId}
+	
+	</update>
+	
+	<update id="deleteBookByBookId">
+	
+		UPDATE
+			m_books
+		SET
+			deleted_flag = 1
+		WHERE
+			book_id = #{bookId}	
+	
+	</update>
+</mapper>

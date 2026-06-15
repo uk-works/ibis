@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link href="../css/bootstrap.min.css" rel="stylesheet">
+	<link th:href="@{../css/common_header.css}" rel="stylesheet">
+	<title>システムエラー | IBIS</title>
+</head>
+<header th:replace="~{common/customer_header :: page_header}"></header>
+
+<body>
+	<div class="container mt-5">
+	    <div class="alert alert-danger">
+
+	        <h2>システムエラーが発生しました</h2>
+
+	        <p>
+	            申し訳ありません。<br>
+	            システムエラーが発生しました。
+	        </p>
+
+	        <p>
+	            [[${backLabel}]]へ戻り、再度操作してください。
+	        </p>
+
+			<a th:href="@{${backUrl}}" class="btn btn-primary">
+			    [[${backLabel}]]へ戻る
+			</a>
+
+	    </div>
+	</div>
+	<script src="../js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/common_header.css" rel="stylesheet">
+	<link href="css/dashboard.css" rel="stylesheet">
+	<title>管理者ダッシュボード | IBIS</title>
+</head>
+
+<header th:replace="~{common/admin_header :: page_header}"></header>
+
+<body>
+
+	<main class="container mt-4">
+		<div class="row">
+			<div class="col-md-3">
+				<div class="d-grid">
+				    <a href="/book/list" class="btn btn-light border text-center menu-btn">書籍管理</a>
+				    <a href="/inventory/list" class="btn btn-light border text-center menu-btn">在庫管理</a>
+				    <a href="#" class="btn btn-light border text-center menu-btn">書店管理（未実装）</a>
+				    <a href="#" class="btn btn-light border text-center menu-btn">書籍編集提案<br>申請管理（未実装）</a>
+				</div>
+			</div>
+
+
+			<div class="flex-cards">
+				
+				<div class="card">
+					<div class="card-header">
+						書店営業状態
+					</div>
+					
+					<div class="card-body p-0">
+						<table class="table table-striped" >
+							<thead>
+								<tr><th>書店名</th><th>営業状態</th><th></th></tr>
+							</thead>
+
+							<tbody>
+								<tr th:each="summary : ${dashboardInfo.storeStatuses}" th:object="${summary}">
+									<td>[[*{storeName}]]</td>
+									<td>[[*{storeStatus.getLabel}]]</td>
+									<td><button class="btn btn-secondary" th:onclick="|location.href='@{#}'|">詳細（未実装）</button></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+				<div class="card">
+					<div class="card-header">
+						書籍編集提案申請状況
+					</div>
+					<div class="card-body p-0">
+						<table class="table table-striped" >
+							<thead>
+								<tr><th>承認ステータス</th><th>書籍名</th><th>書店名</th><th>提案日時</th><th></th></tr>								
+							</thead>
+							
+							<tbody>
+								<tr th:each="summary : ${dashboardInfo.bookEditProposalSummaries}" th:object="${summary}">
+									<td>[[*{proposalStatus.getLabel}]]</td>
+									<td>[[*{bookTitle}]]</td>
+									<td>[[*{storeName}]]</td>	
+									<td>[[*{#temporals.format(proposedAt, 'yyyy/MM/dd HH:mm:ss')}]]</td>	
+									<td><button class="btn btn-secondary" th:onclick="|location.href='@{#}'|">詳細（未実装）</button></td>
+								</tr>	
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div>
+
+	</main>
+
+	
+	<script src="js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

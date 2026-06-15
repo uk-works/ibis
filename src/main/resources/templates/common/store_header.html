@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+</head>
+
+<header class="top-header" th:fragment="page_header">
+	<div class="layout-container">
+		<div class="logo"><h4>書籍情報統合システム</h4></div>
+		 <div class="user-info">
+		     <span>[[${displayName}]] 様</span>
+		     <a href="/auth/logout"><span>ログアウト</span></a>
+		 </div>
+	</div>
+	<nav class="nav-menu">
+	    <a href="/dashboard" class="nav-item">HOME</a>
+	    <a href="/book/list" class="nav-item">書籍管理</a>
+	    <a href="/inventory/list" class="nav-item">在庫管理</a>
+	    <a href="/store/edit" class="nav-item">書店管理</a>
+	    <a href="#" class="nav-item">書籍編集提案<br>申請結果（未実装）</a>
+	    <a href="#" class="nav-item">操作マニュアル（未実装）</a>
+	</nav>
+</header>
+
+</html>

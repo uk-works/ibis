@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link th:href="@{../../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../../css/common_header.css}" rel="stylesheet">
+	<title>書籍閲覧 | IBIS</title>
+</head>
+
+<header th:replace="~{common/customer_header :: page_header}"></header>
+
+<body th:object="${bookView}">
+
+	<div class="container mt-4">
+		<h2>書籍基本情報</h2>
+		<div class="row mb-5">
+			<!-- 画像 -->
+			<div class="col-md-4">
+				<th:block th:if="*{bookBasicInfo.coverImagePath} != null and *{bookBasicInfo.coverImagePath} != ''">
+					<img th:src="@{/images/{path}(path = *{bookBasicInfo.coverImagePath})}" class="img-fluid">					
+				</th:block>
+				<th:block th:unless="*{bookBasicInfo.coverImagePath} != null and *{bookBasicInfo.coverImagePath} != ''">
+					<h6>画像イメージがありません</h5>	
+				</th:block>
+			</div>
+
+			<!-- 書籍情報 -->
+			<div class="col-md-8">
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">書籍名</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.bookTitle}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">著者
+					</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.author}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">出版社</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.publisher.publisherName}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">サイズ</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.bookSize.getLabel}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">定価</div>
+					<div class="col-md-9">
+						[[*{#numbers.formatInteger(bookBasicInfo.listPrice, 3, 'COMMA')}]]円
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">図書分類</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.cCodeName}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">ジャンル</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.genre.genreName}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">ISBN</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.isbn}]]
+					</div>
+				</div>
+				<div class="row mb-2">
+					<div class="col-md-3 fw-bold">JANコード</div>
+					<div class="col-md-9">
+						[[*{bookBasicInfo.janCode}]]
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="card mb-3">
+			<th:block th:each="storeBook, stat : *{storeBooks}" >
+				<div class="card-body px-5">
+					<h5>[[${storeBook.storeName}]]</h5>
+					<div class="row mb-2">
+						<div class="col-md-2 fw-bold">
+							紹介文
+						</div>
+						<div class="col-md-10">
+							[[${storeBook.storeComment}]]
+						</div>
+					</div>
+					<div class="row mb-2">
+						<div class="col-md-2 fw-bold">
+							店頭価格
+						</div>
+						<div class="col-md-10">
+							[[${#numbers.formatInteger(storeBook.storePrice, 3, 'COMMA')}]]円
+						</div>
+					</div>
+					<div class="row mb-2">
+						<div class="col-md-2 fw-bold">
+							書店ジャンル
+						</div>
+						<div class="col-md-10">
+							[[${storeBook.storeGenre}]]
+						</div>
+					</div>
+					<div class="row mb-2">
+						<div class="col-md-2 fw-bold">
+							備考
+						</div>
+						<div class="col-md-10">
+							<th:block th:if="${#strings.isEmpty(storeBook.note)}">
+								ー
+							</th:block>
+							<th:block th:unless="${#strings.isEmpty(storeBook.note)}">
+								[[${storeBook.note}]]
+							</th:block>
+						</div>
+					</div>
+				</div>
+				<hr class="my-0" th:if="${!stat.last}"></hr>
+			</th:block>
+		</div>
+		
+		<div class="d-flex justify-content-center mb-4">
+			<button class="btn btn-secondary" th:onclick="|location.href='@{/search/result(keyword=${keyword}, genre=${genre}, page=${page})}'|">戻る</button>			
+		</div>
+
+	</div>
+
+
+	<script th:src="@{../../js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=devide-width, initial-scale=1.0" />
+	<link th:href="@{../css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{../css/common_header.css}" rel="stylesheet">
+	<title>書籍登録 | IBIS</title>
+</head>
+
+<header th:replace="~{common/admin_header :: page_header}"></header>
+
+<body>
+
+	<main class="container mt-4">
+		<h2>書籍登録</h2>
+
+		<form th:action="@{/book/create}" method="post" th:object="${bookCreateRequest}" enctype="multipart/form-data">
+
+			<div class="row justify-content-center mb-4 gap-5">
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">登録</button>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary btn-lg" onclick="location.href='/book/list'">戻る</button>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.isbn" class="col-md-2 col-form-label">ISBN</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.isbn}" />
+					<p th:errors="*{book.isbn}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.janCode" class="col-md-2 col-form-label">JANコード</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.janCode}" />
+					<p th:errors="*{book.janCode}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.bookTitle" class="col-md-2 col-form-label">書籍名</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.bookTitle}" />
+					<p th:errors="*{book.bookTitle}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.cCode" class="col-md-2 col-form-label">Cコード</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.cCode}" />
+					<p th:errors="*{book.cCode}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.genre.genreId" class="col-md-2 col-form-label">ジャンル名</label>
+				<div class="col-md-7">
+					<select class="form-select" th:field="*{book.genre.genreId}">
+						<option th:each="genre : ${genres}" th:value="${genre.genreId}">
+							[[${genre.genreName}]]
+						</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.author" class="col-md-2 col-form-label">著者</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.author}" />
+					<p th:errors="*{book.author}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center mb-2">
+				<label for="book.publisher.publisherId" class="col-md-2 col-form-label">出版社</label>
+				<div class="col-md-7">
+					<select class="form-select" th:field="*{book.publisher.publisherId}">
+						<option th:each="publisher : ${publishers}" th:value="${publisher.publisherId}">
+							[[${publisher.publisherName}]]
+						</option>
+					</select>
+					<p>出版社リストに無い出版社で書籍登録したい場合は、<br>リストを未選択状態にして下記に入力してください。</p>
+					<p>※将来の機能拡張（リストにない出版社の直接登録）を見据えて、DTO構造および画面レイアウトを設計しています。<br>
+					    （現在は初回リリースのスピードを優先し、マスター選択のみ対応のため入力欄はロックされています）</p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.publisher.publisherName" class="col-md-2 col-form-label">出版社（その他）</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control pe-none bg-body-secondary" th:field="*{book.publisher.publisherName}" readonly />
+					<p th:errors="*{book.publisher.publisherName}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.bookSize" class="col-md-2 col-form-label">サイズ</label>
+				<div class="col-md-7">
+					<select class="form-select" th:field="*{book.bookSize}">
+						<option th:each="bookSize : ${bookSizes}" th:value="${bookSize}">
+							[[${bookSize.getLabel}]]
+						</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.listPrice" class="col-md-2 col-form-label">定価（税込み）</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.listPrice}" />
+					<p th:errors="*{book.listPrice}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.edition" class="col-md-2 col-form-label">版</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{book.edition}" />
+					<p th:errors="*{book.edition}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-2">
+				<label for="book.releaseDate" class="col-md-2 col-form-label">発売日</label>
+				<div class="col-md-7">
+					<input type="date" class="form-control" th:field="*{book.releaseDate}" />
+					<p th:errors="*{book.releaseDate}"></p>
+				</div>
+			</div>
+
+			<div class="row justify-content-center mb-2">
+				<label for="book.coverImageFile" class="col-md-2 col-form-label">表紙画像</label>
+				<div class="col-md-7">
+					<input type="file" class="form-control" th:field="*{book.coverImageFile}" />
+					<p>画像ファイルの最大ファイルサイズは10MB<br>
+					   アップロード可能な画像の種類は .jpg .jpeg です。<br>
+					   ※エラーがある場合は再度画像を選択してください
+					</p>
+					<p th:errors="*{book.coverImageFile}"></p>
+				</div>
+			</div>
+
+
+			<!-- 書店個別項目 -->
+			<div class="row mb-1">
+				<div class="offset-1 col-md-auto">
+					<h5>書店個別項目</h4>
+				</div>
+			</div>
+			
+			<div class="row justify-content-center align-items-center mb-4">
+				<label for="storeBook.storeId" class="col-md-2 col-form-label">書店</label>
+				<div class="col-md-7">
+					<select class="form-select" th:field="*{storeBook.storeId}">
+						<option th:each="store : ${stores}" th:value="${store.storeId}">
+							[[${store.storeName}]]
+						</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="row justify-content-center align-items-center mb-4">
+				<label for="storeBook.storeGenre" class="col-md-2 col-form-label">書店ジャンル</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{storeBook.storeGenre}" />
+					<p th:errors="*{storeBook.storeGenre}"></p>
+				</div>
+			</div>
+
+
+			<div class="row justify-content-center align-items-center mb-4">
+				<label for="storeBook.storePrice" class="col-md-2 col-form-label">店頭価格</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{storeBook.storePrice}" />
+					<p th:errors="*{storeBook.storePrice}"></p>
+				</div>
+			</div>
+
+
+			<div class="row justify-content-center align-items-center mb-4">
+				<label for="storeBook.storeComment" class="col-md-2 col-form-label">紹介文</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{storeBook.storeComment}" />
+					<p th:errors="*{storeBook.storeComment}"></p>
+				</div>
+			</div>
+
+
+			<div class="row justify-content-center align-items-center mb-4">
+				<label for="storeBook.note" class="col-md-2 col-form-label">備考</label>
+				<div class="col-md-7">
+					<input type="text" class="form-control" th:field="*{storeBook.note}" />
+					<p th:errors="*{storeBook.note}"></p>
+				</div>
+			</div>
+			
+			<div class="row justify-content-center align-items-center mb-4 gap-5">
+				<div class="col-auto">
+					<button class="btn btn-primary btn-lg">登録</button>
+				</div>
+				<div class="col-auto">
+					<button type="button" class="btn btn-secondary btn-lg" onclick="location.href='/book/list'">戻る</button>
+				</div>
+			</div>			
+		</form>
+	</main>
+
+
+	<script th:src="@{../js/bootstrap.bundle.min.js}"></script>
+</body>
+
+</html>

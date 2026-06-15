@@ -22,7 +22,7 @@ public enum BookSize {
 		return code;
 	}
 	
-	public String getBookSize() {
+	public String getLabel() {
 		return label;
 	}
 	

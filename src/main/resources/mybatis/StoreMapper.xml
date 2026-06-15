@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.store.StoreMapper">
+
+	<resultMap id="resultStoreEdit" type="com.integratedbookinfo.system.store.dto.StoreEditRequestDTO">
+		<association property="store" javaType="com.integratedbookinfo.system.store.dto.StoreDTO" autoMapping="true">
+		</association>
+		<association property="account" javaType="com.integratedbookinfo.system.store.dto.AccountDTO" autoMapping="true">
+		</association>	
+	</resultMap>
+
+
+	<select id="selectStoreEditByStoreId" parameterType="String" resultMap="resultStoreEdit">
+	
+		SELECT
+			m_stores.store_id,
+		    m_stores.store_name,
+		    m_stores.email,
+		    m_stores.tel,
+		    m_stores.postal_code,
+		    m_stores.address,
+		    m_stores.opening_hours,
+		    m_stores.closed_days,
+		    m_stores.store_status,
+		    m_stores.note,
+		    user_accounts.login_id,
+		    user_accounts.password
+		FROM
+			m_stores
+		INNER JOIN
+			store_accounts
+		ON
+			m_stores.store_id = store_accounts.store_id
+		INNER JOIN
+			user_accounts
+		ON
+			store_accounts.account_id = user_accounts.account_id
+		WHERE
+			store_accounts.store_id = #{storeId};
+			
+	</select>
+
+	<select id="selectStoreDetailByStoreId" parameterType="String" resultType="com.integratedbookinfo.system.search.dto.StoreBasicInfoDTO">
+	
+		SELECT
+			store_name,
+			email,
+			tel,
+			postal_code,
+			address,
+			opening_hours,
+			closed_days,
+			store_status,
+			note	
+		FROM
+			m_stores
+		WHERE
+			store_id = #{storeId};
+	
+	</select>
+
+	<select id="selectLastStoreIdForUpdate" resultType="String">
+		SELECT
+			store_id
+		FROM
+			m_stores
+		ORDER BY store_id DESC
+		LIMIT
+			1
+		FOR UPDATE;
+	</select>
+
+	<insert id="insertStore" parameterType="com.integratedbookinfo.system.store.dto.StoreCreateRequestDTO">
+	
+		INSERT INTO
+			m_stores(
+				store_id,
+				store_name,
+				email,
+				tel,
+				postal_code,
+				address,
+				opening_hours,
+				closed_days,
+				store_status,
+				note,
+				created_at,
+				updated_at,
+				deleted_flag
+			)
+		VALUE(
+			#{storeId},
+			#{storeName},
+			#{email},
+			#{tel},
+			#{postalCode},
+			#{address},
+			#{openingHours},
+			#{closedDays},
+			#{storeStatus},
+			#{note},
+			NOW(),
+			NOW(),
+			0
+		);
+	
+	</insert>
+
+	<insert id="insertStoreAccounts">
+	
+		INSERT INTO
+			store_accounts
+		VALUE(
+			#{storeId},
+			#{accountId}
+		);
+	
+	</insert>
+
+	<update id="updateAccount">
+	
+		UPDATE
+			user_accounts
+		SET
+			login_id = #{account.loginId},
+			password = #{account.password},
+			updated_at = NOW()
+		WHERE
+			account_id = (
+				SELECT 
+					account_id
+				FROM 
+					store_accounts
+				WHERE
+					store_id = #{storeId}
+			);
+	
+	</update>
+	
+	<update id="updateStore" parameterType="com.integratedbookinfo.system.store.dto.StoreDTO">
+	
+		UPDATE
+			m_stores
+		SET
+			store_name = #{store.storeName},
+			email = #{store.email},
+			tel = #{store.tel},
+			postal_code = #{store.postalCode},
+			address = #{store.address},
+			opening_hours = #{store.openingHours},
+			closed_days = #{store.closedDays},
+			store_status = #{store.storeStatus},
+			note = #{store.note},
+			updated_at = NOW()
+		WHERE
+			store_id = #{storeId}
+	
+	</update>	
+
+	<select id="selectStoresHasUnregisteredInventories" resultType="com.integratedbookinfo.system.shared.domain.StoreOptionDTO">
+	
+		SELECT
+			DISTINCT m_stores.store_id, 
+			m_stores.store_name
+		FROM
+			m_books
+		INNER JOIN
+			store_books
+		ON
+			m_books.book_id = store_books.book_id
+		INNER JOIN
+			m_stores
+		ON
+			store_books.store_id = m_stores.store_id
+		LEFT OUTER JOIN
+			t_inventories
+		ON 
+			m_books.book_id = t_inventories.book_id
+		AND
+			store_books.store_id = t_inventories.store_id 
+		WHERE 
+			m_books.deleted_flag = 0
+		AND (
+			(
+				store_books.deleted_flag = 0
+			AND         
+				t_inventories.book_id IS NULL
+			)
+		OR
+			(
+				t_inventories.deleted_flag = 1
+			))
+		ORDER BY
+			m_stores.store_id;
+	
+	</select>
+
+</mapper>

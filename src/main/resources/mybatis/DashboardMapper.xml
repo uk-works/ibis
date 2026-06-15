@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.dashboard.DashboardMapper">
+
+	<resultMap id="allProposalResult" type="com.integratedbookinfo.system.dashboard.dto.BookEditProposalSummaryDTO">
+		<id property="proposalId" column="proposal_id" />
+		<result property="proposalStatus" column="proposal_status" />
+		<result property="bookTitle" column="book_title" />
+		<result property="storeName" column="store_name" />
+		<result property="proposedAt" column="proposed_at" />
+	</resultMap>
+
+
+	<select id="selectAdminBookEditProposalList" resultMap="allProposalResult">
+
+		SELECT 
+			proposal_id, 
+			proposal_status, 
+			book_title, 
+			store_name, 
+			proposed_at
+		FROM 
+			t_book_edit_proposals
+		INNER JOIN 
+			m_stores
+		ON 
+			t_book_edit_proposals.store_id = m_stores.store_id
+		WHERE
+			t_book_edit_proposals.deleted_flag = 0;
+
+	</select>
+
+
+
+	<resultMap id="allStoreStatusResult" type="com.integratedbookinfo.system.dashboard.dto.StoreStatusDTO">
+		<id property="storeId" column="store_id" />
+		<result property="storeName" column="store_name" />
+		<result property="storeStatus" column="store_status" />
+	</resultMap>
+
+	<select id="selectAdminStoreStatusList" resultMap="allStoreStatusResult">
+
+		<![CDATA[
+		SELECT 
+			store_id, 
+			store_name, 
+			store_status
+		FROM 
+			m_stores
+		WHERE 
+			store_status <> 'open';
+		]]>
+		
+	</select>
+
+
+
+	<resultMap id="storeProposalResult" type="com.integratedbookinfo.system.dashboard.dto.BookEditProposalSummaryDTO">
+		<id property="proposalId" column="proposal_id" />
+		<result property="bookTitle" column="book_title" />
+		<result property="storeName" column="store_name" />
+		<result property="proposedAt" column="proposed_at" />
+	</resultMap>
+
+	<select id="selectStoreBookEditProposalList" parameterType="String"  resultMap="storeProposalResult">
+
+		SELECT 
+			proposal_id, 
+			proposal_status, 
+			book_title, 
+			updated_at, 
+			proposed_at
+		FROM 
+			t_book_edit_proposals
+		WHERE 
+			deleted_flag = 0
+		AND
+			store_id = #{storeId};
+
+	</select>
+
+
+	<select id="selectStoreStoreStatus" parameterType="String" resultType="com.integratedbookinfo.system.shared.enums.StoreStatus">
+	
+		SELECT 
+			store_status
+		FROM 
+			m_stores
+		WHERE 
+			store_id = #{storeId};
+	
+	</select>
+
+</mapper>

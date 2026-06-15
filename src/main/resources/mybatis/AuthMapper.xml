@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.integratedbookinfo.system.auth.AuthMapper">
+
+	<resultMap id="loginUserResult" type="com.integratedbookinfo.system.auth.dto.LoginUserRequestDTO">
+		<id property="loginId" column="login_id" />
+		<result property="password" column="password" />
+		<result property="displayName" column="display_name" />
+		<result property="storeId" column="store_id" />
+		<result property="accountRole" column="account_role" />
+	</resultMap>
+
+
+	<select id="selectLoginUserByLoginId" parameterType="String" resultMap="loginUserResult">
+
+		SELECT  
+			user_accounts.login_id, 
+			user_accounts.password, 
+			store_accounts.store_id,
+			user_accounts.account_role, 
+			CASE 
+				WHEN user_accounts.account_role = 'admin' THEN administrators.full_name 
+				WHEN user_accounts.account_role = 'store' THEN m_stores.store_name 
+				ELSE '不明' 
+			END AS display_name 
+		FROM user_accounts 
+		LEFT JOIN administrators 
+			ON user_accounts.account_id = administrators.account_id 
+		LEFT JOIN store_accounts 
+			ON user_accounts.account_id = store_accounts.account_id 
+		LEFT JOIN m_stores 
+			ON store_accounts.store_id = m_stores.store_id 
+		WHERE login_id = #{loginId};
+	
+	</select>
+
+
+	<insert id="insertAccount"
+			parameterType="com.integratedbookinfo.system.store.dto.AccountDTO"
+			useGeneratedKeys="true"
+			keyProperty="accountId">
+	
+		INSERT INTO
+			user_accounts(
+				login_id,
+				password,
+				account_role,
+				created_at,
+				updated_at,
+				deleted_flag
+			)
+		VALUE (
+			#{loginId},
+			#{password},
+			'store',
+			NOW(),
+			NOW(),
+			0
+		);
+		
+	</insert>
+</mapper>
