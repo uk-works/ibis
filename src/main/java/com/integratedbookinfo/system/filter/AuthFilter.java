@@ -26,15 +26,11 @@ public class AuthFilter implements Filter {
 		
 		LoginUserRequestDTO loginUser = (LoginUserRequestDTO) session.getAttribute("loginUser");
 		
-		if (loginUser != null) {
+		if (session == null || loginUser == null) {
 			
-			if (loginUser.getLoginId() == null) {
-				res.sendRedirect("/auth/login");
-				return;
-			}
-		} else {
 			res.sendRedirect("/auth/login");
 			return;
+
 		}
 		
 		chain.doFilter(request, response);
