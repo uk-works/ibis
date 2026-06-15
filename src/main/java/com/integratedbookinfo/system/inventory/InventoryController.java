@@ -111,9 +111,9 @@ public class InventoryController {
 		
 		if(errors.hasErrors() || isStoreIdError || isBookIdError) {
 			
-		if(errors.hasErrors() || isStoreIdError) {
-			
-			errors.reject("error.inventory.no-available-stock");
+			if (isStoreIdError || isBookIdError) {
+				errors.reject("error.inventory.no-available-stock");
+			}
 			
 			model.addAttribute("displayName", loginUser.getDisplayName());
 			model.addAttribute("accountRole", loginUser.getAccountRole());
