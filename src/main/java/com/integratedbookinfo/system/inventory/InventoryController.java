@@ -31,7 +31,8 @@ public class InventoryController {
 
     private final AuthController authController;
 
-	private final int NUM_PER_PAGE = 2;
+	private final int NUM_PER_PAGE_ADMIN = 2;
+	private final int NUM_PER_PAGE_STORE = 10;
 	private final InventoryService inventoryService;
 
 
@@ -52,13 +53,13 @@ public class InventoryController {
 		
 		if (loginUser.getAccountRole().equals(AccountRole.ADMIN)) {
 			model.addAttribute("page", page);
-			model.addAttribute("storeInventoryResponse", inventoryService.getStoreInventoriesByKeyword(page, NUM_PER_PAGE, keyword));
-			model.addAttribute("totalPages", inventoryService.getStoreTotalPagesByKeyword(NUM_PER_PAGE, keyword));
+			model.addAttribute("storeInventoryResponse", inventoryService.getStoreInventoriesByKeyword(page, NUM_PER_PAGE_ADMIN, keyword));
+			model.addAttribute("totalPages", inventoryService.getStoreTotalPagesByKeyword(NUM_PER_PAGE_ADMIN, keyword));
 			pageName = "inventory/admin/list";
 		} else {
 			model.addAttribute("page", page);
-			model.addAttribute("storeInventoryResponse", inventoryService.getInventorySummariesByKeyword(page, NUM_PER_PAGE, loginUser.getStoreId(), keyword));
-			model.addAttribute("totalPages", inventoryService.getInventoryTotalPagesByKeyword(NUM_PER_PAGE, loginUser.getStoreId(), keyword));
+			model.addAttribute("storeInventoryResponse", inventoryService.getInventorySummariesByKeyword(page, NUM_PER_PAGE_STORE, loginUser.getStoreId(), keyword));
+			model.addAttribute("totalPages", inventoryService.getInventoryTotalPagesByKeyword(NUM_PER_PAGE_STORE, loginUser.getStoreId(), keyword));
 			pageName = "inventory/store/list";
 		}
 
