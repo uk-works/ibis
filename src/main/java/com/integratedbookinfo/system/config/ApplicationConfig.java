@@ -39,6 +39,7 @@ public class ApplicationConfig implements WebMvcConfigurer{
 		var bean = new FilterRegistrationBean<AuthFilter>(new AuthFilter());
 		bean.addUrlPatterns("/dashboard");
 		bean.addUrlPatterns("/book/*");
+		bean.addUrlPatterns("/store/edit");
 		bean.addUrlPatterns("/inventory/*");
 		return bean;
 	}
