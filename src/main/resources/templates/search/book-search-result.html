@@ -89,7 +89,7 @@
 				<tbody>
 					<tr th:each="summary : *{summaries}">
 						<td><a
-								th:href="@{/search/store/{storeId}(storeId = ${summary.storeId})}">[[${summary.storeName}]]</a>
+								th:href="@{/search/store/{storeId}(storeId = ${summary.storeId}, keyword=${keyword}, genre=${genre}, page=${page})}">[[${summary.storeName}]]</a>
 						</td>
 						<td>[[${summary.amount}]]</td>
 						<td>[[${summary.inventoryStatus.getLabel}]]</td>
